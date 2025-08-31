@@ -3,6 +3,9 @@ name: CVI Calculation and Dashboard Update
 on:
   schedule:
     - cron: '*/30 * * * *'  # Runs every 30 minutes
+  push:
+    branches:
+      - main  # Trigger workflow on pushes to the main branch
 
 jobs:
   fetch-options-data:
