@@ -31,6 +31,6 @@ jobs:
         uses: EndBug/add-and-commit@v8
         with:
           message: 'Update CVI data'
-          add: 'data/cvi.json'
+          add: 'docs/cvi.json'  # Updated path to 'docs/cvi.json'
           author_name: 'github-actions[bot]'
           author_email: 'github-actions[bot]@users.noreply.github.com'
