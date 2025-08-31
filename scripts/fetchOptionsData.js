@@ -25,6 +25,11 @@ async function fetchOptionsData() {
     // Log the raw API response for debugging
     console.log('API Response:', response.data);
 
+    if (!response.data || !response.data.result || response.data.result.length === 0) {
+      console.error('No options data available in the response');
+      return;
+    }
+
     const options = response.data.result;
     const volatilityData = options.map(option => {
       if (option.last_price && option.strike) {
