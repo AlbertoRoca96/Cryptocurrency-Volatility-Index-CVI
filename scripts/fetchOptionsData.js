@@ -4,9 +4,9 @@ const fs = require('fs');
 const moment = require('moment');
 
 // Ensure the data directory exists
-const dataDirectory = './data';
+const dataDirectory = './docs/data';  // Adjusted to match the correct folder
 if (!fs.existsSync(dataDirectory)) {
-  fs.mkdirSync(dataDirectory);
+  fs.mkdirSync(dataDirectory, { recursive: true });
 }
 
 const S = 50000; // Current spot price of Bitcoin
@@ -46,8 +46,8 @@ async function fetchOptionsData() {
 
     // Check if the data is valid before writing it to file
     if (volatilityData.length > 0) {
-      console.log('Writing to data/cvi.json:', JSON.stringify(volatilityData, null, 2));
-      fs.writeFileSync('data/cvi.json', JSON.stringify(volatilityData, null, 2));
+      console.log('Writing to docs/data/cvi.json:', JSON.stringify(volatilityData, null, 2));
+      fs.writeFileSync('docs/data/cvi.json', JSON.stringify(volatilityData, null, 2));
     } else {
       console.log('No valid options data to write.');
     }
