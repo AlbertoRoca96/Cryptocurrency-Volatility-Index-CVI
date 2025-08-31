@@ -2,7 +2,7 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every hour
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
 
 jobs:
   fetch-options-data:
