@@ -10,7 +10,7 @@
   <h1>Cryptocurrency Volatility Index (CVI)</h1>
   <canvas id="cviChart" width="400" height="200"></canvas>
   <script>
-    fetch('./data/cvi.json')  <!-- Updated path -->
+    fetch('/Cryptocurrency-Volatility-Index-CVI/data/cvi.json')  <!-- Updated path -->
       .then(response => response.json())
       .then(data => {
         const ctx = document.getElementById('cviChart').getContext('2d');
