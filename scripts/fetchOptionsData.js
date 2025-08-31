@@ -3,6 +3,12 @@ const math = require('mathjs');
 const fs = require('fs');
 const moment = require('moment');
 
+// Ensure the data directory exists
+const dataDirectory = './data';
+if (!fs.existsSync(dataDirectory)){
+    fs.mkdirSync(dataDirectory);
+}
+
 const S = 50000; // Current spot price of Bitcoin
 const r = 0.01;  // Risk-free interest rate
 const T = 30 / 365; // Time to expiration in years
@@ -25,6 +31,7 @@ async function fetchOptionsData() {
       };
     });
 
+    // Save data to 'data/cvi.json'
     fs.writeFileSync('data/cvi.json', JSON.stringify(volatilityData, null, 2));
   } catch (error) {
     console.error('Error fetching options data:', error);
