@@ -50,6 +50,10 @@ async function fetchOptionsData() {
     fs.writeFileSync('docs/cvi.json', JSON.stringify(volatilityData, null, 2));
     console.log('CVI data saved to docs/cvi.json');
 
+    // Check if the file content is correct after saving
+    const savedData = fs.readFileSync('docs/cvi.json', 'utf8');
+    console.log('Saved Data:', savedData);  // Log the content of the file
+
   } catch (error) {
     console.error('Error fetching options data:', error);
   }
