@@ -23,9 +23,18 @@ jobs:
         run: |
           npm install
 
-      - name: Fetch options docs
+      - name: Fetch options data
         run: |
-          npm run start
+          npm run start  # This will run the script to fetch the data and create/update cvi.json
+
+      - name: Check if cvi.json exists and is updated
+        run: |
+          if [ -f docs/cvi.json ]; then
+            echo "cvi.json exists, committing changes."
+          else
+            echo "cvi.json does not exist, creating file."
+            touch docs/cvi.json
+          fi
 
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v8
@@ -34,3 +43,5 @@ jobs:
           add: 'docs/cvi.json'
           author_name: 'github-actions[bot]'
           author_email: 'github-actions[bot]@users.noreply.github.com'
+          committer_name: 'github-actions[bot]'
+          committer_email: 'github-actions[bot]@users.noreply.github.com'
