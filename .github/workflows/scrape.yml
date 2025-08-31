@@ -18,11 +18,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install axios mathjs moment
+          npm install
 
       - name: Fetch options data
         run: |
-          node scripts/fetchOptionsData.js
+          npm run start
 
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v8
