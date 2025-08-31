@@ -1,0 +1,33 @@
+name: CVI Calculation and Dashboard Update
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+
+jobs:
+  fetch-options-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: |
+          npm install axios mathjs moment
+
+      - name: Fetch options data
+        run: |
+          node scripts/fetchOptionsData.js
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v8
+        with:
+          message: 'Update CVI data'
+          add: 'data/cvi.json'
+          author_name: 'github-actions[bot]'
+          author_email: 'github-actions[bot]@users.noreply.github.com'
