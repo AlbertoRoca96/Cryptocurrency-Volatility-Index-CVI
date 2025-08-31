@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cryptocurrency Volatility Index</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Cryptocurrency Volatility Index (CVI)</h1>
+  <canvas id="cviChart" width="400" height="200"></canvas>
+  <script>
+    fetch('data/cvi.json')
+      .then(response => response.json())
+      .then(data => {
+        const ctx = document.getElementById('cviChart').getContext('2d');
+        const labels = data.map(item => item.strike);
+        const ivs = data.map(item => item.implied_volatility);
+
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Implied Volatility',
+              data: ivs,
+              borderColor: 'rgba(75, 192, 192, 1)',
+              fill: false
+            }]
+          }
+        });
+      })
+      .catch(error => console.error('Error loading CVI data:', error));
+  </script>
+</body>
+</html>
