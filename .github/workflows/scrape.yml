@@ -2,42 +2,35 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes to update the CVI data
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
   push:
     branches:
-      - main  # Trigger the workflow when changes are pushed to the main branch
+      - main  # Trigger workflow on pushes to the main branch
 
 jobs:
   fetch-options-data:
-    runs-on: ubuntu-latest  # Run the job on the latest Ubuntu environment
-    
+    runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository to access the code and files
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js version 16 to run the Node.js script
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16'
 
-      # Step 3: Install dependencies by running 'npm install'
       - name: Install dependencies
         run: |
-          npm install  # Install all required dependencies from package.json
+          npm install
 
-      # Step 4: Run the Node.js script to fetch the latest options data and calculate implied volatility
       - name: Fetch options data
         run: |
-          npm run start  # This will run the fetchOptionsData.js script and generate updated cvi.json
+          npm run start
 
-      # Step 5: Commit and push the updated 'docs/cvi.json' file to GitHub repository
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v8
         with:
-          message: 'Update CVI data'  # Commit message for the change
-          add: 'docs/cvi.json'  # Ensure that the path points to the updated 'docs/cvi.json'
-          author_name: 'github-actions[bot]'  # Set author name for GitHub Actions bot
-          author_email: 'github-actions[bot]@users.noreply.github.com'  # Set author email for the bot
-
+          message: 'Update CVI data'
+          add: 'data/cvi.json'
+          author_name: 'github-actions[bot]'
+          author_email: 'github-actions[bot]@users.noreply.github.com'
