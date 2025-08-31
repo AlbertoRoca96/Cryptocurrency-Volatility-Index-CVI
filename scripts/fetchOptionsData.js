@@ -26,6 +26,8 @@ async function fetchOptionsData() {
     console.log('API Response:', response.data);
 
     const options = response.data.result;
+
+    // Check if options exist and contain valid data
     const volatilityData = options.map(option => {
       if (option.last_price && option.strike) {
         const iv = calculateImpliedVolatility(option.last_price, S, option.strike, T, r);
@@ -38,21 +40,22 @@ async function fetchOptionsData() {
           implied_volatility: iv
         };
       } else {
+        // Log the invalid data
         console.log(`Invalid data for option: ${JSON.stringify(option)}`);
         return null;  // Ignore invalid options
       }
     }).filter(item => item !== null);  // Remove invalid entries
 
     // Log the final volatility data before writing to file
-    console.log('Writing to docs/cvi.json:', JSON.stringify(volatilityData, null, 2));
+    if (volatilityData.length > 0) {
+      console.log('Writing to docs/cvi.json:', JSON.stringify(volatilityData, null, 2));
 
-    // Save the data to 'docs/cvi.json'
-    fs.writeFileSync('docs/cvi.json', JSON.stringify(volatilityData, null, 2));
-    console.log('CVI data saved to docs/cvi.json');
-
-    // Check if the file content is correct after saving
-    const savedData = fs.readFileSync('docs/cvi.json', 'utf8');
-    console.log('Saved Data:', savedData);  // Log the content of the file
+      // Save the data to 'docs/cvi.json'
+      fs.writeFileSync('docs/cvi.json', JSON.stringify(volatilityData, null, 2));
+      console.log('CVI data saved to docs/cvi.json');
+    } else {
+      console.log('No valid data to save.');
+    }
 
   } catch (error) {
     console.error('Error fetching options data:', error);
