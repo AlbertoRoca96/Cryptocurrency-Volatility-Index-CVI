@@ -33,6 +33,7 @@ function ema(arr, period){
     e = (e===null)? v : (v*k + e*(1-k)); out.push(e); }
   return out;
 }
+
 function percentile(arr, p){ 
   const a=arr.filter(Number.isFinite).slice().sort((x,y)=>x-y);
   if(!a.length) return null;
@@ -47,11 +48,13 @@ function percentile(arr, p){
    ERI     = 100 * sigma_d
 */
 const SQRT_365 = Math.sqrt(365);
+
 function lastIv(row){ 
   if (!row) return null;
   const v = Number(row.vega_weighted_iv ?? row.atm_iv);
   return isFinite(v) ? v : null;
 }
+
 function toSigmaDaily(iv){ return isFinite(iv) ? iv / SQRT_365 : null; }
 function toERI(iv){ const sd = toSigmaDaily(iv); return isFinite(sd)? 100*sd : null; }
 
