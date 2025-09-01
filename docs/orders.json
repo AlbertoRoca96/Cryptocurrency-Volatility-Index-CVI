@@ -1,28 +1,28 @@
 {
-  "generated_at": "2025-09-01T05:13:24.756Z",
+  "generated_at": "2025-09-01T05:17:16.685Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T05:13:24.755Z",
-      "last_iv": 0.02033,
-      "eri": 77,
+      "ts": "2025-09-01T05:17:16.684Z",
+      "last_iv": 0.020801,
+      "eri": 78,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "ETH",
-      "ts": "2025-09-01T05:13:24.756Z",
-      "last_iv": 0.033581,
-      "eri": 72,
+      "ts": "2025-09-01T05:17:16.685Z",
+      "last_iv": 0.034318,
+      "eri": 74,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "SOL",
-      "ts": "2025-09-01T05:13:24.756Z",
-      "last_iv": 0.857177,
+      "ts": "2025-09-01T05:17:16.685Z",
+      "last_iv": 0.857151,
       "eri": 100,
       "recommendation": "SHORT_VOL",
       "size_hint": 1,
@@ -30,12 +30,30 @@
     },
     {
       "symbol": "BNB",
-      "ts": "2025-09-01T05:13:24.756Z",
+      "ts": "2025-09-01T05:17:16.685Z",
       "last_iv": 0.46823,
       "eri": 100,
       "recommendation": "SHORT_VOL",
       "size_hint": 1,
       "reason": "IV ≥ 80th pct"
+    },
+    {
+      "symbol": "AVAX",
+      "ts": "2025-09-01T05:17:16.685Z",
+      "last_iv": 0.890823,
+      "eri": 50,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
+    },
+    {
+      "symbol": "DOGE",
+      "ts": "2025-09-01T05:17:16.685Z",
+      "last_iv": 0.954874,
+      "eri": 50,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
     }
   ]
 }
