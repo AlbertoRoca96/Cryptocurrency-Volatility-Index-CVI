@@ -1,36 +1,36 @@
 {
-  "generated_at": "2025-09-01T15:56:24.636Z",
+  "generated_at": "2025-09-01T16:29:44.797Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T15:56:24.634Z",
-      "last_iv": 0.029669,
-      "eri": 83,
-      "recommendation": "SHORT_VOL",
-      "size_hint": 0.57,
-      "reason": "IV ≥ 80th pct"
+      "ts": "2025-09-01T16:29:44.795Z",
+      "last_iv": 0.024952,
+      "eri": 70,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
     },
     {
       "symbol": "ETH",
-      "ts": "2025-09-01T15:56:24.635Z",
-      "last_iv": 0.033925,
-      "eri": 60,
+      "ts": "2025-09-01T16:29:44.796Z",
+      "last_iv": 0.03724,
+      "eri": 63,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "SOL",
-      "ts": "2025-09-01T15:56:24.635Z",
-      "last_iv": 0.855536,
-      "eri": 81,
-      "recommendation": "SHORT_VOL",
-      "size_hint": 0.53,
-      "reason": "IV ≥ 80th pct"
+      "ts": "2025-09-01T16:29:44.796Z",
+      "last_iv": 0.854755,
+      "eri": 63,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
     },
     {
       "symbol": "BNB",
-      "ts": "2025-09-01T15:56:24.635Z",
+      "ts": "2025-09-01T16:29:44.796Z",
       "last_iv": 0.468784,
       "eri": 94,
       "recommendation": "SHORT_VOL",
@@ -39,8 +39,8 @@
     },
     {
       "symbol": "AVAX",
-      "ts": "2025-09-01T15:56:24.635Z",
-      "last_iv": 0.886887,
+      "ts": "2025-09-01T16:29:44.796Z",
+      "last_iv": 0.88689,
       "eri": 0,
       "recommendation": "LONG_VOL",
       "size_hint": 1,
@@ -48,9 +48,27 @@
     },
     {
       "symbol": "DOGE",
-      "ts": "2025-09-01T15:56:24.636Z",
-      "last_iv": 0.950612,
-      "eri": 36,
+      "ts": "2025-09-01T16:29:44.796Z",
+      "last_iv": 0.9508,
+      "eri": 50,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
+    },
+    {
+      "symbol": "LINK",
+      "ts": "2025-09-01T16:29:44.797Z",
+      "last_iv": 1.18436,
+      "eri": 100,
+      "recommendation": "SHORT_VOL",
+      "size_hint": 1,
+      "reason": "IV ≥ 80th pct"
+    },
+    {
+      "symbol": "LTC",
+      "ts": "2025-09-01T16:29:44.797Z",
+      "last_iv": 0.744234,
+      "eri": 50,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
