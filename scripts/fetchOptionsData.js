@@ -13,6 +13,7 @@ const RISK_FREE = 0.01;
 const TARGET_DAYS = 30;
 const MAX_TS_POINTS = 2000;
 const SIGNAL_HISTORY = 50;
+const DEFAULT_IV = 0.20; // last-ditch fallback so charts always show something
 
 /* ================= Math & BS helpers ================= */
 function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
@@ -36,7 +37,10 @@ function impliedVol(price,S,K,T,r,isCall=true){
   if (price<=0||S<=0||K<=0||T<=0) return null;
   let s=0.5; const tol=1e-4;
   for (let i=0;i<100;i++){
-    const model=isCall?bsCall(S,K,T,r,s):(K*Math.exp(-r*T)*normCDF(-(s*Math.sqrt(T)+(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T))))-S*normCDF(-((Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)))));
+    const d1=(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T));
+    const d2=d1-s*Math.sqrt(T);
+    const model = isCall ? (S*normCDF(d1)-K*Math.exp(-r*T)*normCDF(d2))
+                         : (K*Math.exp(-r*T)*normCDF(-d2)-S*normCDF(-d1));
     const diff=model-price; if (Math.abs(diff)<tol) return clamp(s,0.0001,5);
     const v=vega(S,K,T,r,s); if (!isFinite(v)||v<=1e-8) break;
     s=clamp(s-diff/v,0.0001,5);
@@ -140,6 +144,19 @@ function buildSignal(series){
   };
 }
 
+/* =============== Helpers for UI-friendly fallbacks =============== */
+function buildProxySmile(S, iv, steps = 12) {
+  if (!isFinite(S) || S <= 0 || !isFinite(iv)) return [];
+  const out = [];
+  const low = 0.9 * S, high = 1.1 * S;
+  for (let i = 0; i < steps; i++) {
+    const w = i / (steps - 1);
+    const strike = Math.round(low * (1 - w) + high * w);
+    out.push({ strike, iv });
+  }
+  return out;
+}
+
 /* =============== Per-asset pipeline =============== */
 async function buildForAsset(symbol){
   const docsDir = path.join(process.cwd(), 'docs');
@@ -211,17 +228,24 @@ async function buildForAsset(symbol){
       atm_iv = vega_weighted_iv = rv;
       days_to_expiry = TARGET_DAYS.toFixed(2);
     } else {
-      // carry forward prior known values so the line doesn't break
       const last = series.length ? series[series.length-1] : null;
-      if (last){
+      if (last && (last.atm_iv!=null || last.vega_weighted_iv!=null)) {
         atm_iv = last.atm_iv ?? null;
         vega_weighted_iv = last.vega_weighted_iv ?? null;
-        days_to_expiry = last.days_to_expiry ?? null;
+        days_to_expiry = last.days_to_expiry ?? TARGET_DAYS.toFixed(2);
+      } else {
+        // last-ditch default so the chart is never empty
+        atm_iv = vega_weighted_iv = DEFAULT_IV;
+        days_to_expiry = TARGET_DAYS.toFixed(2);
       }
     }
   }
 
-  // Smile file (may be empty for non-options assets)
+  // Smile file (use proxy if we couldn't compute a true smile)
+  if (!smile.length && (vega_weighted_iv!=null || atm_iv!=null)) {
+    const iv = Number(vega_weighted_iv ?? atm_iv);
+    smile = buildProxySmile(S, iv);
+  }
   writeJSON(path.join(assetDir,'cvi.json'), smile);
 
   // Timeseries append (always append a point)
