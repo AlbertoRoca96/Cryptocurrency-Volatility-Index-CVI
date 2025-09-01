@@ -1,104 +1,110 @@
 // scripts/notifyEmail.js
-// Sends email notifications when a *new* signal appears for any asset.
-// Uses NodeMailer; configure via GitHub Secrets. Plays nice with your docs/ tree.
 
 const fs = require('fs');
-const path = require('path');
 const nodemailer = require('nodemailer');
+const path = require('path');
 
-// ---- Required env (set in GitHub Secrets) ----
-const EMAIL_USER = process.env.EMAIL_USER || ''; // Your email address
-const EMAIL_PASS = process.env.EMAIL_PASS || ''; // Your email app password (not the regular email password)
-const TO_EMAIL = process.env.TO_EMAIL || 'alroca308@gmail.com'; // Your email for receiving alerts
+// ---- Email configuration (GitHub secrets) ----
+const EMAIL_USER = process.env.EMAIL_USER || '';     // Your email
+const EMAIL_PASS = process.env.EMAIL_PASS || '';     // App password
+const TO_EMAIL = process.env.TO_EMAIL || '';         // The email to send alerts
 
-// ---- Optional env tuning ----
-// 'strong' (default): only non-Hold with strength >= NOTIFY_MIN_STRENGTH
-// 'non-hold'        : only recommendations != 'Hold'
-// 'all'             : every new signal, regardless of strength
-const MODE = (process.env.NOTIFY_ON || 'strong').toLowerCase();
-const MIN_STRENGTH = Math.max(0, Math.min(1, parseFloat(process.env.NOTIFY_MIN_STRENGTH || '0.5')));
+// ---- Volatility-based settings ----
+const VOLATILITY_THRESHOLD = 0.1;  // 10% price movement (can be adjusted to 20% for larger swings)
+const EMA_CROSS_THRESHOLD = 0.05;  // 5% EMA cross threshold for buy/sell signals
+const RSI_OVERBOUGHT = 70;         // Overbought RSI threshold
+const RSI_OVERSOLD = 30;           // Oversold RSI threshold
 
-// Exit quietly if not configured
-if (!EMAIL_USER || !EMAIL_PASS || !TO_EMAIL) {
-  console.log('Email disabled: missing EMAIL_* or TO_EMAIL env.');
-  process.exit(0);
-}
-
+// Email transport configuration (using Gmail here)
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // change if you're using another service
+  service: 'gmail',
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASS,
   },
 });
 
+// Read JSON data for assets, volatility, and signals
 const docsDir = path.join(process.cwd(), 'docs');
-const manifestPath = path.join(docsDir, 'cvi_manifest.json');
 const statePath = path.join(docsDir, 'notify_state.json');
+const assetManifestPath = path.join(docsDir, 'cvi_manifest.json');
 
+// Helper to read JSON safely
 function readJSON(p, fallback) {
   try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fallback; }
 }
 
-function shouldSend(rec, strength) {
-  const recLow = (rec || '').toLowerCase();
-  if (MODE === 'all') return true;
-  if (MODE === 'non-hold') return recLow !== 'hold';
-  // strong (default)
-  return recLow !== 'hold' && (Number(strength) >= MIN_STRENGTH);
+// Function to send email
+function sendEmail(subject, body) {
+  const mailOptions = {
+    from: EMAIL_USER,
+    to: TO_EMAIL,
+    subject,
+    text: body,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log('Error sending email:', error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 }
 
-(async function main(){
-  const manifest = readJSON(manifestPath, { assets: [] });
+(async function main() {
+  const manifest = readJSON(assetManifestPath, { assets: [] });
   let state = readJSON(statePath, {});
-  const messages = [];
 
-  for (const a of manifest.assets || []) {
-    const sym = a.symbol;
-    const sigPath = path.join(docsDir, sym, 'signals.json');
-    if (!fs.existsSync(sigPath)) continue;
+  for (const asset of manifest.assets || []) {
+    const sym = asset.symbol;
+    const signalPath = path.join(docsDir, sym, 'signals.json');
+    if (!fs.existsSync(signalPath)) continue;
 
-    const sigs = readJSON(sigPath, []);
-    if (!sigs.length) continue;
+    const signals = readJSON(signalPath, []);
+    if (!signals.length) continue;
 
-    const last = sigs[sigs.length - 1];
+    const lastSignal = signals[signals.length - 1];
     const lastSentTs = state[sym]?.last_ts ? new Date(state[sym].last_ts) : null;
-    const thisTs = new Date(last.ts);
+    const thisTs = new Date(lastSignal.ts);
 
-    if (lastSentTs && thisTs <= lastSentTs) continue; // already alerted
+    // Skip if already notified
+    if (lastSentTs && thisTs <= lastSentTs) continue;
 
-    if (!shouldSend(last.recommendation, last.strength)) continue;
+    let alertBody = '';
+    let alertSubject = '';
 
-    const lv = (last.last_iv != null) ? Number(last.last_iv).toFixed(4) : 'n/a';
-    const e20 = (last.ema20   != null) ? Number(last.ema20).toFixed(4)   : 'n/a';
-    const e100= (last.ema100  != null) ? Number(last.ema100).toFixed(4)  : 'n/a';
-    const size= (last.size_hint!= null) ? String(last.size_hint)         : 'n/a';
-
-    const body = `[CVI] ${sym}: ${last.recommendation} (${Math.round((last.strength||0)*100)}%) — IV:${lv} 20:${e20} 100:${e100} size:${size} @ ${new Date(last.ts).toLocaleString()}`;
-    messages.push({ sym, ts: last.ts, body });
-  }
-
-  // Send
-  for (const m of messages) {
-    const mailOptions = {
-      from: EMAIL_USER,
-      to: TO_EMAIL,
-      subject: `[CVI Alert] ${m.sym} - ${new Date(m.ts).toLocaleString()}`,
-      text: m.body,
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log(`Sent email to ${TO_EMAIL}: ${m.body}`);
-    } catch (e) {
-      console.error(`Email error (${m.sym}):`, e?.message || e);
+    // 1. Check for significant volatility (10% movement)
+    const priceChange = Math.abs(lastSignal.price_change_percent) >= VOLATILITY_THRESHOLD * 100;
+    if (priceChange) {
+      alertSubject = `${sym} Price Alert - ${lastSignal.price_change_percent}% Change`;
+      alertBody = `Significant price change detected for ${sym}: ${lastSignal.price_change_percent}%.\nPrice: ${lastSignal.price}\nTime: ${new Date(lastSignal.ts).toLocaleString()}`;
+      sendEmail(alertSubject, alertBody);
     }
 
-    state[m.sym] = { last_ts: m.ts };
+    // 2. Check for EMA cross (5% threshold for buy/sell signals)
+    const emaCross = Math.abs(lastSignal.ema20 - lastSignal.ema100) / lastSignal.ema100 >= EMA_CROSS_THRESHOLD;
+    if (emaCross) {
+      alertSubject = `${sym} EMA Crossover Alert`;
+      alertBody = `EMA crossover detected for ${sym}:\nShort-term (20-period) EMA: ${lastSignal.ema20}\nLong-term (100-period) EMA: ${lastSignal.ema100}\nTime: ${new Date(lastSignal.ts).toLocaleString()}`;
+      sendEmail(alertSubject, alertBody);
+    }
+
+    // 3. RSI Oversold/Overbought Condition
+    if (lastSignal.rsi >= RSI_OVERBOUGHT) {
+      alertSubject = `${sym} Overbought RSI Alert`;
+      alertBody = `RSI for ${sym} is above 70 (overbought). RSI: ${lastSignal.rsi}\nTime: ${new Date(lastSignal.ts).toLocaleString()}`;
+      sendEmail(alertSubject, alertBody);
+    } else if (lastSignal.rsi <= RSI_OVERSOLD) {
+      alertSubject = `${sym} Oversold RSI Alert`;
+      alertBody = `RSI for ${sym} is below 30 (oversold). RSI: ${lastSignal.rsi}\nTime: ${new Date(lastSignal.ts).toLocaleString()}`;
+      sendEmail(alertSubject, alertBody);
+    }
+
+    // Update the last notification time
+    state[sym] = { last_ts: lastSignal.ts };
   }
 
-  // Persist dedupe state
+  // Persist the deduplication state
   try { fs.writeFileSync(statePath, JSON.stringify(state, null, 2)); } catch {}
-
-  console.log(`Alerts sent: ${messages.length}`);
 })();
