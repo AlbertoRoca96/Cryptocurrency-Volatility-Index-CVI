@@ -20,21 +20,39 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Optional: create an empty manifest only if it doesn't exist yet.
-      # (My script will overwrite it later in the run.)
+      # Keep your first-run manifest bootstrap
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
 
-      - name: Set up Node.js
+      # 1) Set up Node WITHOUT cache so we can generate a lockfile if missing
+      - name: Set up Node.js (no cache, first-run friendly)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'        # speeds up installs
 
+      # 2) If there's no lockfile yet, create one from package.json (no installs)
+      - name: Create package-lock.json if missing
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      # 3) Re-run setup-node WITH cache now that a lockfile exists
+      - name: Set up Node.js (with cache)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      # 4) Install deps reproducibly if lockfile exists; fall back otherwise
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
 
       - name: Build CVI data for all assets
         run: node scripts/fetchOptionsData.js
