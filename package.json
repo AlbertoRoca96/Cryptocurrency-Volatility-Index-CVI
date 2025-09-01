@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node scripts/fetchOptionsData.js",
-    "notify": "node scripts/notifyEmail.js"   // Added a new script for email notifications
+    "notify": "node scripts/notifyEmail.js"   
   },
   "dependencies": {
     "axios": "^1.6.8",
-    "nodemailer": "^6.7.2",   // Added nodemailer for email functionality
-    "twilio": "^4.21.0"        // Keeping Twilio dependency for SMS functionality
+    "nodemailer": "^6.7.2",   
+    "twilio": "^4.21.0"       
   },
   "author": "A.R",
   "license": "MIT"
