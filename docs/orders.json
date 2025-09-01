@@ -1,55 +1,46 @@
 {
-  "generated_at": "2025-09-01T05:30:29.567Z",
+  "generated_at": "2025-09-01T05:46:50.276Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T05:30:29.566Z",
-      "last_iv": 0.012465,
-      "eri": 13,
-      "recommendation": "LONG_VOL",
-      "size_hint": 0.68,
-      "reason": "IV ≤ 20th pct"
-    },
-    {
-      "symbol": "ETH",
-      "ts": "2025-09-01T05:30:29.566Z",
-      "last_iv": 0.016084,
-      "eri": 8,
-      "recommendation": "LONG_VOL",
-      "size_hint": 0.8,
-      "reason": "IV ≤ 20th pct"
-    },
-    {
-      "symbol": "SOL",
-      "ts": "2025-09-01T05:30:29.567Z",
-      "last_iv": 0.855949,
-      "eri": 67,
-      "recommendation": "HOLD",
-      "size_hint": 0.25,
-      "reason": "mid regime"
-    },
-    {
-      "symbol": "BNB",
-      "ts": "2025-09-01T05:30:29.567Z",
-      "last_iv": 0.46823,
+      "ts": "2025-09-01T05:46:50.275Z",
+      "last_iv": 0.038109,
       "eri": 100,
       "recommendation": "SHORT_VOL",
       "size_hint": 1,
       "reason": "IV ≥ 80th pct"
     },
     {
-      "symbol": "AVAX",
-      "ts": "2025-09-01T05:30:29.567Z",
-      "last_iv": 0.890019,
-      "eri": 81,
+      "symbol": "ETH",
+      "ts": "2025-09-01T05:46:50.276Z",
+      "last_iv": 0.055857,
+      "eri": 100,
       "recommendation": "SHORT_VOL",
-      "size_hint": 0.53,
+      "size_hint": 1,
+      "reason": "IV ≥ 80th pct"
+    },
+    {
+      "symbol": "SOL",
+      "ts": "2025-09-01T05:46:50.276Z",
+      "last_iv": 0.854688,
+      "eri": 24,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
+    },
+    {
+      "symbol": "BNB",
+      "ts": "2025-09-01T05:46:50.276Z",
+      "last_iv": 0.468916,
+      "eri": 100,
+      "recommendation": "SHORT_VOL",
+      "size_hint": 1,
       "reason": "IV ≥ 80th pct"
     },
     {
       "symbol": "DOGE",
-      "ts": "2025-09-01T05:30:29.567Z",
-      "last_iv": 0.954874,
+      "ts": "2025-09-01T05:46:50.276Z",
+      "last_iv": 0.952739,
       "eri": 50,
       "recommendation": "HOLD",
       "size_hint": 0.25,
