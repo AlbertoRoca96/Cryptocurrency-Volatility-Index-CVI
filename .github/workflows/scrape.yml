@@ -17,30 +17,34 @@ jobs:
   fetch-options-data:
     runs-on: ubuntu-latest
     env:
-      # Skip noisy assets without touching code:
-      CVI_EXCLUDE: XRP,ADA,LINK,LTC
-      # (Optional) Explicitly pick a subset without code changes (e.g., "BTC,ETH,SOL")
+      # Leave blank to NOT skip any assets (your "no-skip" behavior)
+      CVI_EXCLUDE: ""
+      # Optional: explicitly include a subset (e.g., "BTC,ETH,SOL"); leave blank to use full base set
       CVI_INCLUDE: ""
-      # (Optional) CoinGecko Pro key to reduce rate-limiting (leave blank if not used)
+      # Optional: CoinGecko Pro key to reduce rate-limiting (safe to leave unset)
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Keep your first-run manifest bootstrap
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
 
-      - name: Set up Node.js (no cache)
+      # 1) Set up Node WITHOUT cache so we can generate a lockfile if missing
+      - name: Set up Node.js (no cache, first-run friendly)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # 2) If there's no lockfile yet, create one from package.json (no installs)
       - name: Create package-lock.json if missing
         if: ${{ hashFiles('package-lock.json') == '' }}
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
+      # 3) Re-run setup-node WITH cache now that a lockfile exists
       - name: Set up Node.js (with cache)
         uses: actions/setup-node@v4
         with:
@@ -48,6 +52,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
+      # 4) Install deps reproducibly if lockfile exists; fall back otherwise
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
@@ -59,9 +64,12 @@ jobs:
       - name: Build CVI data for all assets
         run: node scripts/fetchOptionsData.js
 
+      - name: Generate ERI + trade recommendations
+        run: node scripts/strategyEngine.js
+
       - name: Commit and push changes (only if there are changes)
         uses: EndBug/add-and-commit@v9
         with:
           add: docs/**
-          message: "Update CVI (multi-asset): smile + timeseries + manifest + signals + meta"
+          message: "Update CVI + ERI: smiles, timeseries, manifest, signals, risk index, orders + meta"
           default_author: github_actions
