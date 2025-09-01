@@ -13,8 +13,6 @@ const RISK_FREE = 0.01;
 const TARGET_DAYS = 30;
 const MAX_TS_POINTS = 2000;
 const SIGNAL_HISTORY = 50;
-const RV_DELAY_MS = 1200;        // pace realized-vol calls to avoid 429
-const ROUND = (x) => (x == null ? null : Math.round(x * 1e6) / 1e6);
 
 /* ================= Math & BS helpers ================= */
 function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
@@ -38,10 +36,7 @@ function impliedVol(price,S,K,T,r,isCall=true){
   if (price<=0||S<=0||K<=0||T<=0) return null;
   let s=0.5; const tol=1e-4;
   for (let i=0;i<100;i++){
-    const model=isCall?bsCall(S,K,T,r,s):(
-      K*Math.exp(-r*T)*normCDF(-( (Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)) - s*Math.sqrt(T) )) -
-      S*normCDF(-( (Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)) ))
-    );
+    const model=isCall?bsCall(S,K,T,r,s):(K*Math.exp(-r*T)*normCDF(-(s*Math.sqrt(T)+(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T))))-S*normCDF(-((Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)))));
     const diff=model-price; if (Math.abs(diff)<tol) return clamp(s,0.0001,5);
     const v=vega(S,K,T,r,s); if (!isFinite(v)||v<=1e-8) break;
     s=clamp(s-diff/v,0.0001,5);
@@ -50,28 +45,25 @@ function impliedVol(price,S,K,T,r,isCall=true){
 }
 
 /* =============== Generic helpers =============== */
-const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+const delay = (ms) => new Promise(r => setTimeout(r, ms));
 function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
 function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
 
 /* =============== Data sources =============== */
-// Batch all spot prices in one request (minimizes 429s)
-async function getSpotsUSD(symbols){
-  const ids = symbols.map(s=>COINGECKO_IDS[s]).filter(Boolean).join(',');
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`;
+async function getSpotUSD(symbol){
+  const id = COINGECKO_IDS[symbol]; if (!id) return null;
+  const url=`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`;
   const r = await axios.get(url,{timeout:15000});
-  const out = {};
-  for (const s of symbols){
-    out[s] = r?.data?.[COINGECKO_IDS[s]]?.usd ?? null;
-  }
-  return out;
+  return r?.data?.[id]?.usd ?? null;
 }
 async function getInstruments(symbol){
-  const r = await axios.get('https://www.deribit.com/api/v2/public/get_instruments',{
-    params:{currency:symbol,kind:'option'}, timeout:20000
-  });
-  return r?.data?.result ?? [];
+  try{
+    const r = await axios.get('https://www.deribit.com/api/v2/public/get_instruments',{
+      params:{currency:symbol,kind:'option'}, timeout:20000
+    });
+    return r?.data?.result ?? [];
+  }catch{ return []; }
 }
 async function getMarkOrLast(instrument_name){
   try{
@@ -82,31 +74,24 @@ async function getMarkOrLast(instrument_name){
     return isFinite(p)?p:null;
   }catch{ return null; }
 }
-// 30d realized volatility proxy (daily closes from Coingecko) + pacing
+// 30d realized volatility proxy if no options (daily closes from Coingecko)
 async function getRealizedVol30d(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   const url=`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=daily`;
   try{
     const r = await axios.get(url,{timeout:20000});
-    const prices = r?.data?.prices || []; // [ [ts, price], ... ]
+    const prices = r?.data?.prices || [];
     if (prices.length < 10) return null;
     const rets = [];
     for (let i=1;i<prices.length;i++){
-      rets.push(Math.log(prices[i][1]/prices[i-1][1]));
+      const ret = Math.log(prices[i][1]/prices[i-1][1]);
+      rets.push(ret);
     }
     const mean = rets.reduce((s,x)=>s+x,0)/rets.length;
-    const var_ = rets.reduce((s,x)=>s+(x-mean)*(x-mean),0)/(rets.length||1);
-    return Math.sqrt(var_) * Math.sqrt(365);
+    const varc = rets.reduce((s,x)=>s+(x-mean)*(x-mean),0)/rets.length;
+    const std = Math.sqrt(varc);
+    return std*Math.sqrt(365); // annualize
   }catch{ return null; }
-}
-async function getRealizedVol30dPaced(symbol){
-  // retry with pacing to dodge 429s
-  for (let i=0;i<2;i++){
-    const rv = await getRealizedVol30d(symbol);
-    if (rv!=null) return rv;
-    await sleep(RV_DELAY_MS);
-  }
-  return null;
 }
 
 /* =============== Signals =============== */
@@ -116,32 +101,38 @@ function ema(arr, period){
   return out;
 }
 function percentile(arr, p){ if(!arr.length) return null;
-  const a=[...arr].sort((x,y)=>x-y); const idx=clamp((p/100)*(a.length-1),0,a.length-1);
+  const a=[...arr].sort((x,y)=>x-y); const idx=Math.max(0, Math.min((p/100)*(a.length-1), a.length-1));
   const lo=Math.floor(idx), hi=Math.ceil(idx); if (lo===hi) return a[lo];
   const w=idx-lo; return a[lo]*(1-w)+a[hi]*w;
 }
 function buildSignal(series){
   const y = series.map(p => Number(p.vega_weighted_iv ?? p.atm_iv)).filter(x => isFinite(x));
   if (y.length < 30) return null;
+
   const fast = ema(y, 20), slow = ema(y, 100);
-  const last=y.at(-1), fLast=fast.at(-1), sLast=slow.at(-1);
-  const fPrev=fast.at(-2), sPrev=slow.at(-2);
+  const last = y[y.length-1], fLast = fast[fast.length-1], sLast = slow[slow.length-1];
+
+  const fPrev = fast[fast.length-2], sPrev = slow[slow.length-2];
   const crossedUp   = fPrev <= sPrev && fLast > sLast;
   const crossedDown = fPrev >= sPrev && fLast < sLast;
+
   const window = y.slice(-252);
   const loP = percentile(window,10), hiP = percentile(window,90);
 
-  let rec='Hold', strength=0.0, reason=[];
-  if (crossedUp){   rec='Long Volatility';  strength+=0.5; reason.push('EMA20 > EMA100 (bullish IV trend)'); }
+  let rec = 'Hold', strength = 0.0, reason = [];
+  if (crossedUp){ rec='Long Volatility'; strength+=0.5; reason.push('EMA20 > EMA100 (bullish IV trend)'); }
   if (crossedDown){ rec='Short Volatility'; strength+=0.5; reason.push('EMA20 < EMA100 (bearish IV trend)'); }
-  if (isFinite(hiP) && last>=hiP){ rec='Short Volatility'; strength+=0.6; reason.push('IV at 90th percentile'); }
-  if (isFinite(loP) && last<=loP){ rec='Long Volatility';  strength+=0.6; reason.push('IV at 10th percentile'); }
+  if (isFinite(hiP) && last >= hiP){ rec='Short Volatility'; strength+=0.6; reason.push('IV at 90th percentile'); }
+  if (isFinite(loP) && last <= loP){ rec='Long Volatility';  strength+=0.6; reason.push('IV at 10th percentile'); }
+
   strength = clamp(strength, 0, 1);
+  const sizing = Math.round( (0.5 + strength/2) * 100 )/100;
+
   return {
     ts: new Date().toISOString(),
     recommendation: rec,
     strength,
-    size_hint: Math.round((0.5 + strength/2)*100)/100,
+    size_hint: sizing,
     reason: reason.join('; '),
     last_iv: last,
     ema20: fLast,
@@ -150,20 +141,17 @@ function buildSignal(series){
 }
 
 /* =============== Per-asset pipeline =============== */
-async function buildForAsset(symbol, SMap){
+async function buildForAsset(symbol){
   const docsDir = path.join(process.cwd(), 'docs');
   const assetDir = path.join(docsDir, symbol);
   ensureDir(docsDir); ensureDir(assetDir);
 
-  const S = SMap[symbol];
+  const S = await getSpotUSD(symbol);
   if (!S){ console.log(`[${symbol}] No spot`); return null; }
-
-  const tsPath = path.join(assetDir,'cvi_timeseries.json');
-  let series = readJSON(tsPath, []);
-  const prev = series.length ? (series.at(-1).vega_weighted_iv ?? series.at(-1).atm_iv) : null;
 
   const instruments = await getInstruments(symbol);
   const now = Date.now();
+
   let smile = [], atm_iv=null, vega_weighted_iv=null, days_to_expiry=null;
 
   if (instruments.length){
@@ -191,7 +179,7 @@ async function buildForAsset(symbol, SMap){
       for (const {inst,price} of tickers){
         if (!price || price<=0) continue;
         const iv = impliedVol(price, S, inst.strike, T, RISK_FREE, true);
-        if (iv && isFinite(iv)) smile.push({ strike: inst.strike, iv: ROUND(iv) });
+        if (iv && isFinite(iv)) smile.push({ strike: inst.strike, iv });
       }
       smile.sort((a,b)=>a.strike-b.strike);
 
@@ -213,24 +201,35 @@ async function buildForAsset(symbol, SMap){
     }
   }
 
-  // Fallbacks: realized vol → previous value → skip
+  // Fallback: realized vol proxy when options missing
+  const tsPath = path.join(assetDir,'cvi_timeseries.json');
+  let series = readJSON(tsPath, []);
+
   if (atm_iv==null && vega_weighted_iv==null){
-    const rv = await getRealizedVol30dPaced(symbol);
-    if (rv!=null){ atm_iv = vega_weighted_iv = rv; days_to_expiry = TARGET_DAYS.toFixed(2); }
-    else if (prev!=null){ atm_iv = vega_weighted_iv = prev; days_to_expiry = TARGET_DAYS.toFixed(2); }
-    else { console.log(`[${symbol}] No IV and no fallback; skipping`); return null; }
+    const rv = await getRealizedVol30d(symbol);
+    if (rv!=null){
+      atm_iv = vega_weighted_iv = rv;
+      days_to_expiry = TARGET_DAYS.toFixed(2);
+    } else {
+      // carry forward last value so the chart keeps a line
+      const last = series.length ? series[series.length-1] : null;
+      if (last){
+        atm_iv = last.atm_iv ?? null;
+        vega_weighted_iv = last.vega_weighted_iv ?? null;
+        days_to_expiry = last.days_to_expiry ?? null;
+      }
+    }
   }
 
-  // Smile file (empty array is fine when no options)
+  // Smile file (may be empty for non-options assets)
   writeJSON(path.join(assetDir,'cvi.json'), smile);
 
-  // Timeseries append
+  // Timeseries append (always append a point)
   series.push({
     t: new Date().toISOString(),
-    spot: Math.round(S*100)/100,
+    spot: S,
     days_to_expiry,
-    atm_iv: ROUND(atm_iv),
-    vega_weighted_iv: ROUND(vega_weighted_iv)
+    atm_iv, vega_weighted_iv
   });
   if (series.length>MAX_TS_POINTS) series = series.slice(series.length-MAX_TS_POINTS);
   writeJSON(tsPath, series);
@@ -244,7 +243,7 @@ async function buildForAsset(symbol, SMap){
 
   return {
     symbol,
-    latest: series.at(-1),
+    latest: series[series.length-1],
     files: { smile:`/${symbol}/cvi.json`, series:`/${symbol}/cvi_timeseries.json`, signals:`/${symbol}/signals.json` }
   };
 }
@@ -253,17 +252,14 @@ async function buildForAsset(symbol, SMap){
 (async function main(){
   const docsDir = path.join(process.cwd(),'docs'); ensureDir(docsDir);
 
-  // Batch spots (1 request)
-  let spots = {};
-  try { spots = await getSpotsUSD(ASSETS); }
-  catch(e){ console.error('Spot fetch failed:', e.message); }
-
   const results = [];
   for (const sym of ASSETS){
     try{
-      const r = await buildForAsset(sym, spots);
+      const r = await buildForAsset(sym);
       if (r) results.push(r);
     }catch(e){ console.error(`[${sym}] failed:`, e.message); }
+    // small delay to be nice to public APIs (reduces 400/429s)
+    await delay(1200);
   }
 
   const manifest = { assets: results.map(r=>({ symbol:r.symbol, files:r.files, latest:r.latest })) };
