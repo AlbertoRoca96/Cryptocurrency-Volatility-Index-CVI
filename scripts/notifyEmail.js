@@ -1,5 +1,3 @@
-// scripts/notifyEmail.js
-
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const path = require('path');
@@ -10,12 +8,12 @@ const EMAIL_PASS = process.env.EMAIL_PASS || '';     // App password
 const TO_EMAIL = process.env.TO_EMAIL || '';         // The email to send alerts
 
 // ---- Volatility-based settings ----
-const VOLATILITY_THRESHOLD = 0.1;  // 10% price movement (can be adjusted to 20% for larger swings)
+const VOLATILITY_THRESHOLD = 0.1;  // 10% price movement (adjustable)
 const EMA_CROSS_THRESHOLD = 0.05;  // 5% EMA cross threshold for buy/sell signals
 const RSI_OVERBOUGHT = 70;         // Overbought RSI threshold
 const RSI_OVERSOLD = 30;           // Oversold RSI threshold
 
-// Email transport configuration (using Gmail here)
+// Email transport configuration (using Gmail)
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -31,7 +29,12 @@ const assetManifestPath = path.join(docsDir, 'cvi_manifest.json');
 
 // Helper to read JSON safely
 function readJSON(p, fallback) {
-  try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return fallback; }
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch (error) {
+    console.error(`Error reading ${p}:`, error);
+    return fallback;
+  }
 }
 
 // Function to send email
@@ -106,5 +109,9 @@ function sendEmail(subject, body) {
   }
 
   // Persist the deduplication state
-  try { fs.writeFileSync(statePath, JSON.stringify(state, null, 2)); } catch {}
+  try {
+    fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
+  } catch (error) {
+    console.error('Error persisting state:', error);
+  }
 })();
