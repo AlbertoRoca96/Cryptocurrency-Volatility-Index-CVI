@@ -1,46 +1,64 @@
 {
-  "generated_at": "2025-09-01T07:45:04.319Z",
+  "generated_at": "2025-09-01T07:57:51.747Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T07:45:04.318Z",
-      "last_iv": 0.029258,
-      "eri": 74,
+      "ts": "2025-09-01T07:57:51.745Z",
+      "last_iv": 0.023928,
+      "eri": 72,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "ETH",
-      "ts": "2025-09-01T07:45:04.318Z",
-      "last_iv": 0.051612,
-      "eri": 78,
+      "ts": "2025-09-01T07:57:51.746Z",
+      "last_iv": 0.038855,
+      "eri": 65,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "SOL",
-      "ts": "2025-09-01T07:45:04.319Z",
-      "last_iv": 0.852989,
+      "ts": "2025-09-01T07:57:51.746Z",
+      "last_iv": 0.852322,
+      "eri": 0,
+      "recommendation": "LONG_VOL",
+      "size_hint": 1,
+      "reason": "IV ≤ 20th pct"
+    },
+    {
+      "symbol": "BNB",
+      "ts": "2025-09-01T07:57:51.746Z",
+      "last_iv": 0.467801,
       "eri": 8,
       "recommendation": "LONG_VOL",
       "size_hint": 0.8,
       "reason": "IV ≤ 20th pct"
     },
     {
-      "symbol": "BNB",
-      "ts": "2025-09-01T07:45:04.319Z",
-      "last_iv": 0.467801,
-      "eri": 5,
+      "symbol": "AVAX",
+      "ts": "2025-09-01T07:57:51.747Z",
+      "last_iv": 0.887166,
+      "eri": 0,
       "recommendation": "LONG_VOL",
-      "size_hint": 0.88,
+      "size_hint": 1,
       "reason": "IV ≤ 20th pct"
     },
     {
       "symbol": "DOGE",
-      "ts": "2025-09-01T07:45:04.319Z",
-      "last_iv": 0.952739,
+      "ts": "2025-09-01T07:57:51.747Z",
+      "last_iv": 0.951298,
+      "eri": 3,
+      "recommendation": "LONG_VOL",
+      "size_hint": 0.93,
+      "reason": "IV ≤ 20th pct"
+    },
+    {
+      "symbol": "LINK",
+      "ts": "2025-09-01T07:57:51.747Z",
+      "last_iv": 0.5,
       "eri": 50,
       "recommendation": "HOLD",
       "size_hint": 0.25,
