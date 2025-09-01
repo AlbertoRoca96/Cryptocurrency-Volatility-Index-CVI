@@ -201,7 +201,7 @@ async function buildForAsset(symbol){
     }
   }
 
-  // Fallback: realized vol proxy when options missing
+  // Fallbacks / carry-forward
   const tsPath = path.join(assetDir,'cvi_timeseries.json');
   let series = readJSON(tsPath, []);
 
@@ -211,7 +211,7 @@ async function buildForAsset(symbol){
       atm_iv = vega_weighted_iv = rv;
       days_to_expiry = TARGET_DAYS.toFixed(2);
     } else {
-      // carry forward last value so the chart keeps a line
+      // carry forward prior known values so the line doesn't break
       const last = series.length ? series[series.length-1] : null;
       if (last){
         atm_iv = last.atm_iv ?? null;
