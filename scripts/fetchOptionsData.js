@@ -1,4 +1,3 @@
-// scripts/fetchOptionsData.js
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +12,6 @@ const RISK_FREE = 0.01;
 const TARGET_DAYS = 30;
 const MAX_TS_POINTS = 2000;
 const SIGNAL_HISTORY = 50;
-const DEFAULT_IV = 0.20; // last-ditch fallback so charts always show something
 
 /* ================= Math & BS helpers ================= */
 function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
@@ -37,10 +35,7 @@ function impliedVol(price,S,K,T,r,isCall=true){
   if (price<=0||S<=0||K<=0||T<=0) return null;
   let s=0.5; const tol=1e-4;
   for (let i=0;i<100;i++){
-    const d1=(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T));
-    const d2=d1-s*Math.sqrt(T);
-    const model = isCall ? (S*normCDF(d1)-K*Math.exp(-r*T)*normCDF(d2))
-                         : (K*Math.exp(-r*T)*normCDF(-d2)-S*normCDF(-d1));
+    const model=isCall?bsCall(S,K,T,r,s):(K*Math.exp(-r*T)*normCDF(-(s*Math.sqrt(T)+(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T))))-S*normCDF(-((Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)))));
     const diff=model-price; if (Math.abs(diff)<tol) return clamp(s,0.0001,5);
     const v=vega(S,K,T,r,s); if (!isFinite(v)||v<=1e-8) break;
     s=clamp(s-diff/v,0.0001,5);
@@ -78,7 +73,6 @@ async function getMarkOrLast(instrument_name){
     return isFinite(p)?p:null;
   }catch{ return null; }
 }
-// 30d realized volatility proxy if no options (daily closes from Coingecko)
 async function getRealizedVol30d(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   const url=`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=daily`;
@@ -94,7 +88,7 @@ async function getRealizedVol30d(symbol){
     const mean = rets.reduce((s,x)=>s+x,0)/rets.length;
     const varc = rets.reduce((s,x)=>s+(x-mean)*(x-mean),0)/rets.length;
     const std = Math.sqrt(varc);
-    return std*Math.sqrt(365); // annualize
+    return std*Math.sqrt(365);
   }catch{ return null; }
 }
 
@@ -112,49 +106,22 @@ function percentile(arr, p){ if(!arr.length) return null;
 function buildSignal(series){
   const y = series.map(p => Number(p.vega_weighted_iv ?? p.atm_iv)).filter(x => isFinite(x));
   if (y.length < 30) return null;
-
   const fast = ema(y, 20), slow = ema(y, 100);
   const last = y[y.length-1], fLast = fast[fast.length-1], sLast = slow[slow.length-1];
-
   const fPrev = fast[fast.length-2], sPrev = slow[slow.length-2];
   const crossedUp   = fPrev <= sPrev && fLast > sLast;
   const crossedDown = fPrev >= sPrev && fLast < sLast;
-
   const window = y.slice(-252);
   const loP = percentile(window,10), hiP = percentile(window,90);
-
   let rec = 'Hold', strength = 0.0, reason = [];
   if (crossedUp){ rec='Long Volatility'; strength+=0.5; reason.push('EMA20 > EMA100 (bullish IV trend)'); }
   if (crossedDown){ rec='Short Volatility'; strength+=0.5; reason.push('EMA20 < EMA100 (bearish IV trend)'); }
   if (isFinite(hiP) && last >= hiP){ rec='Short Volatility'; strength+=0.6; reason.push('IV at 90th percentile'); }
   if (isFinite(loP) && last <= loP){ rec='Long Volatility';  strength+=0.6; reason.push('IV at 10th percentile'); }
-
   strength = clamp(strength, 0, 1);
   const sizing = Math.round( (0.5 + strength/2) * 100 )/100;
-
-  return {
-    ts: new Date().toISOString(),
-    recommendation: rec,
-    strength,
-    size_hint: sizing,
-    reason: reason.join('; '),
-    last_iv: last,
-    ema20: fLast,
-    ema100: sLast
-  };
-}
-
-/* =============== Helpers for UI-friendly fallbacks =============== */
-function buildProxySmile(S, iv, steps = 12) {
-  if (!isFinite(S) || S <= 0 || !isFinite(iv)) return [];
-  const out = [];
-  const low = 0.9 * S, high = 1.1 * S;
-  for (let i = 0; i < steps; i++) {
-    const w = i / (steps - 1);
-    const strike = Math.round(low * (1 - w) + high * w);
-    out.push({ strike, iv });
-  }
-  return out;
+  return { ts:new Date().toISOString(), recommendation:rec, strength, size_hint:sizing,
+           reason:reason.join('; '), last_iv:last, ema20:fLast, ema100:sLast };
 }
 
 /* =============== Per-asset pipeline =============== */
@@ -189,9 +156,7 @@ async function buildForAsset(symbol){
         .filter(x=>Math.abs(x.strike/S-1)<=0.20)
         .slice(0,120);
 
-      const tickers = await Promise.all(calls.map(async inst => ({
-        inst, price: await getMarkOrLast(inst.instrument_name)
-      })));
+      const tickers = await Promise.all(calls.map(async inst => ({ inst, price: await getMarkOrLast(inst.instrument_name) })));
 
       for (const {inst,price} of tickers){
         if (!price || price<=0) continue;
@@ -203,13 +168,9 @@ async function buildForAsset(symbol){
       if (smile.length){
         const atm = smile.reduce((best,p)=>Math.abs(p.strike-S)<Math.abs(best.strike-S)?p:best, smile[0]);
         atm_iv = atm.iv;
-
         const band = smile.filter(p=>Math.abs(p.strike/S-1)<=0.10);
         if (band.length){
-          const parts = band.map(p=>{
-            const sig=p.iv, vg=vega(S,p.strike,T,RISK_FREE,sig);
-            return { w: Math.max(1e-8, vg), iv: sig };
-          });
+          const parts = band.map(p=>{ const sig=p.iv, vg=vega(S,p.strike,T,RISK_FREE,sig); return { w: Math.max(1e-8, vg), iv: sig }; });
           const wsum = parts.reduce((s,x)=>s+x.w,0);
           const ivsum = parts.reduce((s,x)=>s+x.w*x.iv,0);
           vega_weighted_iv = ivsum/wsum;
@@ -218,7 +179,6 @@ async function buildForAsset(symbol){
     }
   }
 
-  // Fallbacks / carry-forward
   const tsPath = path.join(assetDir,'cvi_timeseries.json');
   let series = readJSON(tsPath, []);
 
@@ -227,28 +187,18 @@ async function buildForAsset(symbol){
     if (rv!=null){
       atm_iv = vega_weighted_iv = rv;
       days_to_expiry = TARGET_DAYS.toFixed(2);
-    } else {
-      const last = series.length ? series[series.length-1] : null;
-      if (last && (last.atm_iv!=null || last.vega_weighted_iv!=null)) {
-        atm_iv = last.atm_iv ?? null;
-        vega_weighted_iv = last.vega_weighted_iv ?? null;
-        days_to_expiry = last.days_to_expiry ?? TARGET_DAYS.toFixed(2);
-      } else {
-        // last-ditch default so the chart is never empty
-        atm_iv = vega_weighted_iv = DEFAULT_IV;
-        days_to_expiry = TARGET_DAYS.toFixed(2);
-      }
+    } else if (series.length){
+      const last = series[series.length-1];
+      atm_iv = last.atm_iv ?? null;
+      vega_weighted_iv = last.vega_weighted_iv ?? null;
+      days_to_expiry = last.days_to_expiry ?? null;
     }
   }
 
-  // Smile file (use proxy if we couldn't compute a true smile)
-  if (!smile.length && (vega_weighted_iv!=null || atm_iv!=null)) {
-    const iv = Number(vega_weighted_iv ?? atm_iv);
-    smile = buildProxySmile(S, iv);
-  }
+  // write smile (can be empty)
   writeJSON(path.join(assetDir,'cvi.json'), smile);
 
-  // Timeseries append (always append a point)
+  // append to timeseries
   series.push({
     t: new Date().toISOString(),
     spot: S,
@@ -258,18 +208,15 @@ async function buildForAsset(symbol){
   if (series.length>MAX_TS_POINTS) series = series.slice(series.length-MAX_TS_POINTS);
   writeJSON(tsPath, series);
 
-  // Signals
+  // signals
   const sig = buildSignal(series);
   const sigPath = path.join(assetDir,'signals.json');
   let sigs = readJSON(sigPath, []);
   if (sig){ sigs.push(sig); if (sigs.length> SIGNAL_HISTORY) sigs = sigs.slice(sigs.length-SIGNAL_HISTORY); }
   writeJSON(sigPath, sigs);
 
-  return {
-    symbol,
-    latest: series[series.length-1],
-    files: { smile:`/${symbol}/cvi.json`, series:`/${symbol}/cvi_timeseries.json`, signals:`/${symbol}/signals.json` }
-  };
+  return { symbol, latest: series[series.length-1],
+           files: { smile:`/${symbol}/cvi.json`, series:`/${symbol}/cvi_timeseries.json`, signals:`/${symbol}/signals.json` } };
 }
 
 /* =============== Orchestrate all assets + manifest =============== */
@@ -282,8 +229,7 @@ async function buildForAsset(symbol){
       const r = await buildForAsset(sym);
       if (r) results.push(r);
     }catch(e){ console.error(`[${sym}] failed:`, e.message); }
-    // small delay to be nice to public APIs (reduces 400/429s)
-    await delay(1200);
+    await delay(1200); // be gentle to public APIs
   }
 
   const manifest = { assets: results.map(r=>({ symbol:r.symbol, files:r.files, latest:r.latest })) };
