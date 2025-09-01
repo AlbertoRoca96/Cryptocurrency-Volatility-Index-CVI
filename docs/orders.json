@@ -1,36 +1,36 @@
 {
-  "generated_at": "2025-09-01T05:17:16.685Z",
+  "generated_at": "2025-09-01T05:30:29.567Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T05:17:16.684Z",
-      "last_iv": 0.020801,
-      "eri": 78,
-      "recommendation": "HOLD",
-      "size_hint": 0.25,
-      "reason": "mid regime"
+      "ts": "2025-09-01T05:30:29.566Z",
+      "last_iv": 0.012465,
+      "eri": 13,
+      "recommendation": "LONG_VOL",
+      "size_hint": 0.68,
+      "reason": "IV ≤ 20th pct"
     },
     {
       "symbol": "ETH",
-      "ts": "2025-09-01T05:17:16.685Z",
-      "last_iv": 0.034318,
-      "eri": 74,
+      "ts": "2025-09-01T05:30:29.566Z",
+      "last_iv": 0.016084,
+      "eri": 8,
+      "recommendation": "LONG_VOL",
+      "size_hint": 0.8,
+      "reason": "IV ≤ 20th pct"
+    },
+    {
+      "symbol": "SOL",
+      "ts": "2025-09-01T05:30:29.567Z",
+      "last_iv": 0.855949,
+      "eri": 67,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
-      "symbol": "SOL",
-      "ts": "2025-09-01T05:17:16.685Z",
-      "last_iv": 0.857151,
-      "eri": 100,
-      "recommendation": "SHORT_VOL",
-      "size_hint": 1,
-      "reason": "IV ≥ 80th pct"
-    },
-    {
       "symbol": "BNB",
-      "ts": "2025-09-01T05:17:16.685Z",
+      "ts": "2025-09-01T05:30:29.567Z",
       "last_iv": 0.46823,
       "eri": 100,
       "recommendation": "SHORT_VOL",
@@ -39,16 +39,16 @@
     },
     {
       "symbol": "AVAX",
-      "ts": "2025-09-01T05:17:16.685Z",
-      "last_iv": 0.890823,
-      "eri": 50,
-      "recommendation": "HOLD",
-      "size_hint": 0.25,
-      "reason": "mid regime"
+      "ts": "2025-09-01T05:30:29.567Z",
+      "last_iv": 0.890019,
+      "eri": 81,
+      "recommendation": "SHORT_VOL",
+      "size_hint": 0.53,
+      "reason": "IV ≥ 80th pct"
     },
     {
       "symbol": "DOGE",
-      "ts": "2025-09-01T05:17:16.685Z",
+      "ts": "2025-09-01T05:30:29.567Z",
       "last_iv": 0.954874,
       "eri": 50,
       "recommendation": "HOLD",
