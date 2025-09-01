@@ -8,11 +8,11 @@
         "signals": "/BTC/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T11:52:25.410Z",
-        "spot": 108693,
-        "days_to_expiry": "24.84",
-        "atm_iv": 0.012900292807096748,
-        "vega_weighted_iv": 0.0288242509558647
+        "t": "2025-09-01T12:51:09.487Z",
+        "spot": 109039,
+        "days_to_expiry": "24.80",
+        "atm_iv": 0.009527563272463787,
+        "vega_weighted_iv": 0.023870883271163077
       }
     },
     {
@@ -23,11 +23,11 @@
         "signals": "/ETH/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T11:52:28.624Z",
-        "spot": 4390.39,
-        "days_to_expiry": "24.84",
-        "atm_iv": 0.0035283404817749455,
-        "vega_weighted_iv": 0.017404756685667454
+        "t": "2025-09-01T12:51:13.186Z",
+        "spot": 4402.25,
+        "days_to_expiry": "24.80",
+        "atm_iv": 0.03248441990841627,
+        "vega_weighted_iv": 0.056694768182977334
       }
     },
     {
@@ -38,11 +38,11 @@
         "signals": "/SOL/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T11:52:31.766Z",
-        "spot": 199.05,
+        "t": "2025-09-01T12:51:16.474Z",
+        "spot": 199.79,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8543506334424134,
-        "vega_weighted_iv": 0.8543506334424134
+        "atm_iv": 0.8535787627530387,
+        "vega_weighted_iv": 0.8535787627530387
       }
     },
     {
@@ -53,8 +53,8 @@
         "signals": "/BNB/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T11:52:51.035Z",
-        "spot": 852.83,
+        "t": "2025-09-01T12:51:35.664Z",
+        "spot": 852.64,
         "days_to_expiry": "30.00",
         "atm_iv": 0.4692424443995272,
         "vega_weighted_iv": 0.4692424443995272
@@ -68,26 +68,11 @@
         "signals": "/AVAX/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T11:53:35.915Z",
-        "spot": 23.73,
+        "t": "2025-09-01T12:52:20.879Z",
+        "spot": 23.84,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8872031144611937,
-        "vega_weighted_iv": 0.8872031144611937
-      }
-    },
-    {
-      "symbol": "DOGE",
-      "files": {
-        "smile": "/DOGE/cvi.json",
-        "series": "/DOGE/cvi_timeseries.json",
-        "signals": "/DOGE/signals.json"
-      },
-      "latest": {
-        "t": "2025-09-01T11:53:38.233Z",
-        "spot": 0.215704,
-        "days_to_expiry": "30.00",
-        "atm_iv": 0.9505375437126223,
-        "vega_weighted_iv": 0.9505375437126223
+        "atm_iv": 0.8878457698719818,
+        "vega_weighted_iv": 0.8878457698719818
       }
     }
   ]
