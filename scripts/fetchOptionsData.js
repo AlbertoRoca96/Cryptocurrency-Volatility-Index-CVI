@@ -1,3 +1,4 @@
+// scripts/fetchOptionsData.js
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -49,24 +50,42 @@ function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
 function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
 
+// NEW: tiny retry wrapper for axios.get (handles 429/5xx)
+async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDelay=800} = {}){
+  headers = { 'User-Agent':'cvi-bot/1.0', ...headers };
+  for (let i=0;i<=retries;i++){
+    try {
+      return await axios.get(url, { params, timeout, headers });
+    } catch (e) {
+      const s = e?.response?.status;
+      if (s===429 || (s>=500 && s<=599)) {
+        const backoff = baseDelay * Math.pow(1.7, i) + Math.random()*300;
+        await delay(backoff);
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error('max retries exceeded for '+url);
+}
+
 /* =============== Data sources =============== */
 async function getSpotUSD(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const url=`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`;
-  const r = await axios.get(url,{timeout:15000});
+  const url = `https://api.coingecko.com/api/v3/simple/price`;
+  const r = await httpGet(url, { params:{ ids:id, vs_currencies:'usd' } });
   return r?.data?.[id]?.usd ?? null;
 }
 async function getInstruments(symbol){
   try{
-    const r = await axios.get('https://www.deribit.com/api/v2/public/get_instruments',{
-      params:{currency:symbol,kind:'option'}, timeout:20000
-    });
+    const r = await httpGet('https://www.deribit.com/api/v2/public/get_instruments',
+      { params:{currency:symbol,kind:'option'}, timeout:20000 });
     return r?.data?.result ?? [];
   }catch{ return []; }
 }
 async function getMarkOrLast(instrument_name){
   try{
-    const r = await axios.get('https://www.deribit.com/api/v2/public/ticker',
+    const r = await httpGet('https://www.deribit.com/api/v2/public/ticker',
       { params:{instrument_name}, timeout:15000 });
     const t=r?.data?.result||{};
     const p = Number(t.mark_price ?? t.last_price ?? NaN);
@@ -76,9 +95,9 @@ async function getMarkOrLast(instrument_name){
 // 30d realized vol proxy if no options
 async function getRealizedVol30d(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const url=`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=daily`;
+  const url=`https://api.coingecko.com/api/v3/coins/${id}/market_chart`;
   try{
-    const r = await axios.get(url,{timeout:20000});
+    const r = await httpGet(url, { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000 });
     const prices = r?.data?.prices || [];
     if (prices.length < 10) return null;
     const rets = [];
@@ -183,6 +202,7 @@ async function buildForAsset(symbol){
   const tsPath = path.join(assetDir,'cvi_timeseries.json');
   let series = readJSON(tsPath, []);
 
+  // your original fallbacks
   if (atm_iv==null && vega_weighted_iv==null){
     const rv = await getRealizedVol30d(symbol);
     if (rv!=null){
@@ -196,8 +216,29 @@ async function buildForAsset(symbol){
     }
   }
 
+  // NEW: absolute guarantee — if still null, synthesize something sane
+  if (atm_iv==null && vega_weighted_iv==null){
+    if (smile.length){
+      // use smile median as ATM; vega-weighted from a 10% band or average
+      const median = smile[Math.floor(smile.length/2)].iv;
+      const near = smile.filter(p=>Math.abs(p.strike/S-1)<=0.10);
+      const vw = near.length
+        ? near.reduce((s,p)=>s+p.iv,0)/near.length
+        : smile.reduce((s,p)=>s+p.iv,0)/smile.length;
+      atm_iv = median; vega_weighted_iv = vw;
+      days_to_expiry = days_to_expiry ?? TARGET_DAYS.toFixed(2);
+    } else {
+      const rv2 = await getRealizedVol30d(symbol);
+      const val = (rv2!=null) ? rv2 : 0.5; // bounded default if APIs keep 429-ing
+      atm_iv = vega_weighted_iv = clamp(val, 0.05, 2.0);
+      days_to_expiry = days_to_expiry ?? TARGET_DAYS.toFixed(2);
+    }
+  }
+
+  // write smile (can be empty)
   writeJSON(path.join(assetDir,'cvi.json'), smile);
 
+  // append to timeseries
   series.push({
     t: new Date().toISOString(),
     spot: S,
@@ -207,14 +248,18 @@ async function buildForAsset(symbol){
   if (series.length>MAX_TS_POINTS) series = series.slice(series.length-MAX_TS_POINTS);
   writeJSON(tsPath, series);
 
+  // signals
   const sig = buildSignal(series);
   const sigPath = path.join(assetDir,'signals.json');
   let sigs = readJSON(sigPath, []);
   if (sig){ sigs.push(sig); if (sigs.length> SIGNAL_HISTORY) sigs = sigs.slice(sigs.length-SIGNAL_HISTORY); }
   writeJSON(sigPath, sigs);
 
-  return { symbol, latest: series[series.length-1],
-           files: { smile:`/${symbol}/cvi.json`, series:`/${symbol}/cvi_timeseries.json`, signals:`/${symbol}/signals.json` } };
+  return {
+    symbol,
+    latest: series[series.length-1],
+    files: { smile:`/${symbol}/cvi.json`, series:`/${symbol}/cvi_timeseries.json`, signals:`/${symbol}/signals.json` }
+  };
 }
 
 /* =============== Orchestrate all assets + manifest =============== */
@@ -227,7 +272,8 @@ async function buildForAsset(symbol){
       const r = await buildForAsset(sym);
       if (r) results.push(r);
     }catch(e){ console.error(`[${sym}] failed:`, e.message); }
-    await delay(2000 + Math.floor(Math.random() * 800)); // be gentle to public APIs
+    // NEW: be gentler to public APIs
+    await delay(2000 + Math.random()*1500);
   }
 
   const manifest = { assets: results.map(r=>({ symbol:r.symbol, files:r.files, latest:r.latest })) };
