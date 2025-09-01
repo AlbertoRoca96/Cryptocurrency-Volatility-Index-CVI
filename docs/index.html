@@ -4,7 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cryptocurrency Volatility Index (CVI)</title>
+
+  <!-- Chart.js + time scale adapter -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+  <!-- silence favicon 404 -->
+  <link rel="icon" href="data:,">
+
   <style>
     :root { --fg:#111; --muted:#666; --pill:#eef3ff; --pill-active:#d8e4ff; }
     * { box-sizing: border-box; }
@@ -65,7 +72,7 @@
 
     function ctxFor(canvasId){
       const el = document.getElementById(canvasId);
-      const existing = Chart.getChart(el);   // Chart.js v4 safe destroy
+      const existing = Chart.getChart(el); // Chart.js v4 safe destroy
       if (existing) existing.destroy();
       return el.getContext('2d');
     }
@@ -90,10 +97,19 @@
           maintainAspectRatio: false,
           parsing: false,
           scales: {
-            y: { title: { display:true, text:'IV' } },
-            x: { ticks: { maxTicksLimit: 10 } }
+            x: { type: 'time', time: { unit: 'minute' }, ticks: { maxTicksLimit: 8 } },
+            y: { title: { display:true, text:'IV' } }
           },
-          plugins: { legend: { position: 'top' } }
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                title: (items) => items?.length ? new Date(items[0].parsed.x).toLocaleString() : ''
+              }
+            }
+          }
         }
       });
     }
