@@ -18,16 +18,14 @@ jobs:
   fetch-options-data:
     runs-on: ubuntu-latest
     env:
-      CVI_EXCLUDE: ""              # no skip by default
-      CVI_INCLUDE: ""              # optional include list
+      CVI_EXCLUDE: ""              # No skip by default
+      CVI_INCLUDE: ""              # Optional include list (can be set for specific assets)
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
-      # Twilio / Email (store these in GitHub Secrets):
       EMAIL_USER: ${{ secrets.EMAIL_USER }}     # Your email
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}     # App password
       TO_EMAIL: ${{ secrets.TO_EMAIL }}         # Recipient email
-      # Optional alert tuning
-      NOTIFY_ON:          strong                            # strong | non-hold | all
-      NOTIFY_MIN_STRENGTH: "0.5"                            # used by strong mode
+      NOTIFY_ON: "strong"                         # strong | non-hold | all
+      NOTIFY_MIN_STRENGTH: "0.5"                  # Threshold used for "strong" mode alerts
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,7 +40,7 @@ jobs:
 
       - name: Decide CoinGecko mode based on schedule
         run: |
-          # If this run was triggered by the hourly cron ('5 * * * *'), enable CoinGecko.
+          # Enable CoinGecko only on the hourly cron ('5 * * * *') trigger
           if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "5 * * * *" ]; then
             echo "COINGECKO_MODE=on" >> "$GITHUB_ENV"
             echo "CoinGecko: ON (hourly refresh)"
