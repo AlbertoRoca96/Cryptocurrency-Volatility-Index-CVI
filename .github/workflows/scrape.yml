@@ -24,7 +24,7 @@ jobs:
       # Twilio / Email (store these in GitHub Secrets):
       EMAIL_USER: ${{ secrets.EMAIL_USER }}     # Your email
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}     # App password
-      TO_EMAIL: ${{ secrets.TO_EMAIL }}         # Your email for alerts
+      TO_EMAIL: ${{ secrets.TO_EMAIL }}         # Recipient email
       # Optional alert tuning
       NOTIFY_ON:          strong                            # strong | non-hold | all
       NOTIFY_MIN_STRENGTH: "0.5"                            # used by strong mode
