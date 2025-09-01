@@ -8,11 +8,11 @@
         "signals": "/BTC/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:52:25.285Z",
-        "spot": 108219,
-        "days_to_expiry": "25.26",
-        "atm_iv": 0.017289124058803815,
-        "vega_weighted_iv": 0.03453066606179212
+        "t": "2025-09-01T01:58:08.274Z",
+        "spot": 108059,
+        "days_to_expiry": "25.25",
+        "atm_iv": 0.018806389558998823,
+        "vega_weighted_iv": 0.03645546629315197
       }
     },
     {
@@ -23,11 +23,11 @@
         "signals": "/ETH/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:52:25.847Z",
-        "spot": 4418.1,
-        "days_to_expiry": "25.26",
-        "atm_iv": 0.027451117967082966,
-        "vega_weighted_iv": 0.05085459211574632
+        "t": "2025-09-01T01:58:09.185Z",
+        "spot": 4412.88,
+        "days_to_expiry": "25.25",
+        "atm_iv": 0.029046348959963025,
+        "vega_weighted_iv": 0.05274091676292032
       }
     },
     {
@@ -38,11 +38,11 @@
         "signals": "/SOL/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:52:26.043Z",
-        "spot": 201.64,
+        "t": "2025-09-01T01:58:09.523Z",
+        "spot": 201.17,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8523818973077089,
-        "vega_weighted_iv": 0.8523818973077089
+        "atm_iv": 0.8526147968121565,
+        "vega_weighted_iv": 0.8526147968121565
       }
     },
     {
@@ -53,11 +53,26 @@
         "signals": "/BNB/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:52:26.416Z",
-        "spot": 863.96,
-        "days_to_expiry": null,
-        "atm_iv": null,
-        "vega_weighted_iv": null
+        "t": "2025-09-01T01:58:09.904Z",
+        "spot": 863.05,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.46780429227710363,
+        "vega_weighted_iv": 0.46780429227710363
+      }
+    },
+    {
+      "symbol": "XRP",
+      "files": {
+        "smile": "/XRP/cvi.json",
+        "series": "/XRP/cvi_timeseries.json",
+        "signals": "/XRP/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T01:58:10.373Z",
+        "spot": 2.76,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.7442823546012373,
+        "vega_weighted_iv": 0.7442823546012373
       }
     }
   ]
