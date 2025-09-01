@@ -31,6 +31,7 @@ const COINGECKO_IDS = {
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || '';
 const CG_MODE   = (process.env.COINGECKO_MODE || 'off').toLowerCase();
 const CG_SAMPLE = Math.max(0, Math.min(1, parseFloat(process.env.COINGECKO_SAMPLE || '0')));
+
 function shouldUseCG(mode = CG_MODE) {
   if (mode === 'on') return true;
   if (mode === 'off') return false;
@@ -38,6 +39,7 @@ function shouldUseCG(mode = CG_MODE) {
   // 'auto' => treat as conservative (off); enable via workflow env on a schedule
   return false;
 }
+
 const USE_CG = shouldUseCG();
 const CG_BASE = COINGECKO_API_KEY
   ? 'https://pro-api.coingecko.com/api/v3'
@@ -79,7 +81,7 @@ function impliedVol(price,S,K,T,r,isCall=true){
   const tol=1e-4;
   for (let i=0;i<100;i++){
     const model = bsCall(S,K,T,r,s);
-    let diff = model - callPx;                     // <-- fixed undeclared var
+    let diff = model - callPx;
     if (Math.abs(diff) < tol) return clamp(s, 0.0001, 5);
     const v = vega(S,K,T,r,s); if (!isFinite(v) || v<=1e-8) break;
     s = clamp(s - diff/v, 0.0001, 5);
@@ -110,7 +112,7 @@ function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
 function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
 
-// simple concurrency limiter for bursty API loops
+/* ===== simple concurrency limiter for bursty API loops ===== */
 async function pMapLimit(items, limit, iter){
   const ret = new Array(items.length);
   let idx = 0;
@@ -125,7 +127,7 @@ async function pMapLimit(items, limit, iter){
 }
 
 // retrying GET (handles 429/5xx)
-async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDelay=800} = {}){
+async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDelay=800} = {}) {
   headers = { 'User-Agent':'cvi-bot/1.0', ...headers };
   for (let i=0;i<=retries;i++){
     try { return await axios.get(url, { params, timeout, headers }); }
@@ -144,33 +146,28 @@ async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDela
 
 /* =============== Data sources =============== */
 async function getSpotFromCoingecko(symbol){
-  if (!USE_CG) return null;                     // <-- quota gate
+  if (!USE_CG) return null; 
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const r = await httpGet(`${CG_BASE}/simple/price`,
-    { params:{ ids:id, vs_currencies:'usd' }, headers: CG_HEADERS });
+  const r = await httpGet(`${CG_BASE}/simple/price`, { params:{ ids:id, vs_currencies:'usd' }, headers: CG_HEADERS });
   return r?.data?.[id]?.usd ?? null;
 }
 async function getSpotFromDeribitIndex(symbol){
-  // Deribit commonly supports BTC/ETH (others may be absent).
   const idx = `${symbol.toLowerCase()}_usd`;
   try{
-    const r = await httpGet('https://www.deribit.com/api/v2/public/get_index_price',
-      { params:{ index_name:idx }, timeout:15000 });
+    const r = await httpGet('https://www.deribit.com/api/v2/public/get_index_price', { params:{ index_name:idx }, timeout:15000 });
     const px = Number(r?.data?.result?.index_price ?? NaN);
     return isFinite(px) ? px : null;
   }catch{ return null; }
 }
 async function getInstruments(symbol){
   try{
-    const r = await httpGet('https://www.deribit.com/api/v2/public/get_instruments',
-      { params:{currency:symbol, kind:'option', expired:false}, timeout:20000 });
+    const r = await httpGet('https://www.deribit.com/api/v2/public/get_instruments', { params:{currency:symbol, kind:'option', expired:false}, timeout:20000 });
     return r?.data?.result ?? [];
   }catch{ return []; }
 }
 async function getMarkOrLast(instrument_name){
   try{
-    const r = await httpGet('https://www.deribit.com/api/v2/public/ticker',
-      { params:{instrument_name}, timeout:15000 });
+    const r = await httpGet('https://www.deribit.com/api/v2/public/ticker', { params:{instrument_name}, timeout:15000 });
     const t=r?.data?.result||{};
     const p = Number(t.mark_price ?? t.last_price ?? NaN);
     return isFinite(p)?p:null;
@@ -178,11 +175,10 @@ async function getMarkOrLast(instrument_name){
 }
 // 30d realized vol proxy if no options (CoinGecko)
 async function getRealizedVol30d(symbol){
-  if (!USE_CG) return null;                     // <-- quota gate
+  if (!USE_CG) return null; 
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   try{
-    const r = await httpGet(`${CG_BASE}/coins/${id}/market_chart`,
-      { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers: CG_HEADERS });
+    const r = await httpGet(`${CG_BASE}/coins/${id}/market_chart`, { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers: CG_HEADERS });
     const prices = r?.data?.prices || [];
     if (prices.length < 10) return null;
     const rets = [];
