@@ -8,11 +8,11 @@
         "signals": "/BTC/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:58:08.274Z",
-        "spot": 108059,
+        "t": "2025-09-01T02:03:50.563Z",
+        "spot": 108114,
         "days_to_expiry": "25.25",
-        "atm_iv": 0.018806389558998823,
-        "vega_weighted_iv": 0.03645546629315197
+        "atm_iv": 0.018282446096691142,
+        "vega_weighted_iv": 0.03576990326971251
       }
     },
     {
@@ -23,11 +23,11 @@
         "signals": "/ETH/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:58:09.185Z",
-        "spot": 4412.88,
+        "t": "2025-09-01T02:03:51.095Z",
+        "spot": 4416.68,
         "days_to_expiry": "25.25",
-        "atm_iv": 0.029046348959963025,
-        "vega_weighted_iv": 0.05274091676292032
+        "atm_iv": 0.02784438286466013,
+        "vega_weighted_iv": 0.05128446796842564
       }
     },
     {
@@ -38,11 +38,11 @@
         "signals": "/SOL/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:58:09.523Z",
-        "spot": 201.17,
+        "t": "2025-09-01T02:03:51.347Z",
+        "spot": 200.99,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8526147968121565,
-        "vega_weighted_iv": 0.8526147968121565
+        "atm_iv": 0.8526952673222807,
+        "vega_weighted_iv": 0.8526952673222807
       }
     },
     {
@@ -53,26 +53,11 @@
         "signals": "/BNB/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T01:58:09.904Z",
-        "spot": 863.05,
-        "days_to_expiry": "30.00",
-        "atm_iv": 0.46780429227710363,
-        "vega_weighted_iv": 0.46780429227710363
-      }
-    },
-    {
-      "symbol": "XRP",
-      "files": {
-        "smile": "/XRP/cvi.json",
-        "series": "/XRP/cvi_timeseries.json",
-        "signals": "/XRP/signals.json"
-      },
-      "latest": {
-        "t": "2025-09-01T01:58:10.373Z",
-        "spot": 2.76,
-        "days_to_expiry": "30.00",
-        "atm_iv": 0.7442823546012373,
-        "vega_weighted_iv": 0.7442823546012373
+        "t": "2025-09-01T02:03:51.553Z",
+        "spot": 862.23,
+        "days_to_expiry": null,
+        "atm_iv": null,
+        "vega_weighted_iv": null
       }
     }
   ]
