@@ -56,6 +56,7 @@
   <script>
     let seriesChart = null, smileChart = null;
     let loadSeq = 0;
+    let manifestBySymbol = {}; // latest snapshot fallback
 
     async function json(url){
       const r = await fetch(url, { cache: 'no-store' });
@@ -76,6 +77,7 @@
 
     const nonNull = v => v!=null && isFinite(v);
     const countNonNull = arr => arr.filter(nonNull).length;
+
     function nonNullMax(arr){
       const nn = arr.filter(nonNull);
       if (!nn.length) return 0.05;
@@ -87,6 +89,7 @@
       const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat();
       const b = (smile||[]).map(p => p.iv);
       const m = Math.max(nonNullMax(a), nonNullMax(b));
+      // pad 20%, clamp into a sensible range so tiny lines remain visible
       return Math.min(Math.max(m * 1.2, 0.05), 3);
     }
 
@@ -109,16 +112,28 @@
       const n = countNonNull(atm) + countNonNull(vega);
       if (n === 0){ seriesChart = drawEmpty(ctx); return; }
 
-      const dot = n < 3 ? 3 : 0;           // << show dots if we have < 3 points
-      const showLine = n >= 2;             // no line with just one point
+      const dot = n < 3 ? 3 : 0;      // show dots if there are < 3 valid points (why your chart looked empty)
+      const showLine = n >= 2;        // only draw a line when we have at least 2 real points
 
       seriesChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels,
           datasets: [
-            { label:'CVI (ATM 30-day IV)',    data: atm,  borderWidth:2, tension:0.2, pointRadius: dot, spanGaps: true, showLine },
-            { label:'CVI (Vega-weighted IV)', data: vega, borderWidth:2, tension:0.2, pointRadius: dot, spanGaps: true, showLine }
+            {
+              label:'CVI (ATM 30-day IV)',
+              data: atm,
+              borderWidth:2, tension:0.2, spanGaps:true, showLine,
+              pointRadius: dot, hitRadius: 6, hoverRadius: 5,
+              borderColor:'rgb(54,162,235)', backgroundColor:'rgba(54,162,235,0.15)'
+            },
+            {
+              label:'CVI (Vega-weighted IV)',
+              data: vega,
+              borderWidth:2, tension:0.2, spanGaps:true, showLine,
+              pointRadius: dot, hitRadius: 6, hoverRadius: 5,
+              borderColor:'rgb(255,99,132)', backgroundColor:'rgba(255,99,132,0.15)'
+            }
           ]
         },
         options: {
@@ -133,8 +148,8 @@
           plugins: {
             legend: { position: 'top' },
             tooltip: {
-              mode: 'index',
-              intersect: false,
+              mode: 'index', intersect: false,
+              // Use safe title; don't access parsed.x when there are nulls
               callbacks: { title: (items) => (items && items[0]) ? String(items[0].label) : '' }
             }
           }
@@ -150,7 +165,12 @@
         type: 'line',
         data: {
           labels: smile.map(p=>p.strike),
-          datasets: [{ label: 'Implied Volatility', data: smile.map(p=>p.iv), borderWidth: 2, tension: 0.2, pointRadius: 0 }]
+          datasets: [{
+            label: 'Implied Volatility',
+            data: smile.map(p=>p.iv),
+            borderWidth: 2, tension: 0.2, pointRadius: 0,
+            borderColor:'rgb(54,162,235)', backgroundColor:'rgba(54,162,235,0.15)'
+          }]
         },
         options: {
           maintainAspectRatio: false,
@@ -186,31 +206,57 @@
       tbl.innerHTML = recent;
     }
 
+    function buildSyntheticSeriesFromManifest(symbol){
+      const snap = manifestBySymbol[symbol]?.latest;
+      if (!snap) return [];
+      return [{
+        t: snap.t || new Date().toISOString(),
+        spot: snap.spot ?? null,
+        days_to_expiry: snap.days_to_expiry ?? null,
+        atm_iv: snap.atm_iv ?? null,
+        vega_weighted_iv: snap.vega_weighted_iv ?? null
+      }];
+    }
+
     async function loadAsset(sym){
       const mySeq = ++loadSeq;
       setActiveTab(sym);
 
       try {
-        const [series, smile = [], sigs = []] = await Promise.all([
-          json(`${sym}/cvi_timeseries.json`),
-          json(`${sym}/cvi.json`).catch(() => []),
-          json(`${sym}/signals.json`).catch(() => [])
-        ]);
+        let series = [], smile = [], sigs = [];
+        try {
+          series = await json(`${sym}/cvi_timeseries.json`);
+        } catch { /* fall back later */ }
+        try {
+          smile = await json(`${sym}/cvi.json`);
+        } catch {}
+        try {
+          sigs = await json(`${sym}/signals.json`);
+        } catch {}
+
         if (mySeq !== loadSeq) return;
 
-        if (series?.length){
+        // Fallback: if series is missing/empty or all nulls, synthesize a one-dot series from manifest
+        const nonNullCount = (arr) => arr.reduce((n,p)=>n + (nonNull(p.atm_iv)||nonNull(p.vega_weighted_iv) ? 1 : 0), 0);
+        if (!Array.isArray(series) || !series.length || nonNullCount(series) === 0) {
+          series = buildSyntheticSeriesFromManifest(sym);
+          if (!series.length) {
+            document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
+            drawSeries([], 1); drawSmile([], 1); renderSignals([]);
+            return;
+          } else {
+            document.getElementById('runInfo').textContent = `Asset: ${sym} — showing latest snapshot (manifest).`;
+          }
+        } else {
           const last = series[series.length - 1];
           document.getElementById('runInfo').textContent =
             `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry ?? 'n/a'}d`;
-          const yMax = computeUnifiedYMax(series, smile);
-          drawSeries(series, yMax);
-          drawSmile(smile, yMax);
-        } else {
-          document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
-          drawSeries([], 1);
-          drawSmile([], 1);
         }
-        renderSignals(sigs);
+
+        const yMax = computeUnifiedYMax(series, Array.isArray(smile) ? smile : []);
+        drawSeries(series, yMax);
+        drawSmile(Array.isArray(smile) ? smile : [], yMax);
+        renderSignals(Array.isArray(sigs) ? sigs : []);
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
         ctxFor('cviSeries'); ctxFor('cviSmile');
@@ -228,7 +274,9 @@
           document.getElementById('runInfo').textContent = 'No assets available yet.';
           return;
         }
+        manifestBySymbol = {};
         manifest.assets.forEach(a => {
+          manifestBySymbol[a.symbol] = a;
           const el = document.createElement('button');
           el.className = 'tab';
           el.dataset.sym = a.symbol;
