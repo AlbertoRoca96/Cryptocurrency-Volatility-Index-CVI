@@ -7,18 +7,20 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root { --fg:#111; --muted:#666; --pill:#eef3ff; --pill-active:#d8e4ff; }
+    * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; color: var(--fg); }
     h1 { margin: 0 0 8px 0; }
-    .muted { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
-    .tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; }
-    .tab { white-space:nowrap; padding:6px 10px; border-radius:999px; background:var(--pill); cursor:pointer; font-weight:600; }
+    .muted { color: var(--muted); font-size: 12px; margin: 6px 0 14px; }
+    .tabs { display:flex; gap:8px; overflow-x:auto; padding:6px 0 10px; }
+    .tab { white-space:nowrap; padding:6px 12px; border-radius:999px; background:var(--pill); cursor:pointer; font-weight:600; border:0; }
     .tab.active { background:var(--pill-active); }
-    .layout { max-width: 1200px; }
+    .layout { max-width: 1200px; display: grid; gap: 18px; }
     .row { display:grid; grid-template-columns: 2fr 1fr; gap:16px; align-items:start; }
-    .card { border:1px solid #eee; border-radius:12px; padding:12px; }
+    .card { border:1px solid #eee; border-radius:12px; padding:12px; background:#fff; }
     .signal-title { font-weight:700; }
     .signal-meta { font-size:12px; color:#555; margin-top:4px; }
-    canvas { background:white; }
+    canvas { background:#fff; border-radius:8px; }
+    hr { border:0; border-top:1px solid #eee; margin:10px 0; }
   </style>
 </head>
 <body>
@@ -30,7 +32,7 @@
   <div class="layout">
     <div class="row">
       <div class="card">
-        <canvas id="cviSeries" height="180"></canvas>
+        <canvas id="cviSeries" height="190"></canvas>
       </div>
       <div class="card" id="signalCard">
         <div class="signal-title">Signal</div>
@@ -41,104 +43,171 @@
       </div>
     </div>
 
-    <h3 style="margin-top:28px">Volatility smile — ~30-day expiry</h3>
+    <h3 style="margin-top:4px">Volatility smile — ~30-day expiry</h3>
     <div class="card">
-      <canvas id="cviSmile" height="280"></canvas>
+      <canvas id="cviSmile" height="300"></canvas>
     </div>
   </div>
 
   <script>
-    let seriesChart=null, smileChart=null;
+    let seriesChart = null, smileChart = null;
+    let loadSeq = 0; // prevent races when switching tabs quickly
 
     async function json(url){
-      const r = await fetch(url, { cache:'no-store' });
-      if (!r.ok) throw new Error('HTTP '+r.status);
+      const r = await fetch(url, { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       return await r.json();
     }
+
     function setActiveTab(sym){
-      document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.sym===sym));
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.sym === sym));
     }
+
+    function ctxFor(canvasId){
+      const el = document.getElementById(canvasId);
+      const existing = Chart.getChart(el);   // Chart.js v4 safe destroy
+      if (existing) existing.destroy();
+      return el.getContext('2d');
+    }
+
     function drawSeries(series){
-      const ctx=document.getElementById('cviSeries').getContext('2d');
-      if (seriesChart) seriesChart.destroy();
+      const ctx = ctxFor('cviSeries');
       const labels = series.map(p => new Date(p.t));
-      const atm = series.map(p => p.atm_iv ?? null);
-      const vega= series.map(p => p.vega_weighted_iv ?? null);
-      seriesChart = new Chart(ctx,{
-        type:'line',
-        data:{ labels, datasets:[
-          { label:'CVI (ATM 30-day IV)', data:atm, borderWidth:2, tension:0.2, pointRadius:0 },
-          { label:'CVI (Vega-weighted IV)', data:vega, borderWidth:2, tension:0.2, pointRadius:0 }
-        ]},
-        options:{
-          maintainAspectRatio:false,
-          parsing:false,
-          scales:{ y:{ title:{display:true,text:'IV'} }, x:{ ticks:{ maxTicksLimit:10 } } },
-          plugins:{ legend:{ position:'top' } }
+      const atm    = series.map(p => (p.atm_iv ?? null));
+      const vega   = series.map(p => (p.vega_weighted_iv ?? null));
+      const showPoints = labels.length < 3 ? 3 : 0; // show dots until we have a few samples
+
+      seriesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label:'CVI (ATM 30-day IV)',    data: atm,  borderWidth:2, tension:0.2, pointRadius: showPoints },
+            { label:'CVI (Vega-weighted IV)', data: vega, borderWidth:2, tension:0.2, pointRadius: showPoints }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          parsing: false,
+          scales: {
+            y: { title: { display:true, text:'IV' } },
+            x: { ticks: { maxTicksLimit: 10 } }
+          },
+          plugins: { legend: { position: 'top' } }
         }
       });
     }
+
     function drawSmile(smile){
-      const ctx=document.getElementById('cviSmile').getContext('2d');
-      if (smileChart) smileChart.destroy();
-      if (!smile || !smile.length){
-        smileChart = new Chart(ctx,{ type:'line', data:{labels:[],datasets:[]}, options:{plugins:{legend:{display:false}}} });
+      const ctx = ctxFor('cviSmile');
+
+      if (!Array.isArray(smile) || !smile.length){
+        // render an empty chart (no legend) when no options/smile for the asset
+        smileChart = new Chart(ctx, {
+          type:'line',
+          data:{ labels:[], datasets:[] },
+          options:{ maintainAspectRatio:false, plugins:{ legend:{ display:false } } }
+        });
         return;
       }
-      smileChart = new Chart(ctx,{
-        type:'line',
-        data:{ labels:smile.map(p=>p.strike),
-          datasets:[{ label:'Implied Volatility', data:smile.map(p=>p.iv), borderWidth:2, tension:0.2, pointRadius:0 }]},
-        options:{ maintainAspectRatio:false,
-          scales:{ x:{ title:{ display:true, text:'Strike'}}, y:{ title:{ display:true, text:'IV'}}},
-          plugins:{ legend:{ position:'top' } }
+
+      const labels = smile.map(p => p.strike);
+      const ivs    = smile.map(p => p.iv);
+      const showPoints = labels.length < 3 ? 3 : 0;
+
+      smileChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Implied Volatility', data: ivs, borderWidth: 2, tension: 0.2, pointRadius: showPoints }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          scales: {
+            x: { title: { display: true, text: 'Strike' } },
+            y: { title: { display: true, text: 'IV' } }
+          },
+          plugins: { legend: { position: 'top' } }
         }
       });
     }
+
     function renderSignals(sigs){
-      const body=document.getElementById('signalBody');
-      const tbl=document.getElementById('signalTable');
-      if (!sigs || !sigs.length){ body.textContent='No signals yet.'; tbl.textContent=''; return; }
-      const last=sigs[sigs.length-1];
+      const body = document.getElementById('signalBody');
+      const tbl  = document.getElementById('signalTable');
+      if (!sigs || !sigs.length){
+        body.textContent = 'No signals yet (need more history).';
+        tbl.textContent = '';
+        return;
+      }
+      const last = sigs[sigs.length - 1];
       body.innerHTML = `
         <div><b>${last.recommendation}</b> — strength ${Math.round(last.strength*100)}% (size hint ${last.size_hint}x)</div>
         <div>${last.reason}</div>
         <div>IV: ${last.last_iv?.toFixed?.(4) ?? 'n/a'} | EMA20: ${last.ema20?.toFixed?.(4) ?? 'n/a'} | EMA100: ${last.ema100?.toFixed?.(4) ?? 'n/a'}</div>
-        <div>${new Date(last.ts).toLocaleString()}</div>`;
+        <div>${new Date(last.ts).toLocaleString()}</div>
+      `;
       const recent = sigs.slice(-10).reverse().map(s =>
-        `<div>• ${new Date(s.ts).toLocaleString()}: <b>${s.recommendation}</b> (${Math.round(s.strength*100)}%)</div>`).join('');
+        `<div>• ${new Date(s.ts).toLocaleString()}: <b>${s.recommendation}</b> (${Math.round(s.strength*100)}%)</div>`
+      ).join('');
       tbl.innerHTML = recent;
     }
 
     async function loadAsset(sym){
+      const mySeq = ++loadSeq;   // this call's sequence id
       setActiveTab(sym);
-      const series = await json(`${sym}/cvi_timeseries.json`);
-      const smile  = await json(`${sym}/cvi.json`).catch(()=>[]);
-      const sigs   = await json(`${sym}/signals.json`).catch(()=>[]);
-      if (series?.length){
-        const last=series[series.length-1];
-        document.getElementById('runInfo').textContent =
-          `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry}d`;
-        drawSeries(series);
-      } else {
-        document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
+
+      try {
+        const [series, smile = [], sigs = []] = await Promise.all([
+          json(`${sym}/cvi_timeseries.json`),
+          json(`${sym}/cvi.json`).catch(() => []),
+          json(`${sym}/signals.json`).catch(() => [])
+        ]);
+        if (mySeq !== loadSeq) return; // a newer tab click superseded this render
+
+        if (series?.length){
+          const last = series[series.length - 1];
+          document.getElementById('runInfo').textContent =
+            `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry ?? 'n/a'}d`;
+          drawSeries(series);
+        } else {
+          document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
+          drawSeries([]); // clears any prior chart
+        }
+        drawSmile(smile);
+        renderSignals(sigs);
+      } catch (e){
+        document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
+        // clear canvases / panels safely
+        ctxFor('cviSeries'); ctxFor('cviSmile');
+        document.getElementById('signalBody').textContent = 'No data.';
+        document.getElementById('signalTable').textContent = '';
       }
-      drawSmile(smile);
-      renderSignals(sigs);
     }
 
     (async function init(){
-      const manifest = await json('cvi_manifest.json');
-      const tabs=document.getElementById('assetTabs'); tabs.innerHTML='';
-      if (!manifest?.assets?.length){
-        document.getElementById('runInfo').textContent='No assets available yet.'; return;
+      try{
+        const manifest = await json('cvi_manifest.json'); // { assets: [{symbol, files, latest}] }
+        const tabs = document.getElementById('assetTabs');
+        tabs.innerHTML = '';
+        if (!manifest?.assets?.length){
+          document.getElementById('runInfo').textContent = 'No assets available yet.';
+          return;
+        }
+        manifest.assets.forEach(a => {
+          const el = document.createElement('button');
+          el.className = 'tab';
+          el.dataset.sym = a.symbol;
+          el.textContent = a.symbol;
+          el.onclick = () => loadAsset(a.symbol);
+          tabs.appendChild(el);
+        });
+        loadAsset(manifest.assets[0].symbol);
+      }catch{
+        document.getElementById('runInfo').textContent = 'Failed to load manifest.';
       }
-      manifest.assets.forEach(a=>{
-        const el=document.createElement('button');
-        el.className='tab'; el.dataset.sym=a.symbol; el.textContent=a.symbol;
-        el.onclick=()=>loadAsset(a.symbol); tabs.appendChild(el);
-      });
-      loadAsset(manifest.assets[0].symbol);
     })();
   </script>
 </body>
