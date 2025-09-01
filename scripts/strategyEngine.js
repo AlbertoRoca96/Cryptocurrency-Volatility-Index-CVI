@@ -1,11 +1,3 @@
-// scripts/strategyEngine.js
-//
-// Reads per-asset CVI timeseries, computes ERI + size hints,
-// emits docs/<ASSET>/risk.json and docs/<ASSET>/orders.json,
-// and writes a root docs/orders.json aggregator.
-//
-// No extra deps. Matches your existing folder structure.
-
 const fs = require('fs');
 const path = require('path');
 
