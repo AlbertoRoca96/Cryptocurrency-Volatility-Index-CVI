@@ -9,11 +9,11 @@
         "signals": "/BTC/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T19:32:17.423Z",
-        "spot": 109192,
+        "t": "2025-09-01T19:34:09.230Z",
+        "spot": 109196,
         "days_to_expiry": "24.52",
-        "atm_iv": 0.01328339322726956,
-        "vega_weighted_iv": 0.027172545123476922
+        "atm_iv": 0.013316273430964155,
+        "vega_weighted_iv": 0.02718732268549349
       }
     },
     {
@@ -25,11 +25,11 @@
         "signals": "/ETH/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T19:32:21.322Z",
-        "spot": 4352.56,
+        "t": "2025-09-01T19:34:13.570Z",
+        "spot": 4353.46,
         "days_to_expiry": "24.52",
-        "atm_iv": 0.021041932874713343,
-        "vega_weighted_iv": 0.04351229700924833
+        "atm_iv": 0.021299968483618814,
+        "vega_weighted_iv": 0.043811720492454034
       }
     },
     {
@@ -41,11 +41,11 @@
         "signals": "/SOL/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T19:32:23.609Z",
-        "spot": 199.41,
+        "t": "2025-09-01T19:34:16.883Z",
+        "spot": 199.54,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8539302126945627,
-        "vega_weighted_iv": 0.8539302126945627
+        "atm_iv": 0.8537711135611448,
+        "vega_weighted_iv": 0.8537711135611448
       }
     },
     {
@@ -57,11 +57,43 @@
         "signals": "/BNB/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T19:32:43.000Z",
-        "spot": 847.63,
+        "t": "2025-09-01T19:34:36.281Z",
+        "spot": 847.48,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.46922654513567547,
-        "vega_weighted_iv": 0.46922654513567547
+        "atm_iv": 0.4692369059787549,
+        "vega_weighted_iv": 0.4692369059787549
+      }
+    },
+    {
+      "symbol": "AVAX",
+      "files": {
+        "smile": "/AVAX/cvi.json",
+        "smile_meta": "/AVAX/smile_meta.json",
+        "series": "/AVAX/cvi_timeseries.json",
+        "signals": "/AVAX/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T19:35:22.462Z",
+        "spot": 23.48,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.8866778478604792,
+        "vega_weighted_iv": 0.8866778478604792
+      }
+    },
+    {
+      "symbol": "DOGE",
+      "files": {
+        "smile": "/DOGE/cvi.json",
+        "smile_meta": "/DOGE/smile_meta.json",
+        "series": "/DOGE/cvi_timeseries.json",
+        "signals": "/DOGE/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T19:35:41.794Z",
+        "spot": 0.21213,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.9516022792881365,
+        "vega_weighted_iv": 0.9516022792881365
       }
     }
   ]
