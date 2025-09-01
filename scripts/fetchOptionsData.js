@@ -1,104 +1,130 @@
 const axios = require('axios');
 const math = require('mathjs');
 const fs = require('fs');
-const moment = require('moment');
 
-// Ensure the docs directory exists
-const docsDirectory = './docs'; 
-if (!fs.existsSync(docsDirectory)) {
-    fs.mkdirSync(docsDirectory);
+// ---------- helpers (math) ----------
+const SQRT2 = Math.SQRT2;
+const N = (x) => 0.5 * (1 + math.erf(x / SQRT2));           // standard normal CDF
+const n = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI); // PDF
+
+function bsD1(S, K, T, r, sigma) {
+  return (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
 }
 
-const S = 50000; // Current spot price of Bitcoin
-const r = 0.01;  // Risk-free interest rate
-const T = 30 / 365; // Time to expiration in years
+function bsPrice(S, K, T, r, sigma, type) {
+  const d1 = bsD1(S, K, T, r, sigma);
+  const d2 = d1 - sigma * Math.sqrt(T);
+  if (type === 'call') return S * N(d1) - K * Math.exp(-r * T) * N(d2);
+  return K * Math.exp(-r * T) * N(-d2) - S * N(-d1); // put
+}
+
+function bsVega(S, K, T, r, sigma) {
+  const d1 = bsD1(S, K, T, r, sigma);
+  return S * Math.sqrt(T) * n(d1);
+}
+
+function impliedVol(price, S, K, T, r, type) {
+  if (!isFinite(price) || price <= 0 || !isFinite(T) || T <= 0) return null;
+
+  let sigma = 0.5;               // start guess
+  const MAX_IT = 60;
+  for (let i = 0; i < MAX_IT; i++) {
+    const model = bsPrice(S, K, T, r, sigma, type);
+    const diff = model - price;
+    if (Math.abs(diff) < 1e-4) return +sigma.toFixed(4);
+    const v = bsVega(S, K, T, r, sigma);
+    if (!isFinite(v) || v < 1e-8) break;    // avoid blowing up
+    sigma = Math.max(0.0001, Math.min(5, sigma - diff / v)); // NR step with clamping
+  }
+  return +sigma.toFixed(4);
+}
+
+// ---------- config ----------
+const BASE = 'https://www.deribit.com/api/v2';
+const DOCS_PATH = './docs/cvi.json';
+const RISK_FREE = 0.01;
+
+// ensure docs folder exists
+if (!fs.existsSync('./docs')) fs.mkdirSync('./docs', { recursive: true });
+
+async function getSpot() {
+  const { data } = await axios.get(`${BASE}/public/get_index_price`, { params: { index_name: 'btc_usd' } });
+  return data?.result?.index_price;
+}
+
+async function getActiveOptions() {
+  const { data } = await axios.get(`${BASE}/public/get_instruments`, {
+    params: { currency: 'BTC', kind: 'option', expired: false },
+  });
+  return (data?.result || []).filter(o => o.is_active);
+}
+
+async function getTicker(instrument_name) {
+  const { data } = await axios.get(`${BASE}/public/ticker`, { params: { instrument_name } });
+  const t = data?.result || {};
+  // robust option price: mark -> mid(bid/ask) -> last
+  if (isFinite(t.mark_price)) return t.mark_price;
+  if (isFinite(t.best_bid_price) && isFinite(t.best_ask_price))
+    return (t.best_bid_price + t.best_ask_price) / 2;
+  if (isFinite(t.last_price)) return t.last_price;
+  return null;
+}
+
+function yearsToExpiry(expiration_ms) {
+  const ms = Math.max(0, expiration_ms - Date.now());
+  return ms / (365 * 24 * 60 * 60 * 1000);
+}
 
 async function fetchOptionsData() {
   try {
-    const response = await axios.get('https://www.deribit.com/api/v2/public/get_instruments', {
-      params: {
-        currency: 'BTC',
-        kind: 'option'
-      }
-    });
-
-    // Log the raw API response for debugging
-    console.log('API Response:', response.data);
-
-    if (!response.data || !response.data.result || response.data.result.length === 0) {
-      console.error('No options data available in the response');
+    const S = await getSpot();
+    if (!isFinite(S)) {
+      console.error('Spot price unavailable; aborting.');
       return;
     }
 
-    const options = response.data.result;
-
-    // Check for valid data (ensure last_price and strike exist)
-    const volatilityData = options.map(option => {
-      if (option.last_price && option.strike) {
-        const iv = calculateImpliedVolatility(option.last_price, S, option.strike, T, r);
-
-        // Log the strike, last price, and implied volatility for debugging
-        console.log(`Strike: ${option.strike}, Last Price: ${option.last_price}, IV: ${iv}`);
-
-        return {
-          strike: option.strike,
-          implied_volatility: iv
-        };
-      } else {
-        console.log(`Invalid data for option: ${JSON.stringify(option)}`);
-        return null;  // Ignore invalid options
-      }
-    }).filter(item => item !== null);  // Remove invalid entries
-
-    // If there is valid data, write it to the file
-    if (volatilityData.length > 0) {
-      console.log('Writing to docs/cvi.json:', JSON.stringify(volatilityData, null, 2));
-
-      // Overwrite the file with the new data
-      fs.writeFileSync('docs/cvi.json', JSON.stringify(volatilityData, null, 2));
-      console.log('CVI data saved to docs/cvi.json');
-    } else {
-      console.log('No valid data to save.');
+    const options = await getActiveOptions();
+    if (!options.length) {
+      console.error('No active options returned.');
+      return;
     }
 
-  } catch (error) {
-    console.error('Error fetching options data:', error);
+    // pick a focused set: near-the-money, soonest expiries
+    const candidates = options
+      .sort((a, b) => Math.abs(a.strike - S) - Math.abs(b.strike - S) || a.expiration_timestamp - b.expiration_timestamp)
+      .slice(0, 60); // limit requests
+
+    const rows = [];
+    for (const opt of candidates) {
+      const price = await getTicker(opt.instrument_name);
+      const T = yearsToExpiry(opt.expiration_timestamp);
+      const type = opt.option_type === 'put' ? 'put' : 'call';
+
+      if (!isFinite(price) || price <= 0 || T <= 0) continue;
+
+      const iv = impliedVol(price, S, opt.strike, T, RISK_FREE, type);
+      if (iv !== null && isFinite(iv)) {
+        rows.push({
+          instrument: opt.instrument_name,
+          option_type: type,
+          strike: opt.strike,
+          expiration: opt.expiration_timestamp,
+          spot: +S,
+          option_price: +price,
+          implied_volatility: iv
+        });
+      }
+    }
+
+    // sort by strike for a clean chart
+    rows.sort((a, b) => a.strike - b.strike);
+
+    // write file (creates if missing, overwrites if present)
+    fs.writeFileSync(DOCS_PATH, JSON.stringify(rows, null, 2));
+    console.log(`Saved ${rows.length} IV points -> ${DOCS_PATH}`);
+  } catch (err) {
+    console.error('Fatal error building CVI:', err?.response?.data || err);
   }
 }
 
-// Function to calculate implied volatility using Black-Scholes model
-function calculateImpliedVolatility(optionPrice, S, K, T, r) {
-  let sigma = 0.2;  // Initial guess
-  const tolerance = 0.0001;
-  let price = 0;
-  let diff = 1;  // Initial difference to start the loop
-  let iterations = 0;
-  const maxIterations = 100;
-
-  // Loop until convergence or max iterations
-  while (diff > tolerance && iterations < maxIterations) {
-    price = blackScholesCallPrice(S, K, T, r, sigma);
-    diff = Math.abs(optionPrice - price);
-    sigma += 0.001; // Increment sigma by a small value
-    iterations++;
-  }
-
-  // Warn if the iteration limit is reached without convergence
-  if (iterations === maxIterations) {
-    console.warn(`Implied volatility calculation did not converge for option price ${optionPrice}`);
-  }
-
-  return sigma;
-}
-
-// Black-Scholes formula for call option price
-function blackScholesCallPrice(S, K, T, r, sigma) {
-  const d1 = (math.log(S / K) + (r + 0.5 * math.pow(sigma, 2)) * T) / (sigma * math.sqrt(T));
-  const d2 = d1 - sigma * math.sqrt(T);
-
-  // Ensure math.cdf() is available or use an alternative for the CDF calculation
-  return S * math.cdf(d1) - K * math.exp(-r * T) * math.cdf(d2);
-}
-
-// Run the function to fetch and process data
 fetchOptionsData();
