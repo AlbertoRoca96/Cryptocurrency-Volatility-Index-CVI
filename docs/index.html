@@ -7,8 +7,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-
-  <!-- silence favicon 404 -->
   <link rel="icon" href="data:,">
 
   <style>
@@ -38,7 +36,6 @@
   <div class="layout">
     <div class="row">
       <div class="card">
-        <!-- SAME HEIGHT for both charts -->
         <canvas id="cviSeries" height="260"></canvas>
       </div>
       <div class="card" id="signalCard">
@@ -52,14 +49,13 @@
 
     <h3 style="margin-top:4px">Volatility smile — ~30-day expiry</h3>
     <div class="card">
-      <!-- SAME HEIGHT for both charts -->
       <canvas id="cviSmile" height="260"></canvas>
     </div>
   </div>
 
   <script>
     let seriesChart = null, smileChart = null;
-    let loadSeq = 0; // prevent races when switching tabs quickly
+    let loadSeq = 0;
 
     async function json(url){
       const r = await fetch(url, { cache: 'no-store' });
@@ -78,36 +74,20 @@
       return el.getContext('2d');
     }
 
+    const nonNull = v => v!=null && isFinite(v);
+    const countNonNull = arr => arr.filter(nonNull).length;
     function nonNullMax(arr){
-      const nn = arr.filter(v => v != null && isFinite(v));
-      if (!nn.length) return 1;
+      const nn = arr.filter(nonNull);
+      if (!nn.length) return 0.05;
       const m = Math.max(...nn);
-      return m > 0 ? m : 1;
-    }
-
-    // Build a flat proxy smile around spot when no smile file is available
-    function proxySmileFromSeries(series) {
-      if (!series?.length) return [];
-      const last = series[series.length - 1];
-      const iv = Number(last.vega_weighted_iv ?? last.atm_iv);
-      const S  = Number(last.spot);
-      if (!isFinite(iv) || !isFinite(S) || S <= 0) return [];
-      const points = [];
-      const steps = 12;
-      const low = 0.9 * S, high = 1.1 * S;
-      for (let i = 0; i < steps; i++) {
-        const w = i / (steps - 1);
-        const strike = Math.round(low * (1 - w) + high * w);
-        points.push({ strike, iv });
-      }
-      return points;
+      return Math.max(0.05, m);
     }
 
     function computeUnifiedYMax(series, smile){
-      const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat().filter(v => v!=null && isFinite(v));
-      const b = (smile||[]).map(p => p.iv).filter(v => v!=null && isFinite(v));
-      const m = Math.max(0.0001, ...(a.length? [Math.max(...a)] : [0.0001]), ...(b.length? [Math.max(...b)] : [0.0001]));
-      return Math.min(Math.max(m * 1.2, 0.05), 3); // pad 20%, clamp to keep readable
+      const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat();
+      const b = (smile||[]).map(p => p.iv);
+      const m = Math.max(nonNullMax(a), nonNullMax(b));
+      return Math.min(Math.max(m * 1.2, 0.05), 3);
     }
 
     function drawEmpty(ctx){
@@ -123,18 +103,22 @@
       if (!series || !series.length){ seriesChart = drawEmpty(ctx); return; }
 
       const labels = series.map(p => new Date(p.t));
-      const atm  = series.map(p => (p.atm_iv ?? null));
-      const vega = series.map(p => (p.vega_weighted_iv ?? null));
-      const haveData = atm.some(v=>v!=null) || vega.some(v=>v!=null);
-      if (!haveData){ seriesChart = drawEmpty(ctx); return; }
+      const atm  = series.map(p => (nonNull(p.atm_iv) ? +p.atm_iv : null));
+      const vega = series.map(p => (nonNull(p.vega_weighted_iv) ? +p.vega_weighted_iv : null));
+
+      const n = countNonNull(atm) + countNonNull(vega);
+      if (n === 0){ seriesChart = drawEmpty(ctx); return; }
+
+      const dot = n < 3 ? 3 : 0;           // << show dots if we have < 3 points
+      const showLine = n >= 2;             // no line with just one point
 
       seriesChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels,
           datasets: [
-            { label:'CVI (ATM 30-day IV)',    data: atm,  borderWidth:2, tension:0.2, pointRadius: 0, spanGaps: true },
-            { label:'CVI (Vega-weighted IV)', data: vega, borderWidth:2, tension:0.2, pointRadius: 0, spanGaps: true }
+            { label:'CVI (ATM 30-day IV)',    data: atm,  borderWidth:2, tension:0.2, pointRadius: dot, spanGaps: true, showLine },
+            { label:'CVI (Vega-weighted IV)', data: vega, borderWidth:2, tension:0.2, pointRadius: dot, spanGaps: true, showLine }
           ]
         },
         options: {
@@ -207,31 +191,29 @@
       setActiveTab(sym);
 
       try {
-        const [series, smileRaw = [], sigs = []] = await Promise.all([
+        const [series, smile = [], sigs = []] = await Promise.all([
           json(`${sym}/cvi_timeseries.json`),
           json(`${sym}/cvi.json`).catch(() => []),
           json(`${sym}/signals.json`).catch(() => [])
         ]);
         if (mySeq !== loadSeq) return;
 
-        // Build proxy smile if we didn't get one from the file
-        const smile = (smileRaw && smileRaw.length) ? smileRaw : proxySmileFromSeries(series);
-        const yMax = computeUnifiedYMax(series, smile);
-
         if (series?.length){
           const last = series[series.length - 1];
           document.getElementById('runInfo').textContent =
             `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry ?? 'n/a'}d`;
+          const yMax = computeUnifiedYMax(series, smile);
           drawSeries(series, yMax);
+          drawSmile(smile, yMax);
         } else {
           document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
-          drawSeries([], yMax);
+          drawSeries([], 1);
+          drawSmile([], 1);
         }
-        drawSmile(smile, yMax);
         renderSignals(sigs);
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
-        ctxFor('cviSeries'); ctxFor('cviSmile'); // clear
+        ctxFor('cviSeries'); ctxFor('cviSmile');
         document.getElementById('signalBody').textContent = 'No data.';
         document.getElementById('signalTable').textContent = '';
       }
