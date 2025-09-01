@@ -85,6 +85,14 @@
       return m > 0 ? m : 1;
     }
 
+    function computeUnifiedYMax(series, smile){
+      const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat().filter(v => v!=null && isFinite(v));
+      const b = (smile||[]).map(p => p.iv).filter(v => v!=null && isFinite(v));
+      const m = Math.max(0.0001, ...(a.length? [Math.max(...a)] : [0.0001]), ...(b.length? [Math.max(...b)] : [0.0001]));
+      // pad 20%, clamp to [0.05, 3] to keep the axis readable
+      return Math.min(Math.max(m * 1.2, 0.05), 3);
+    }
+
     function drawEmpty(ctx){
       return new Chart(ctx, {
         type: 'line',
@@ -93,20 +101,15 @@
       });
     }
 
-    function drawSeries(series){
+    function drawSeries(series, yMax){
       const ctx = ctxFor('cviSeries');
-      if (!series || !series.length){
-        seriesChart = drawEmpty(ctx);
-        return;
-      }
+      if (!series || !series.length){ seriesChart = drawEmpty(ctx); return; }
 
       const labels = series.map(p => new Date(p.t));
       const atm  = series.map(p => (p.atm_iv ?? null));
       const vega = series.map(p => (p.vega_weighted_iv ?? null));
       const haveData = atm.some(v=>v!=null) || vega.some(v=>v!=null);
       if (!haveData){ seriesChart = drawEmpty(ctx); return; }
-
-      const ymax = nonNullMax([...atm, ...vega]) * 1.2;
 
       seriesChart = new Chart(ctx, {
         type: 'line',
@@ -124,40 +127,30 @@
           animation: false,
           scales: {
             x: { type: 'time', time: { unit: 'minute' }, ticks: { maxTicksLimit: 8 } },
-            y: { min: 0, suggestedMax: ymax, title: { display:true, text:'IV' } }
+            y: { min: 0, suggestedMax: yMax, title: { display:true, text:'IV' } }
           },
           plugins: {
             legend: { position: 'top' },
             tooltip: {
               mode: 'index',
               intersect: false,
-              callbacks: {
-                // use label safely instead of parsed.x (avoids null crash)
-                title: (items) => (items && items[0]) ? String(items[0].label) : ''
-              }
+              // Avoid parsed.x when data points are null
+              callbacks: { title: (items) => (items && items[0]) ? String(items[0].label) : '' }
             }
           }
         }
       });
     }
 
-    function drawSmile(smile){
+    function drawSmile(smile, yMax){
       const ctx = ctxFor('cviSmile');
-
-      if (!Array.isArray(smile) || !smile.length){
-        smileChart = drawEmpty(ctx);
-        return;
-      }
-
-      const labels = smile.map(p => p.strike);
-      const ivs    = smile.map(p => p.iv);
-      const ymax   = nonNullMax(ivs) * 1.2;
+      if (!Array.isArray(smile) || !smile.length){ smileChart = drawEmpty(ctx); return; }
 
       smileChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels,
-          datasets: [{ label: 'Implied Volatility', data: ivs, borderWidth: 2, tension: 0.2, pointRadius: 0 }]
+          labels: smile.map(p=>p.strike),
+          datasets: [{ label: 'Implied Volatility', data: smile.map(p=>p.iv), borderWidth: 2, tension: 0.2, pointRadius: 0 }]
         },
         options: {
           maintainAspectRatio: false,
@@ -165,7 +158,7 @@
           animation: false,
           scales: {
             x: { title: { display: true, text: 'Strike' } },
-            y: { min: 0, suggestedMax: ymax, title: { display: true, text: 'IV' } }
+            y: { min: 0, suggestedMax: yMax, title: { display: true, text: 'IV' } }
           },
           plugins: { legend: { position: 'top' } }
         }
@@ -209,12 +202,14 @@
           const last = series[series.length - 1];
           document.getElementById('runInfo').textContent =
             `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry ?? 'n/a'}d`;
-          drawSeries(series);
+          const yMax = computeUnifiedYMax(series, smile);
+          drawSeries(series, yMax);
+          drawSmile(smile, yMax);
         } else {
           document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
-          drawSeries([]);
+          drawSeries([], 1);
+          drawSmile([], 1);
         }
-        drawSmile(smile);
         renderSignals(sigs);
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
