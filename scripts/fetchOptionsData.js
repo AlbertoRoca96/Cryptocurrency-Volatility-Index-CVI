@@ -4,7 +4,18 @@ const fs = require('fs');
 const path = require('path');
 
 /* ================= Settings ================= */
-const ASSETS = ['BTC','ETH','SOL','BNB','XRP','ADA','AVAX','DOGE','LINK','LTC'];
+// Which assets to try by default
+const BASE_ASSETS = ['BTC','ETH','SOL','BNB','XRP','ADA','AVAX','DOGE','LINK','LTC'];
+
+// Optional exclude list (comma-separated), e.g. "XRP,ADA,LINK,LTC"
+const EXCLUDE = (process.env.CVI_EXCLUDE || '')
+  .split(',')
+  .map(s => s.trim().toUpperCase())
+  .filter(Boolean);
+
+// Final asset list for this run
+const ASSETS = BASE_ASSETS.filter(s => !EXCLUDE.includes(s));
+
 const COINGECKO_IDS = {
   BTC:'bitcoin', ETH:'ethereum', SOL:'solana', BNB:'binancecoin', XRP:'ripple',
   ADA:'cardano', AVAX:'avalanche-2', DOGE:'dogecoin', LINK:'chainlink', LTC:'litecoin'
@@ -46,7 +57,7 @@ function impliedVol(price,S,K,T,r,isCall=true){
   return null;
 }
 
-/* ===== parity + synthetic helpers (NEW) ===== */
+/* ===== parity + synthetic helpers ===== */
 function callFromPut(putPrice, S, K, T, r) {
   // C - P = S - K e^{-rT}  =>  C = P + S - K e^{-rT}
   return putPrice + S - K * Math.exp(-r * T);
@@ -70,7 +81,7 @@ function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
 function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
 
-// tiny retry wrapper for axios.get (429/5xx) — NEW
+// tiny retry wrapper for axios.get (429/5xx)
 async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDelay=800} = {}){
   headers = { 'User-Agent':'cvi-bot/1.0', ...headers };
   for (let i=0;i<=retries;i++){
@@ -190,7 +201,7 @@ async function buildForAsset(symbol){
       days_to_expiry = ((tgt-now)/86400000).toFixed(2);
       const T = (tgt-now)/(365*24*3600*1000);
 
-      /* ===== widened selection + puts + parity fallback (NEW) ===== */
+      /* ===== widened selection + puts + parity fallback ===== */
       const rawAtT = instruments
         .filter(x => x.expiration_timestamp === tgt && x.is_active)
         .filter(x => Math.abs(x.strike / S - 1) <= 0.40); // widen to ±40%
@@ -260,7 +271,7 @@ async function buildForAsset(symbol){
   const tsPath = path.join(assetDir,'cvi_timeseries.json');
   let series = readJSON(tsPath, []);
 
-  // your original fallbacks
+  // original fallbacks
   if (atm_iv==null && vega_weighted_iv==null){
     const rv = await getRealizedVol30d(symbol);
     if (rv!=null){
@@ -274,7 +285,7 @@ async function buildForAsset(symbol){
     }
   }
 
-  // absolute guarantee — if still null, synthesize sane values (NEW)
+  // absolute guarantee — if still null, synthesize sane values
   if (atm_iv==null && vega_weighted_iv==null){
     if (smile.length){
       const median = smile[Math.floor(smile.length/2)].iv;
@@ -292,7 +303,7 @@ async function buildForAsset(symbol){
     }
   }
 
-  // If smile is still empty, synthesize one so the chart never blanks (NEW)
+  // If smile is still empty, synthesize one so the chart never blanks
   if (!smile.length) {
     const base = Number(vega_weighted_iv ?? atm_iv);
     if (isFinite(base) && base > 0) {
@@ -313,7 +324,7 @@ async function buildForAsset(symbol){
   if (series.length>MAX_TS_POINTS) series = series.slice(series.length-MAX_TS_POINTS);
   writeJSON(tsPath, series);
 
-  // signals (unchanged)
+  // signals
   const sig = buildSignal(series);
   const sigPath = path.join(assetDir,'signals.json');
   let sigs = readJSON(sigPath, []);
@@ -329,6 +340,10 @@ async function buildForAsset(symbol){
 
 /* =============== Orchestrate all assets + manifest =============== */
 (async function main(){
+  if (EXCLUDE.length) console.log('Skipping assets:', EXCLUDE.join(', '));
+  console.log('Running for assets:', ASSETS.join(', '));
+  if (!ASSETS.length) { console.log('No assets selected. Exiting.'); process.exit(0); }
+
   const docsDir = path.join(process.cwd(),'docs'); ensureDir(docsDir);
 
   const results = [];
