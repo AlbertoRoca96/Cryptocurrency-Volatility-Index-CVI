@@ -1,36 +1,36 @@
 {
-  "generated_at": "2025-09-01T14:58:23.492Z",
+  "generated_at": "2025-09-01T15:27:43.155Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T14:58:23.490Z",
-      "last_iv": 0.023384,
-      "eri": 60,
+      "ts": "2025-09-01T15:27:43.153Z",
+      "last_iv": 0.02615,
+      "eri": 75,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "ETH",
-      "ts": "2025-09-01T14:58:23.491Z",
-      "last_iv": 0.057974,
-      "eri": 100,
-      "recommendation": "SHORT_VOL",
-      "size_hint": 1,
-      "reason": "IV ≥ 80th pct"
+      "ts": "2025-09-01T15:27:43.154Z",
+      "last_iv": 0.026946,
+      "eri": 35,
+      "recommendation": "HOLD",
+      "size_hint": 0.25,
+      "reason": "mid regime"
     },
     {
       "symbol": "SOL",
-      "ts": "2025-09-01T14:58:23.491Z",
-      "last_iv": 0.853564,
-      "eri": 28,
+      "ts": "2025-09-01T15:27:43.154Z",
+      "last_iv": 0.853794,
+      "eri": 39,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "BNB",
-      "ts": "2025-09-01T14:58:23.491Z",
+      "ts": "2025-09-01T15:27:43.155Z",
       "last_iv": 0.468784,
       "eri": 93,
       "recommendation": "SHORT_VOL",
@@ -39,21 +39,30 @@
     },
     {
       "symbol": "AVAX",
-      "ts": "2025-09-01T14:58:23.491Z",
-      "last_iv": 0.887759,
-      "eri": 17,
+      "ts": "2025-09-01T15:27:43.155Z",
+      "last_iv": 0.887019,
+      "eri": 0,
       "recommendation": "LONG_VOL",
-      "size_hint": 0.57,
+      "size_hint": 1,
       "reason": "IV ≤ 20th pct"
     },
     {
       "symbol": "DOGE",
-      "ts": "2025-09-01T14:58:23.492Z",
-      "last_iv": 0.950437,
-      "eri": 6,
+      "ts": "2025-09-01T15:27:43.155Z",
+      "last_iv": 0.950381,
+      "eri": 0,
       "recommendation": "LONG_VOL",
-      "size_hint": 0.85,
+      "size_hint": 1,
       "reason": "IV ≤ 20th pct"
+    },
+    {
+      "symbol": "LINK",
+      "ts": "2025-09-01T15:27:43.155Z",
+      "last_iv": 1.18436,
+      "eri": 100,
+      "recommendation": "SHORT_VOL",
+      "size_hint": 1,
+      "reason": "IV ≥ 80th pct"
     }
   ]
 }
