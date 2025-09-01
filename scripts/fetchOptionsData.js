@@ -1,172 +1,195 @@
 // scripts/fetchOptionsData.js
-const axios = require("axios");
-const fs = require("fs");
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
-// ---------- helpers ----------
-function ensureDir(p) {
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+// -------- helpers: normal pdf/cdf, BS pricers, IV via Newton --------
+function normPDF(x) {
+  return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
 }
-function readJsonSafe(path, fallback) {
-  try {
-    if (fs.existsSync(path)) return JSON.parse(fs.readFileSync(path, "utf8"));
-  } catch (_) {}
-  return fallback;
-}
-function writeJson(path, obj) {
-  fs.writeFileSync(path, JSON.stringify(obj, null, 2));
-}
-
-// Normal PDF/CDF (Abramowitz-Stegun approx)
-function normPdf(x) { return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI); }
-function normCdf(x) {
-  const k = 1 / (1 + 0.2316419 * Math.abs(x));
+function normCDF(x) {
+  // Abramowitz-Stegun approximation
+  const k = 1.0 / (1.0 + 0.2316419 * Math.abs(x));
   const a1 = 0.319381530, a2 = -0.356563782, a3 = 1.781477937, a4 = -1.821255978, a5 = 1.330274429;
-  const poly = ((((a5 * k + a4) * k + a3) * k + a2) * k + a1) * k;
-  const approx = 1 - normPdf(Math.abs(x)) * poly;
-  return x >= 0 ? approx : 1 - approx;
+  const poly = (((a5 * k + a4) * k + a3) * k + a2) * k + a1;
+  const cnd = 1 - normPDF(x) * poly;
+  return x >= 0 ? cnd : 1 - cnd;
 }
-
-// Black–Scholes prices + vega
-function bsPrice({ S, K, T, r, sigma, isCall }) {
-  if (T <= 0 || sigma <= 0) return Math.max((isCall ? S - K : K - S), 0);
+function bsCall(S, K, T, r, sigma) {
   const sqrtT = Math.sqrt(T);
   const d1 = (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
   const d2 = d1 - sigma * sqrtT;
-  if (isCall) return S * normCdf(d1) - K * Math.exp(-r * T) * normCdf(d2);
-  return K * Math.exp(-r * T) * normCdf(-d2) - S * normCdf(-d1);
+  return S * normCDF(d1) - K * Math.exp(-r * T) * normCDF(d2);
 }
-function bsVega({ S, K, T, r, sigma }) {
-  if (T <= 0 || sigma <= 0) return 0;
+function bsPut(S, K, T, r, sigma) {
   const sqrtT = Math.sqrt(T);
   const d1 = (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
-  return S * sqrtT * normPdf(d1);
+  const d2 = d1 - sigma * sqrtT;
+  return K * Math.exp(-r * T) * normCDF(-d2) - S * normCDF(-d1);
+}
+function vega(S, K, T, r, sigma) {
+  const sqrtT = Math.sqrt(T);
+  const d1 = (Math.log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * sqrtT);
+  return S * sqrtT * normPDF(d1);
+}
+function impliedVol(price, S, K, T, r, isCall) {
+  // Newton-Raphson; fallbacks if non-convergent
+  if (price <= 0 || T <= 0 || S <= 0 || K <= 0) return null;
+  let sigma = 0.5;           // starting guess
+  const tol = 1e-4;
+  for (let i = 0; i < 100; i++) {
+    const model = isCall ? bsCall(S, K, T, r, sigma) : bsPut(S, K, T, r, sigma);
+    const diff = model - price;
+    if (Math.abs(diff) < tol) return Math.max(0.0001, sigma);
+    const veg = vega(S, K, T, r, sigma);
+    if (veg <= 1e-8 || !isFinite(veg)) break; // can't proceed
+    sigma = Math.max(0.0001, sigma - diff / veg);
+  }
+  return null;
 }
 
-// Invert Black–Scholes via Newton–Raphson
-function impliedVol({ price, S, K, T, r, isCall }) {
-  let sigma = 0.3;                      // initial guess
-  const MAX_ITERS = 100, TOL = 1e-6, MIN = 1e-4, MAX = 3.0;
+// --------- main job: build smile + cvi, write docs/* files ----------
+async function main() {
+  // Ensure docs/
+  const docsDir = path.join(process.cwd(), 'docs');
+  if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir, { recursive: true });
 
-  for (let i = 0; i < MAX_ITERS; i++) {
-    const p = bsPrice({ S, K, T, r, sigma, isCall });
-    const v = bsVega({ S, K, T, r, sigma }) || 1e-8;
-    const diff = p - price;
-    if (Math.abs(diff) < TOL) break;
-    sigma = Math.min(MAX, Math.max(MIN, sigma - diff / v));
-  }
-  return Number(sigma.toFixed(6));
-}
+  // risk-free and target terms
+  const r = 0.01;
 
-// ---------- main job ----------
-async function fetchOptionsData() {
-  ensureDir("./docs");
-
-  // 1) Get the full option instrument list (strike + expiry)
-  const instRes = await axios.get(
-    "https://www.deribit.com/api/v2/public/get_instruments",
-    { params: { currency: "BTC", kind: "option" } }
+  // 1) spot from Coingecko (simple, no key)
+  const spotResp = await axios.get(
+    'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+    { timeout: 15000 }
   );
-  const instruments = instRes.data?.result || [];
-  const instMap = new Map(
-    instruments.map(o => [
-      o.instrument_name,
-      { strike: o.strike, expiryMs: o.expiration_timestamp, optionType: o.option_type } // call/put
-    ])
-  );
-
-  // 2) Get book summaries (mark_price + underlying)
-  const bookRes = await axios.get(
-    "https://www.deribit.com/api/v2/public/get_book_summary_by_currency",
-    { params: { currency: "BTC", kind: "option" } }
-  );
-  const book = bookRes.data?.result || [];
-
-  if (!book.length) {
-    console.log("No option book data returned; leaving previous files unchanged.");
+  const S = spotResp?.data?.bitcoin?.usd;
+  if (!S) {
+    console.error('Failed to get BTC spot – aborting run');
     return;
   }
 
-  const nowMs = Date.now();
-  // Build joined rows we can work with
-  const rows = book
-    .map(x => {
-      const meta = instMap.get(x.instrument_name);
-      if (!meta) return null;
-      const K = meta.strike;
-      const S = x.underlying_price || null;
-      const mark = x.mark_price || x.last_price || null;
-      const Tyears = Math.max( (meta.expiryMs - nowMs) / (365 * 24 * 3600 * 1000), 0 );
-      const isCall = (meta.optionType || "").toLowerCase() === "call" || x.instrument_name.endsWith("-C");
-      return (S && mark && K && Tyears > 0) ? { name: x.instrument_name, S, K, T: Tyears, mark, isCall } : null;
-    })
-    .filter(Boolean);
+  // 2) list Deribit BTC options
+  const instResp = await axios.get(
+    'https://www.deribit.com/api/v2/public/get_instruments',
+    { params: { currency: 'BTC', kind: 'option' }, timeout: 20000 }
+  );
 
-  if (!rows.length) {
-    console.log("No usable rows (missing mark/S/K/T).");
+  const instruments = instResp?.data?.result || [];
+  if (!instruments.length) {
+    console.error('No instruments from Deribit – aborting run');
     return;
   }
 
-  // 3) Pick an expiry ~30 days (20–40 day window; fall back to closest >7 days)
-  const days = r => r.T * 365;
-  const target = rows
-    .filter(r => days(r) >= 20 && days(r) <= 40)
-    .sort((a, b) => Math.abs(days(a) - 30) - Math.abs(days(b) - 30));
-  const candidateSet = (target.length ? target : rows.filter(r => days(r) > 7))
-    .sort((a, b) => a.T - b.T);
-  if (!candidateSet.length) {
-    console.log("No expiries > 7 days; aborting.");
+  const now = Date.now();
+
+  // choose expiry closest to ~30 days
+  function daysToExpiry(ms) { return (ms - now) / (1000 * 60 * 60 * 24); }
+  const byProximity = [...instruments]
+    .filter(x => x.is_active && x.expiration_timestamp > now + 24 * 3600 * 1000) // at least > 1 day
+    .map(x => ({ ...x, dte: daysToExpiry(x.expiration_timestamp) }))
+    .sort((a, b) => Math.abs(a.dte - 30) - Math.abs(b.dte - 30));
+
+  if (!byProximity.length) {
+    console.error('No suitable expiries.');
     return;
   }
-  const expiryT = candidateSet[0].T; // use the closest matching expiry
-  const sameExpiry = rows.filter(r => Math.abs(r.T - expiryT) < 1e-6);
 
-  // 4) Compute IVs for that expiry (volatility smile)
-  const r = 0.01; // risk-free
-  const smile = sameExpiry.map(rw => ({
-    strike: rw.K,
-    implied_volatility: impliedVol({ price: rw.mark, S: rw.S, K: rw.K, T: rw.T, r, isCall: rw.isCall })
-  }))
-  .filter(d => Number.isFinite(d.implied_volatility))
-  .sort((a, b) => a.strike - b.strike);
+  const targetExpiryTs = byProximity[0].expiration_timestamp;
+  const expiryInstruments = instruments.filter(
+    x => x.expiration_timestamp === targetExpiryTs && x.option_type && x.is_active
+  );
 
-  // 5) Compute a single “CVI number”: ATM IV (strike closest to S)
-  const Sref = sameExpiry[0].S; // they all share same underlying snapshot
-  let atm = null, minDist = Infinity;
-  for (const rw of sameExpiry) {
-    const iv = impliedVol({ price: rw.mark, S: rw.S, K: rw.K, T: rw.T, r, isCall: rw.isCall });
-    const dist = Math.abs(rw.K - Sref);
-    if (Number.isFinite(iv) && dist < minDist) {
-      minDist = dist;
-      atm = iv;
+  // get a focused set of CALL options around ATM (±10%) to form the smile
+  const nearATM = expiryInstruments
+    .filter(x => x.option_type === 'call')
+    .sort((a, b) => Math.abs(a.strike - S) - Math.abs(b.strike - S))
+    .filter(x => Math.abs(x.strike / S - 1) <= 0.20) // ±20% band to have a fuller smile
+    .slice(0, 120);                                  // cap
+
+  // fetch last/mark price per instrument
+  async function fetchPrice(instName) {
+    try {
+      const t = await axios.get('https://www.deribit.com/api/v2/public/ticker',
+        { params: { instrument_name: instName }, timeout: 15000 });
+      const r = t?.data?.result || {};
+      // prefer mark_price, then last_price
+      const p = Number(r.mark_price ?? r.last_price ?? NaN);
+      return isFinite(p) ? p : null;
+    } catch {
+      return null;
     }
   }
 
-  // 6) Write docs/cvi.json (smile) and append docs/cvi_timeseries.json
-  writeJson("./docs/cvi.json", smile);
+  const prices = await Promise.all(
+    nearATM.map(async (inst) => ({
+      inst,
+      price: await fetchPrice(inst.instrument_name)
+    }))
+  );
 
-  const seriesPath = "./docs/cvi_timeseries.json";
-  const series = readJsonSafe(seriesPath, []);
-  const nowIso = new Date().toISOString();
-
-  // de-dup if last point is within 20 minutes
-  const last = series[series.length - 1];
-  const shouldAppend =
-    !last ||
-    (Date.now() - new Date(last.timestamp).getTime()) > 20 * 60 * 1000 ||
-    Math.abs(last.cvi - atm) > 1e-6;
-
-  if (atm != null && shouldAppend) {
-    series.push({ timestamp: nowIso, cvi: Number(atm.toFixed(6)) });
-    // keep the last 2000 points to avoid repo bloat
-    while (series.length > 2000) series.shift();
+  // Build smile with IV
+  const T = (targetExpiryTs - now) / (365 * 24 * 3600 * 1000);
+  const smile = [];
+  for (const { inst, price } of prices) {
+    if (!price || price <= 0) continue;
+    const isCall = inst.option_type === 'call';
+    const iv = impliedVol(price, S, inst.strike, T, r, isCall);
+    if (iv && isFinite(iv)) {
+      smile.push({ strike: inst.strike, iv });
+    }
   }
-  writeJson(seriesPath, series);
+  smile.sort((a, b) => a.strike - b.strike);
 
-  console.log(`Wrote ${smile.length} smile points to docs/cvi.json`);
-  console.log(`Appended CVI=${atm} at ${nowIso} to docs/cvi_timeseries.json`);
+  // 3) Compute CVI(s)
+  let atm_iv = null;
+  if (smile.length) {
+    const atm = smile.reduce((best, p) =>
+      Math.abs(p.strike - S) < Math.abs(best.strike - S) ? p : best, smile[0]);
+    atm_iv = atm.iv;
+  }
+
+  // vega-weighted average IV across ±10% band
+  let vega_weighted_iv = null;
+  if (smile.length) {
+    const band = smile.filter(p => Math.abs(p.strike / S - 1) <= 0.10);
+    if (band.length) {
+      const parts = band.map(p => {
+        const sig = p.iv;
+        const v = vega(S, p.strike, T, r, sig);
+        return { w: Math.max(1e-8, v), iv: sig };
+      });
+      const wsum = parts.reduce((s, x) => s + x.w, 0);
+      const ivsum = parts.reduce((s, x) => s + x.w * x.iv, 0);
+      vega_weighted_iv = ivsum / wsum;
+    }
+  }
+
+  // 4) Write docs/cvi.json (smile)
+  const smilePath = path.join(docsDir, 'cvi.json');
+  fs.writeFileSync(smilePath, JSON.stringify(smile, null, 2));
+
+  // 5) Append to docs/cvi_timeseries.json
+  const tsPath = path.join(docsDir, 'cvi_timeseries.json');
+  let series = [];
+  if (fs.existsSync(tsPath)) {
+    try { series = JSON.parse(fs.readFileSync(tsPath, 'utf8') || '[]'); }
+    catch { series = []; }
+  }
+  const point = {
+    t: new Date().toISOString(),
+    spot: S,
+    days_to_expiry: ((targetExpiryTs - now) / 86400000).toFixed(2),
+    atm_iv,
+    vega_weighted_iv
+  };
+  series.push(point);
+  if (series.length > 2000) series = series.slice(series.length - 2000);
+  fs.writeFileSync(tsPath, JSON.stringify(series, null, 2));
+
+  console.log('Wrote:', smilePath, 'and', tsPath);
 }
 
-fetchOptionsData().catch(err => {
-  console.error("Fatal error in fetchOptionsData:", err?.message || err);
+main().catch(err => {
+  console.error('Fatal error in fetchOptionsData:', err);
   process.exit(1);
 });
