@@ -2,12 +2,17 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/30 * * * *'    # every 30 minutes
+    - cron: '*/30 * * * *'   # every 30 minutes
   push:
     branches: [ main ]
 
 permissions:
   contents: write
+
+# avoid overlapping runs
+concurrency:
+  group: cvi-scrape
+  cancel-in-progress: true
 
 jobs:
   fetch-options-data:
@@ -19,7 +24,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci || npm i
@@ -27,16 +33,15 @@ jobs:
       - name: Build CVI data for all assets
         run: node scripts/fetchOptionsData.js
 
+      # Ensure manifest exists even on a totally fresh repo
       - name: Bootstrap manifest on first run
         run: |
-          if [ ! -f docs/cvi_manifest.json ]; then
-            echo "{\"assets\":[]}" > docs/cvi_manifest.json
-          fi
+          mkdir -p docs
+          [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
 
-      - name: Commit and push changes
+      - name: Commit and push changes (only if there are changes)
         uses: EndBug/add-and-commit@v9
         with:
-          add: |
-            docs/**
-          message: "Update CVI (multi-asset): smile + timeseries + manifest"
+          add: docs/**
+          message: "Update CVI (multi-asset): smile + timeseries + manifest + signals"
           default_author: github_actions
