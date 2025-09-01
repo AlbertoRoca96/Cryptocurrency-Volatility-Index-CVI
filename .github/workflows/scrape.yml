@@ -2,9 +2,11 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/30 * * * *'   # every 30 minutes
+    - cron: '*/15 * * * *'   # every 15 minutes (UTC)
   push:
     branches: [ main ]
+  # Optional: enable a manual "Run workflow" button in the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
