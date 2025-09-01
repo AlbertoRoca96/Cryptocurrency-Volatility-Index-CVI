@@ -21,7 +21,13 @@ jobs:
       CVI_EXCLUDE: ""              # no skip by default
       CVI_INCLUDE: ""              # optional include list
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
-      # Default: we’ll set COINGECKO_MODE in the next step via $GITHUB_ENV
+      # Twilio / Email (store these in GitHub Secrets):
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}     # Your email
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}     # App password
+      TO_EMAIL: ${{ secrets.TO_EMAIL }}         # Your email for alerts
+      # Optional alert tuning
+      NOTIFY_ON:          strong                            # strong | non-hold | all
+      NOTIFY_MIN_STRENGTH: "0.5"                            # used by strong mode
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,24 +53,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Create package-lock.json if missing
-        if: ${{ hashFiles('package-lock.json') == '' }}
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-
-      - name: Set up Node.js (with cache)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-
       - name: Install dependencies
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci --ignore-scripts --no-audit --no-fund
-          else
-            npm install --no-audit --no-fund
-          fi
+          npm install --no-audit --no-fund
 
       - name: Build CVI data for all assets
         run: node scripts/fetchOptionsData.js
@@ -72,9 +63,12 @@ jobs:
       - name: Generate ERI + trade recommendations
         run: node scripts/strategyEngine.js
 
+      - name: Send Email alerts (deduped)
+        run: node scripts/notifyEmail.js
+
       - name: Commit and push changes (only if there are changes)
         uses: EndBug/add-and-commit@v9
         with:
           add: docs/**
-          message: "Update CVI + ERI: smiles, timeseries, manifest, signals, risk index, orders + meta"
+          message: "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk index, orders, notify_state"
           default_author: github_actions
