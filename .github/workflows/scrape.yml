@@ -2,10 +2,12 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
+    - cron: '*/30 * * * *'   # every 30 minutes
   push:
     branches: [ main ]
-  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   fetch-options-data:
@@ -17,15 +19,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: '18'
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci || npm i
 
-      - name: Fetch options data
-        run: npm run start
+      - name: Fetch options data + update CVI files
+        run: node scripts/fetchOptionsData.js
 
-      - name: Ensure timeseries file exists (first run safety)
+      - name: Ensure timeseries file exists (first run bootstrap)
         run: |
           if [ ! -f docs/cvi_timeseries.json ]; then
             echo "[]" > docs/cvi_timeseries.json
@@ -34,6 +36,8 @@ jobs:
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v9
         with:
-          add: "docs/cvi.json docs/cvi_timeseries.json"
-          message: "Update CVI smile and timeseries"
+          add: |
+            docs/cvi.json
+            docs/cvi_timeseries.json
+          message: "Update CVI smile + timeseries"
           default_author: github_actions
