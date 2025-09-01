@@ -1,63 +1,65 @@
 {
+  "version": 1,
+  "generated_at": "2025-09-01T02:09:34.637Z",
   "assets": [
     {
-      "symbol": "BTC",
-      "files": {
-        "smile": "/BTC/cvi.json",
-        "series": "/BTC/cvi_timeseries.json",
-        "signals": "/BTC/signals.json"
-      },
-      "latest": {
-        "t": "2025-09-01T02:05:51.564Z",
-        "spot": 108117,
-        "days_to_expiry": "25.25",
-        "atm_iv": 0.01825067604147919,
-        "vega_weighted_iv": 0.035716719707645936
-      }
-    },
-    {
-      "symbol": "ETH",
-      "files": {
-        "smile": "/ETH/cvi.json",
-        "series": "/ETH/cvi_timeseries.json",
-        "signals": "/ETH/signals.json"
-      },
-      "latest": {
-        "t": "2025-09-01T02:05:52.324Z",
-        "spot": 4413.57,
-        "days_to_expiry": "25.25",
-        "atm_iv": 0.028789280109178004,
-        "vega_weighted_iv": 0.052376428143169416
-      }
-    },
-    {
-      "symbol": "SOL",
-      "files": {
-        "smile": "/SOL/cvi.json",
-        "series": "/SOL/cvi_timeseries.json",
-        "signals": "/SOL/signals.json"
-      },
-      "latest": {
-        "t": "2025-09-01T02:05:52.639Z",
-        "spot": 200.87,
-        "days_to_expiry": "30.00",
-        "atm_iv": 0.8527479159318762,
-        "vega_weighted_iv": 0.8527479159318762
-      }
-    },
-    {
       "symbol": "BNB",
-      "files": {
-        "smile": "/BNB/cvi.json",
-        "series": "/BNB/cvi_timeseries.json",
-        "signals": "/BNB/signals.json"
-      },
       "latest": {
         "t": "2025-09-01T02:05:52.841Z",
         "spot": 862.13,
         "days_to_expiry": null,
         "atm_iv": null,
         "vega_weighted_iv": null
+      },
+      "files": {
+        "smile": "/BNB/cvi.json",
+        "series": "/BNB/cvi_timeseries.json",
+        "signals": "/BNB/signals.json"
+      }
+    },
+    {
+      "symbol": "BTC",
+      "latest": {
+        "t": "2025-09-01T02:09:16.667Z",
+        "spot": 108190,
+        "days_to_expiry": "25.24",
+        "atm_iv": 0.017565699999248004,
+        "vega_weighted_iv": 0.03487241914755564
+      },
+      "files": {
+        "smile": "/BTC/cvi.json",
+        "series": "/BTC/cvi_timeseries.json",
+        "signals": "/BTC/signals.json"
+      }
+    },
+    {
+      "symbol": "ETH",
+      "latest": {
+        "t": "2025-09-01T02:09:17.132Z",
+        "spot": 4413.96,
+        "days_to_expiry": "25.24",
+        "atm_iv": 0.028681106015374082,
+        "vega_weighted_iv": 0.052273514899216424
+      },
+      "files": {
+        "smile": "/ETH/cvi.json",
+        "series": "/ETH/cvi_timeseries.json",
+        "signals": "/ETH/signals.json"
+      }
+    },
+    {
+      "symbol": "SOL",
+      "latest": {
+        "t": "2025-09-01T02:09:17.227Z",
+        "spot": 200.88,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.8673108207804239,
+        "vega_weighted_iv": 0.8673108207804239
+      },
+      "files": {
+        "smile": "/SOL/cvi.json",
+        "series": "/SOL/cvi_timeseries.json",
+        "signals": "/SOL/signals.json"
       }
     }
   ]
