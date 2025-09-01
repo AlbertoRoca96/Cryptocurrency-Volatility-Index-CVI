@@ -2,7 +2,8 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # every 15 minutes
+    - cron: '*/15 * * * *'   # frequent runs (Deribit + cached/series-based fallbacks)
+    - cron: '5 * * * *'      # once per hour, allow CoinGecko
   push:
     branches: [ main ]
 
@@ -17,34 +18,39 @@ jobs:
   fetch-options-data:
     runs-on: ubuntu-latest
     env:
-      # Leave blank to NOT skip any assets (your "no-skip" behavior)
-      CVI_EXCLUDE: ""
-      # Optional: explicitly include a subset (e.g., "BTC,ETH,SOL"); leave blank to use full base set
-      CVI_INCLUDE: ""
-      # Optional: CoinGecko Pro key to reduce rate-limiting (safe to leave unset)
+      CVI_EXCLUDE: ""              # no skip by default
+      CVI_INCLUDE: ""              # optional include list
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+      # Default: we’ll set COINGECKO_MODE in the next step via $GITHUB_ENV
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Keep your first-run manifest bootstrap
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
 
-      # 1) Set up Node WITHOUT cache so we can generate a lockfile if missing
+      - name: Decide CoinGecko mode based on schedule
+        run: |
+          # If this run was triggered by the hourly cron ('5 * * * *'), enable CoinGecko.
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "5 * * * *" ]; then
+            echo "COINGECKO_MODE=on" >> "$GITHUB_ENV"
+            echo "CoinGecko: ON (hourly refresh)"
+          else
+            echo "COINGECKO_MODE=off" >> "$GITHUB_ENV"
+            echo "CoinGecko: OFF (15-min run uses Deribit + fallbacks)"
+          fi
+
       - name: Set up Node.js (no cache, first-run friendly)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # 2) If there's no lockfile yet, create one from package.json (no installs)
       - name: Create package-lock.json if missing
         if: ${{ hashFiles('package-lock.json') == '' }}
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
-      # 3) Re-run setup-node WITH cache now that a lockfile exists
       - name: Set up Node.js (with cache)
         uses: actions/setup-node@v4
         with:
@@ -52,7 +58,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      # 4) Install deps reproducibly if lockfile exists; fall back otherwise
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
