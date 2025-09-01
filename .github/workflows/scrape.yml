@@ -2,14 +2,13 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/30 * * * *'   # every 30 minutes
+    - cron: '*/30 * * * *'
   push:
     branches: [ main ]
 
 permissions:
   contents: write
 
-# avoid overlapping runs
 concurrency:
   group: cvi-scrape
   cancel-in-progress: true
@@ -24,16 +23,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '20'   # 18 is fine too
 
       - name: Install dependencies
-        run: npm ci || npm i
+        run: npm install --no-audit --no-fund
 
       - name: Build CVI data for all assets
         run: node scripts/fetchOptionsData.js
 
-      # Ensure manifest exists even on a totally fresh repo
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
