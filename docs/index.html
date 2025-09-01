@@ -10,7 +10,7 @@
   <link rel="icon" href="data:,">
 
   <style>
-    :root { --fg:#111; --muted:#666; --pill:#eef3ff; --pill-active:#d8e4ff; }
+    :root { --fg:#111; --muted:#666; --pill:#eef3ff; --pill-active:#d8e4ff; --ok:#0a0; --warn:#d97706; --bad:#b91c1c; }
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; color: var(--fg); }
     h1 { margin: 0 0 8px 0; }
@@ -23,8 +23,12 @@
     .card { border:1px solid #eee; border-radius:12px; padding:12px; background:#fff; }
     .signal-title { font-weight:700; }
     .signal-meta { font-size:12px; color:#555; margin-top:4px; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; background:#f5f5f5; border:1px solid #eee; margin-left:8px;}
+    .badge.warn { background:#fff7ed; border-color:#fde68a; color:#92400e; }
     canvas { background:#fff; border-radius:8px; }
     hr { border:0; border-top:1px solid #eee; margin:10px 0; }
+    .orders { font-size:12px; line-height:1.4; }
+    .orders b { font-weight:700; }
   </style>
 </head>
 <body>
@@ -38,12 +42,22 @@
       <div class="card">
         <canvas id="cviSeries" height="260"></canvas>
       </div>
-      <div class="card" id="signalCard">
-        <div class="signal-title">Signal</div>
+
+      <div class="card" id="rightCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="signal-title">Signal</div>
+          <div id="smileBadge" class="badge" title="Real quotes vs synthetic fill"></div>
+        </div>
         <div id="signalBody" class="signal-meta">Waiting…</div>
+        <hr/>
+        <div class="signal-title" style="margin-top:8px;">Risk & Trade</div>
+        <div id="riskBody" class="signal-meta">Calculating…</div>
         <hr/>
         <div class="signal-title" style="margin-top:8px;">Recent signals</div>
         <div id="signalTable" class="signal-meta"></div>
+        <hr/>
+        <div class="signal-title" style="margin-top:8px;">Orders (paper)</div>
+        <div id="ordersBox" class="orders"></div>
       </div>
     </div>
 
@@ -76,7 +90,6 @@
     }
 
     const nonNull = v => v!=null && isFinite(v);
-    const countNonNull = arr => arr.filter(nonNull).length;
 
     function nonNullMax(arr){
       const nn = arr.filter(nonNull);
@@ -121,7 +134,7 @@
       }];
     }
 
-    // NEW: robust single-point rendering using (x,y) objects + highlight dots
+    // Robust single-point rendering with highlight dots
     function drawSeries(series, yMax){
       const ctx = ctxFor('cviSeries');
 
@@ -178,7 +191,6 @@
         options: {
           maintainAspectRatio: false,
           normalized: true,
-          // IMPORTANT: allow Chart.js to parse (x,y) objects
           parsing: true,
           animation: false,
           scales: {
@@ -244,6 +256,47 @@
       tbl.innerHTML = recent;
     }
 
+    function renderRisk(risk){
+      const el = document.getElementById('riskBody');
+      if (!risk || risk.ERI==null){
+        el.textContent = 'n/a';
+        return;
+      }
+      const eri = Number(risk.ERI);
+      const sigma_d = Number(risk.sigma_d);
+      const move = risk.etv?.expected_move_usd ?? null;
+      const qty  = risk.etv?.qty ?? null;
+      const notl = risk.etv?.notional_usd ?? null;
+      const hue = eri < 2 ? 'var(--ok)' : (eri < 4 ? 'var(--warn)' : 'var(--bad)');
+      el.innerHTML = `
+        <div>ERI: <b style="color:${hue}">${eri.toFixed(2)}</b> &nbsp; (σ<sub>d</sub>: ${(sigma_d||0).toFixed(4)})</div>
+        <div>Expected move (1d): <b>$${(move||0).toFixed(2)}</b></div>
+        <div>Size hint: <b>${qty?.toFixed?.(6) ?? '0'}</b> (~$${(notl||0).toFixed(2)})</div>
+        <div>Budget: $${risk.etv?.risk_budget_usd ?? 0} — Horizon: ${risk.etv?.horizon_days ?? 1}d — Lev: ${risk.etv?.leverage ?? 1}x</div>
+      `;
+    }
+
+    function renderOrders(orders){
+      const box = document.getElementById('ordersBox');
+      if (!orders || !orders.length){ box.textContent = 'No orders.'; return; }
+      const rows = orders.slice(-8).reverse().map(o =>
+        `<div>• ${new Date(o.t).toLocaleString()} — <b>${o.side.toUpperCase()}</b> ${o.qty.toFixed(6)} ${o.symbol} @ ${o.price} (${o.reason})</div>`
+      ).join('');
+      box.innerHTML = rows;
+    }
+
+    function setSmileBadge(meta){
+      const el = document.getElementById('smileBadge');
+      if (!meta) { el.textContent = ''; return; }
+      if (meta.synthetic) {
+        el.classList.add('warn');
+        el.textContent = 'Synthetic smile';
+      } else {
+        el.classList.remove('warn');
+        el.textContent = 'Real quotes';
+      }
+    }
+
     function buildSyntheticSeriesFromManifest(symbol){
       const snap = manifestBySymbol[symbol]?.latest;
       if (!snap) return [];
@@ -261,15 +314,18 @@
       setActiveTab(sym);
 
       try {
-        let series = [], smile = [], sigs = [];
+        let series = [], smile = [], sigs = [], risk = null, orders = [], smileMeta=null;
         try { series = await json(`${sym}/cvi_timeseries.json`); } catch {}
         try { smile  = await json(`${sym}/cvi.json`); } catch {}
         try { sigs   = await json(`${sym}/signals.json`); } catch {}
+        try { risk   = await json(`${sym}/risk.json`); } catch {}
+        try { orders = await json(`${sym}/orders.json`); } catch {}
+        try { smileMeta = await json(`${sym}/smile_meta.json`); } catch {}
 
         if (mySeq !== loadSeq) return;
 
         // If the series is missing/empty or effectively all-null, try to synthesize from smile or manifest
-        const nonNullCount = (arr) => arr.reduce((n,p)=>n + (nonNull(p.atm_iv)||nonNull(p.vega_weighted_iv) ? 1 : 0), 0);
+        const nonNullCount = (arr) => arr.reduce((n,p)=>n + ((p && (nonNull(p.atm_iv)||nonNull(p.vega_weighted_iv))) ? 1 : 0), 0);
         if (!Array.isArray(series) || !series.length || nonNullCount(series) === 0) {
           const spot = manifestBySymbol[sym]?.latest?.spot ?? null;
           const ts   = manifestBySymbol[sym]?.latest?.t ?? null;
@@ -277,7 +333,7 @@
           series = synth;
           if (!series || !series.length) {
             document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
-            drawSeries([], 1); drawSmile([], 1); renderSignals([]);
+            drawSeries([], 1); drawSmile([], 1); renderSignals([]); renderRisk(null); renderOrders(null); setSmileBadge(null);
             return;
           } else {
             document.getElementById('runInfo').textContent = `Asset: ${sym} — showing latest snapshot (synthetic).`;
@@ -292,11 +348,17 @@
         drawSeries(series, yMax);
         drawSmile(Array.isArray(smile) ? smile : [], yMax);
         renderSignals(Array.isArray(sigs) ? sigs : []);
+        renderRisk(risk);
+        renderOrders(orders);
+        setSmileBadge(smileMeta);
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
         ctxFor('cviSeries'); ctxFor('cviSmile');
         document.getElementById('signalBody').textContent = 'No data.';
         document.getElementById('signalTable').textContent = '';
+        document.getElementById('riskBody').textContent = 'n/a';
+        document.getElementById('ordersBox').textContent = 'No orders.';
+        document.getElementById('smileBadge').textContent = '';
       }
     }
 
