@@ -1,3 +1,6 @@
+Here’s a complete, drop-in replacement for `docs/index.html` with the new single-point rendering logic (x/y objects + explicit “ATM point” and “Vega point” overlays). Paste this whole file:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,7 +88,7 @@
       return Math.max(0.05, m);
     }
 
-    // Per-asset Y max from both series + smile
+    // Use both series + smile to pick a sensible per-asset Y max
     function computeUnifiedYMax(series, smile){
       const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat();
       const b = (smile||[]).map(p => p.iv);
@@ -101,7 +104,7 @@
       });
     }
 
-    // Build a one-dot synthetic reading from smile when the series is all-null/missing
+    // Build a one-dot synthetic reading from the smile when the time-series is all-null
     function synthFromSmile(smile, spot, ts){
       if (!Array.isArray(smile) || !smile.length) return null;
       const byDist = [...smile].sort((a,b)=>Math.abs(a.strike-spot)-Math.abs(b.strike-spot));
@@ -121,58 +124,65 @@
       }];
     }
 
+    // NEW: robust single-point rendering using (x,y) objects + highlight dots
     function drawSeries(series, yMax){
       const ctx = ctxFor('cviSeries');
-      if (!series || !series.length){ seriesChart = drawEmpty(ctx); return; }
 
-      const labels = series.map(p => new Date(p.t));
-      const atm  = series.map(p => (nonNull(p.atm_iv) ? +p.atm_iv : null));
-      const vega = series.map(p => (nonNull(p.vega_weighted_iv) ? +p.vega_weighted_iv : null));
+      const ptsAtm = (series || [])
+        .filter(p => p && p.t && nonNull(p.atm_iv))
+        .map(p => ({ x: new Date(p.t), y: +p.atm_iv }));
 
-      // Count total non-null observations across both datasets
-      const idxs = [];
-      for (let i=0;i<labels.length;i++){
-        if (atm[i]!=null || vega[i]!=null) idxs.push(i);
+      const ptsVega = (series || [])
+        .filter(p => p && p.t && nonNull(p.vega_weighted_iv))
+        .map(p => ({ x: new Date(p.t), y: +p.vega_weighted_iv }));
+
+      if ((ptsAtm.length + ptsVega.length) === 0){
+        seriesChart = drawEmpty(ctx);
+        return;
       }
-      const n = idxs.length;
-      if (n === 0){ seriesChart = drawEmpty(ctx); return; }
 
-      // Line layers (no points) + optional scatter overlays (visible dots when n < 2)
-      const lineDatasets = [
-        {
-          label:'CVI (ATM 30-day IV)',
-          data: atm,
-          borderWidth:2, tension:0.2, spanGaps:true,
-          showLine: true, pointRadius: 0
-        },
-        {
-          label:'CVI (Vega-weighted IV)',
-          data: vega,
-          borderWidth:2, tension:0.2, spanGaps:true,
-          showLine: true, pointRadius: 0
-        }
-      ];
-
-      const scatterATM  = [];
-      const scatterVega = [];
-      if (n < 2){
-        for (const i of idxs){
-          if (atm[i]!=null)  scatterATM.push({ x: labels[i], y: atm[i] });
-          if (vega[i]!=null) scatterVega.push({ x: labels[i], y: vega[i] });
-        }
-      }
-      const scatterDatasets = (n < 2) ? [
-        { type:'scatter', label:'ATM point',  data: scatterATM,  pointRadius: 4, showLine:false },
-        { type:'scatter', label:'Vega point', data: scatterVega, pointRadius: 4, showLine:false }
-      ] : [];
+      const lastAtm  = ptsAtm.length  ? [ptsAtm[ptsAtm.length-1]]   : [];
+      const lastVega = ptsVega.length ? [ptsVega[ptsVega.length-1]] : [];
 
       seriesChart = new Chart(ctx, {
         type: 'line',
-        data: { labels, datasets: [...lineDatasets, ...scatterDatasets] },
+        data: {
+          datasets: [
+            {
+              label:'CVI (ATM 30-day IV)',
+              data: ptsAtm,
+              borderWidth:2, tension:0.2,
+              spanGaps:true, showLine: ptsAtm.length >= 2,
+              pointRadius: 3
+            },
+            {
+              label:'CVI (Vega-weighted IV)',
+              data: ptsVega,
+              borderWidth:2, tension:0.2,
+              spanGaps:true, showLine: ptsVega.length >= 2,
+              pointRadius: 3
+            },
+            ...(lastAtm.length ? [{
+              label:'ATM point',
+              type:'scatter',
+              data:lastAtm,
+              pointRadius:5,
+              showLine:false
+            }] : []),
+            ...(lastVega.length ? [{
+              label:'Vega point',
+              type:'scatter',
+              data:lastVega,
+              pointRadius:5,
+              showLine:false
+            }] : [])
+          ]
+        },
         options: {
           maintainAspectRatio: false,
           normalized: true,
-          parsing: false,
+          // IMPORTANT: allow Chart.js to parse (x,y) objects
+          parsing: true,
           animation: false,
           scales: {
             x: { type: 'time', time: { unit: 'minute' }, ticks: { maxTicksLimit: 8 } },
@@ -320,3 +330,4 @@
   </script>
 </body>
 </html>
+```
