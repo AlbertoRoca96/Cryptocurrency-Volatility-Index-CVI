@@ -145,7 +145,7 @@
               data: atm,
               borderWidth:2, tension:0.2, spanGaps:true, showLine,
               // draw a visible dot only where the value is non-null
-              pointRadius: (ctx) => nonNull(ctx.raw) ? 3 : 0
+              pointRadius: (ctx) => Number.isFinite(ctx.parsed?.y) ? 3 : 0
             },
             {
               label:'CVI (Vega-weighted IV)',
