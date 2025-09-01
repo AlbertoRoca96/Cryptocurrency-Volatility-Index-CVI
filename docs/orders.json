@@ -1,49 +1,58 @@
 {
-  "generated_at": "2025-09-01T13:33:52.823Z",
+  "generated_at": "2025-09-01T13:54:20.258Z",
   "items": [
     {
       "symbol": "BTC",
-      "ts": "2025-09-01T13:33:52.821Z",
-      "last_iv": 0.017299,
-      "eri": 42,
+      "ts": "2025-09-01T13:54:20.257Z",
+      "last_iv": 0.023941,
+      "eri": 69,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
       "symbol": "ETH",
-      "ts": "2025-09-01T13:33:52.822Z",
-      "last_iv": 0.051953,
-      "eri": 79,
+      "ts": "2025-09-01T13:54:20.258Z",
+      "last_iv": 0.021782,
+      "eri": 18,
+      "recommendation": "LONG_VOL",
+      "size_hint": 0.55,
+      "reason": "IV ≤ 20th pct"
+    },
+    {
+      "symbol": "SOL",
+      "ts": "2025-09-01T13:54:20.258Z",
+      "last_iv": 0.853596,
+      "eri": 33,
       "recommendation": "HOLD",
       "size_hint": 0.25,
       "reason": "mid regime"
     },
     {
-      "symbol": "SOL",
-      "ts": "2025-09-01T13:33:52.822Z",
-      "last_iv": 0.852774,
-      "eri": 16,
-      "recommendation": "LONG_VOL",
-      "size_hint": 0.6,
-      "reason": "IV ≤ 20th pct"
-    },
-    {
       "symbol": "BNB",
-      "ts": "2025-09-01T13:33:52.822Z",
+      "ts": "2025-09-01T13:54:20.258Z",
       "last_iv": 0.468784,
-      "eri": 91,
+      "eri": 92,
       "recommendation": "SHORT_VOL",
-      "size_hint": 0.78,
+      "size_hint": 0.8,
       "reason": "IV ≥ 80th pct"
     },
     {
-      "symbol": "DOGE",
-      "ts": "2025-09-01T13:33:52.823Z",
-      "last_iv": 0.95073,
-      "eri": 17,
+      "symbol": "AVAX",
+      "ts": "2025-09-01T13:54:20.258Z",
+      "last_iv": 0.887169,
+      "eri": 0,
       "recommendation": "LONG_VOL",
-      "size_hint": 0.57,
+      "size_hint": 1,
+      "reason": "IV ≤ 20th pct"
+    },
+    {
+      "symbol": "DOGE",
+      "ts": "2025-09-01T13:54:20.258Z",
+      "last_iv": 0.950388,
+      "eri": 0,
+      "recommendation": "LONG_VOL",
+      "size_hint": 1,
       "reason": "IV ≤ 20th pct"
     }
   ]
