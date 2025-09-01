@@ -22,6 +22,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Verify email transport connection to ensure credentials are correct
+transporter.verify((error, success) => {
+  if (error) {
+    console.log('Error occurred during email transporter verification:', error);
+  } else {
+    console.log('Server is ready to send emails.');
+  }
+});
+
 // Read JSON data for assets, volatility, and signals
 const docsDir = path.join(process.cwd(), 'docs');
 const statePath = path.join(docsDir, 'notify_state.json');
