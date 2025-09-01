@@ -32,6 +32,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Pull the latest changes from the remote main branch
+        run: git pull origin main
+
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
