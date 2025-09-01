@@ -36,7 +36,9 @@ function impliedVol(price,S,K,T,r,isCall=true){
   if (price<=0||S<=0||K<=0||T<=0) return null;
   let s=0.5; const tol=1e-4;
   for (let i=0;i<100;i++){
-    const model=isCall?bsCall(S,K,T,r,s):(K*Math.exp(-r*T)*normCDF(-(s*Math.sqrt(T)+(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T))))-S*normCDF(-((Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)))));
+    const model=isCall
+      ? bsCall(S,K,T,r,s)
+      : (K*Math.exp(-r*T)*normCDF(-(s*Math.sqrt(T)+(Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T))))-S*normCDF(-((Math.log(S/K)+(r+0.5*s*s)*T)/(s*Math.sqrt(T)))));
     const diff=model-price; if (Math.abs(diff)<tol) return clamp(s,0.0001,5);
     const v=vega(S,K,T,r,s); if (!isFinite(v)||v<=1e-8) break;
     s=clamp(s-diff/v,0.0001,5);
@@ -44,13 +46,31 @@ function impliedVol(price,S,K,T,r,isCall=true){
   return null;
 }
 
-/* =============== Helpers =============== */
+/* ===== parity + synthetic helpers (NEW) ===== */
+function callFromPut(putPrice, S, K, T, r) {
+  // C - P = S - K e^{-rT}  =>  C = P + S - K e^{-rT}
+  return putPrice + S - K * Math.exp(-r * T);
+}
+function buildSyntheticSmile(S, atm, n=7, width=0.35) {
+  const ks = Array.from({length:n}, (_,i)=>{
+    const t = i/(n-1);
+    return S * (1 - width + 2*width*t);
+  });
+  const a = 2.0, b = -0.25; // convex smile
+  return ks.map(K => {
+    const m = Math.log(K / S);
+    const iv = Math.max(0.01, atm * (1 + a*m*m + b*m));
+    return { strike: Math.round(K), iv };
+  });
+}
+
+/* =============== Generic helpers =============== */
 const delay = (ms) => new Promise(r => setTimeout(r, ms));
 function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
 function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
 
-// NEW: tiny retry wrapper for axios.get (handles 429/5xx)
+// tiny retry wrapper for axios.get (429/5xx) — NEW
 async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDelay=800} = {}){
   headers = { 'User-Agent':'cvi-bot/1.0', ...headers };
   for (let i=0;i<=retries;i++){
@@ -72,8 +92,8 @@ async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDela
 /* =============== Data sources =============== */
 async function getSpotUSD(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const url = `https://api.coingecko.com/api/v3/simple/price`;
-  const r = await httpGet(url, { params:{ ids:id, vs_currencies:'usd' } });
+  const r = await httpGet('https://api.coingecko.com/api/v3/simple/price',
+    { params:{ ids:id, vs_currencies:'usd' } });
   return r?.data?.[id]?.usd ?? null;
 }
 async function getInstruments(symbol){
@@ -95,9 +115,9 @@ async function getMarkOrLast(instrument_name){
 // 30d realized vol proxy if no options
 async function getRealizedVol30d(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const url=`https://api.coingecko.com/api/v3/coins/${id}/market_chart`;
   try{
-    const r = await httpGet(url, { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000 });
+    const r = await httpGet('https://api.coingecko.com/api/v3/coins/'+id+'/market_chart',
+      { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000 });
     const prices = r?.data?.prices || [];
     if (prices.length < 10) return null;
     const rets = [];
@@ -170,31 +190,69 @@ async function buildForAsset(symbol){
       days_to_expiry = ((tgt-now)/86400000).toFixed(2);
       const T = (tgt-now)/(365*24*3600*1000);
 
-      const calls = instruments
-        .filter(x => x.expiration_timestamp===tgt && x.option_type==='call' && x.is_active)
+      /* ===== widened selection + puts + parity fallback (NEW) ===== */
+      const rawAtT = instruments
+        .filter(x => x.expiration_timestamp === tgt && x.is_active)
+        .filter(x => Math.abs(x.strike / S - 1) <= 0.40); // widen to ±40%
+
+      const calls = rawAtT.filter(x => x.option_type === 'call')
         .sort((a,b)=>Math.abs(a.strike-S)-Math.abs(b.strike-S))
-        .filter(x=>Math.abs(x.strike/S-1)<=0.20)
-        .slice(0,120);
+        .slice(0, 180);
 
-      const tickers = await Promise.all(calls.map(async inst => ({ inst, price: await getMarkOrLast(inst.instrument_name) })));
+      const puts  = rawAtT.filter(x => x.option_type === 'put')
+        .sort((a,b)=>Math.abs(a.strike-S)-Math.abs(b.strike-S))
+        .slice(0, 180);
 
-      for (const {inst,price} of tickers){
-        if (!price || price<=0) continue;
-        const iv = impliedVol(price, S, inst.strike, T, RISK_FREE, true);
+      const [callTicks, putTicks] = await Promise.all([
+        Promise.all(calls.map(async inst => ({ inst, price: await getMarkOrLast(inst.instrument_name) }))),
+        Promise.all(puts .map(async inst => ({ inst, price: await getMarkOrLast(inst.instrument_name) }))),
+      ]);
+
+      const putByStrike = new Map();
+      for (const {inst, price} of putTicks) if (price && isFinite(price)) {
+        putByStrike.set(inst.strike, price);
+      }
+
+      for (const {inst, price} of callTicks) {
+        let px = (price && isFinite(price)) ? price : null;
+        if (!px) {
+          const p = putByStrike.get(inst.strike);
+          if (p && isFinite(p)) px = callFromPut(p, S, inst.strike, T, RISK_FREE);
+        }
+        if (!px || px <= 0) continue;
+        const iv = impliedVol(px, S, inst.strike, T, RISK_FREE, true);
         if (iv && isFinite(iv)) smile.push({ strike: inst.strike, iv });
       }
+
+      // If still sparse, try raw puts as puts
+      if (smile.length < 3) {
+        for (const {inst, price} of putTicks) {
+          if (!price || !isFinite(price) || price <= 0) continue;
+          const iv = impliedVol(price, S, inst.strike, T, RISK_FREE, false);
+          if (iv && isFinite(iv)) smile.push({ strike: inst.strike, iv });
+        }
+      }
+
       smile.sort((a,b)=>a.strike-b.strike);
 
+      // compute ATM & vega-weighted if we have something
       if (smile.length){
         const atm = smile.reduce((best,p)=>Math.abs(p.strike-S)<Math.abs(best.strike-S)?p:best, smile[0]);
         atm_iv = atm.iv;
-        const band = smile.filter(p=>Math.abs(p.strike/S-1)<=0.10);
-        if (band.length){
-          const parts = band.map(p=>{ const sig=p.iv, vg=vega(S,p.strike,T,RISK_FREE,sig); return { w: Math.max(1e-8, vg), iv: sig }; });
-          const wsum = parts.reduce((s,x)=>s+x.w,0);
-          const ivsum = parts.reduce((s,x)=>s+x.w*x.iv,0);
-          vega_weighted_iv = ivsum/wsum;
-        }
+
+        const band20 = smile.filter(p=>Math.abs(p.strike/S-1)<=0.10);
+        const band = band20.length ? band20 : smile;
+        const parts = band.map(p=>{
+          const sig=p.iv, vg=vega(S,p.strike,T,RISK_FREE,sig);
+          return { w: Math.max(1e-8, vg), iv: sig };
+        });
+        const wsum = parts.reduce((s,x)=>s+x.w,0);
+        const ivsum = parts.reduce((s,x)=>s+x.w*x.iv,0);
+        vega_weighted_iv = ivsum/wsum;
+
+        // for display, prefer a neat ±20% band if it has enough points
+        const displayBand = smile.filter(p => Math.abs(p.strike/S - 1) <= 0.20);
+        if (displayBand.length >= 3) smile = displayBand;
       }
     }
   }
@@ -216,10 +274,9 @@ async function buildForAsset(symbol){
     }
   }
 
-  // NEW: absolute guarantee — if still null, synthesize something sane
+  // absolute guarantee — if still null, synthesize sane values (NEW)
   if (atm_iv==null && vega_weighted_iv==null){
     if (smile.length){
-      // use smile median as ATM; vega-weighted from a 10% band or average
       const median = smile[Math.floor(smile.length/2)].iv;
       const near = smile.filter(p=>Math.abs(p.strike/S-1)<=0.10);
       const vw = near.length
@@ -235,7 +292,15 @@ async function buildForAsset(symbol){
     }
   }
 
-  // write smile (can be empty)
+  // If smile is still empty, synthesize one so the chart never blanks (NEW)
+  if (!smile.length) {
+    const base = Number(vega_weighted_iv ?? atm_iv);
+    if (isFinite(base) && base > 0) {
+      smile = buildSyntheticSmile(S, clamp(base, 0.05, 2.0));
+    }
+  }
+
+  // write smile (real or synthetic)
   writeJSON(path.join(assetDir,'cvi.json'), smile);
 
   // append to timeseries
@@ -248,7 +313,7 @@ async function buildForAsset(symbol){
   if (series.length>MAX_TS_POINTS) series = series.slice(series.length-MAX_TS_POINTS);
   writeJSON(tsPath, series);
 
-  // signals
+  // signals (unchanged)
   const sig = buildSignal(series);
   const sigPath = path.join(assetDir,'signals.json');
   let sigs = readJSON(sigPath, []);
@@ -272,7 +337,7 @@ async function buildForAsset(symbol){
       const r = await buildForAsset(sym);
       if (r) results.push(r);
     }catch(e){ console.error(`[${sym}] failed:`, e.message); }
-    // NEW: be gentler to public APIs
+    // be gentle to public APIs
     await delay(2000 + Math.random()*1500);
   }
 
