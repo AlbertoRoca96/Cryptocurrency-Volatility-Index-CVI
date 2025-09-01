@@ -56,7 +56,7 @@
   <script>
     let seriesChart = null, smileChart = null;
     let loadSeq = 0;
-    let manifestBySymbol = {}; // latest snapshot fallback
+    let manifestBySymbol = {};
 
     async function json(url){
       const r = await fetch(url, { cache: 'no-store' });
@@ -85,11 +85,11 @@
       return Math.max(0.05, m);
     }
 
+    // Use both series + smile to pick a sensible per-asset Y max
     function computeUnifiedYMax(series, smile){
       const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat();
       const b = (smile||[]).map(p => p.iv);
       const m = Math.max(nonNullMax(a), nonNullMax(b));
-      // pad 20%, clamp into a sensible range so tiny lines remain visible
       return Math.min(Math.max(m * 1.2, 0.05), 3);
     }
 
@@ -99,6 +99,26 @@
         data: { labels: [], datasets: [] },
         options: { maintainAspectRatio: false, plugins: { legend: { display:false } } }
       });
+    }
+
+    // Build a one-dot synthetic reading from the smile when the time-series is all-null
+    function synthFromSmile(smile, spot, ts){
+      if (!Array.isArray(smile) || !smile.length) return null;
+      const byDist = [...smile].sort((a,b)=>Math.abs(a.strike-spot)-Math.abs(b.strike-spot));
+      const atm = byDist[0]?.iv ?? null;
+      const near = smile.filter(p => Math.abs(p.strike/spot - 1) <= 0.10);
+      const vegaW = (near.length
+        ? (near.reduce((s,p)=>s + p.iv/(Math.abs(p.strike-spot)+1e-6),0) /
+           near.reduce((s,p)=>s + 1/(Math.abs(p.strike-spot)+1e-6),0))
+        : (smile.reduce((s,p)=>s + p.iv,0)/smile.length)
+      );
+      return [{
+        t: ts || new Date().toISOString(),
+        spot: spot ?? null,
+        days_to_expiry: 30.0,
+        atm_iv: atm,
+        vega_weighted_iv: vegaW
+      }];
     }
 
     function drawSeries(series, yMax){
@@ -112,8 +132,8 @@
       const n = countNonNull(atm) + countNonNull(vega);
       if (n === 0){ seriesChart = drawEmpty(ctx); return; }
 
-      const dot = n < 3 ? 3 : 0;      // show dots if there are < 3 valid points (why your chart looked empty)
-      const showLine = n >= 2;        // only draw a line when we have at least 2 real points
+      // Show dots when data is sparse; draw a line only when we have ≥2 real points
+      const showLine = n >= 2;
 
       seriesChart = new Chart(ctx, {
         type: 'line',
@@ -124,15 +144,14 @@
               label:'CVI (ATM 30-day IV)',
               data: atm,
               borderWidth:2, tension:0.2, spanGaps:true, showLine,
-              pointRadius: dot, hitRadius: 6, hoverRadius: 5,
-              borderColor:'rgb(54,162,235)', backgroundColor:'rgba(54,162,235,0.15)'
+              // draw a visible dot only where the value is non-null
+              pointRadius: (ctx) => nonNull(ctx.raw) ? 3 : 0
             },
             {
               label:'CVI (Vega-weighted IV)',
               data: vega,
               borderWidth:2, tension:0.2, spanGaps:true, showLine,
-              pointRadius: dot, hitRadius: 6, hoverRadius: 5,
-              borderColor:'rgb(255,99,132)', backgroundColor:'rgba(255,99,132,0.15)'
+              pointRadius: (ctx) => nonNull(ctx.raw) ? 3 : 0
             }
           ]
         },
@@ -149,7 +168,7 @@
             legend: { position: 'top' },
             tooltip: {
               mode: 'index', intersect: false,
-              // Use safe title; don't access parsed.x when there are nulls
+              // Safe title: don't rely on parsed.x when nulls exist
               callbacks: { title: (items) => (items && items[0]) ? String(items[0].label) : '' }
             }
           }
@@ -168,8 +187,7 @@
           datasets: [{
             label: 'Implied Volatility',
             data: smile.map(p=>p.iv),
-            borderWidth: 2, tension: 0.2, pointRadius: 0,
-            borderColor:'rgb(54,162,235)', backgroundColor:'rgba(54,162,235,0.15)'
+            borderWidth: 2, tension: 0.2, pointRadius: 0
           }]
         },
         options: {
@@ -224,28 +242,25 @@
 
       try {
         let series = [], smile = [], sigs = [];
-        try {
-          series = await json(`${sym}/cvi_timeseries.json`);
-        } catch { /* fall back later */ }
-        try {
-          smile = await json(`${sym}/cvi.json`);
-        } catch {}
-        try {
-          sigs = await json(`${sym}/signals.json`);
-        } catch {}
+        try { series = await json(`${sym}/cvi_timeseries.json`); } catch {}
+        try { smile  = await json(`${sym}/cvi.json`); } catch {}
+        try { sigs   = await json(`${sym}/signals.json`); } catch {}
 
         if (mySeq !== loadSeq) return;
 
-        // Fallback: if series is missing/empty or all nulls, synthesize a one-dot series from manifest
+        // If the series is missing/empty or effectively all-null, try to synthesize from smile or manifest
         const nonNullCount = (arr) => arr.reduce((n,p)=>n + (nonNull(p.atm_iv)||nonNull(p.vega_weighted_iv) ? 1 : 0), 0);
         if (!Array.isArray(series) || !series.length || nonNullCount(series) === 0) {
-          series = buildSyntheticSeriesFromManifest(sym);
-          if (!series.length) {
+          const spot = manifestBySymbol[sym]?.latest?.spot ?? null;
+          const ts   = manifestBySymbol[sym]?.latest?.t ?? null;
+          const synth = synthFromSmile(Array.isArray(smile)?smile:[], spot, ts) || buildSyntheticSeriesFromManifest(sym);
+          series = synth;
+          if (!series || !series.length) {
             document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
             drawSeries([], 1); drawSmile([], 1); renderSignals([]);
             return;
           } else {
-            document.getElementById('runInfo').textContent = `Asset: ${sym} — showing latest snapshot (manifest).`;
+            document.getElementById('runInfo').textContent = `Asset: ${sym} — showing latest snapshot (synthetic).`;
           }
         } else {
           const last = series[series.length - 1];
