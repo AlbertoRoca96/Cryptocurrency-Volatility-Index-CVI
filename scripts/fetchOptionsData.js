@@ -13,7 +13,7 @@ const INCLUDE = (process.env.CVI_INCLUDE || '')
 const EXCLUDE = (process.env.CVI_EXCLUDE || '')
   .split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
 
-// Resolve final run set (preserve original structure)
+// Resolve final run set
 const UNIVERSE = Array.from(new Set([...BASE_ASSETS, ...INCLUDE]));
 const ASSETS = (INCLUDE.length ? UNIVERSE.filter(s => INCLUDE.includes(s)) : UNIVERSE)
   .filter(s => !EXCLUDE.includes(s));
@@ -22,7 +22,28 @@ const COINGECKO_IDS = {
   BTC:'bitcoin', ETH:'ethereum', SOL:'solana', BNB:'binancecoin', XRP:'ripple',
   ADA:'cardano', AVAX:'avalanche-2', DOGE:'dogecoin', LINK:'chainlink', LTC:'litecoin'
 };
+
+/* ---- CoinGecko usage gate (quota control) ----
+   COINGECKO_MODE: 'on' | 'off' | 'sample' | 'auto'
+   - Default 'off' to protect your monthly cap.
+   - In workflow, set to 'on' for hourly (or 4x/day) runs.
+   COINGECKO_SAMPLE: 0..1 probability if MODE='sample' (default 0).
+*/
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || '';
+const CG_MODE   = (process.env.COINGECKO_MODE || 'off').toLowerCase();
+const CG_SAMPLE = Math.max(0, Math.min(1, parseFloat(process.env.COINGECKO_SAMPLE || '0')));
+function shouldUseCG(mode = CG_MODE) {
+  if (mode === 'on') return true;
+  if (mode === 'off') return false;
+  if (mode === 'sample') return Math.random() < CG_SAMPLE;
+  // 'auto' => treat as conservative (off); enable via workflow env on a schedule
+  return false;
+}
+const USE_CG = shouldUseCG();
+const CG_BASE = COINGECKO_API_KEY
+  ? 'https://pro-api.coingecko.com/api/v3'
+  : 'https://api.coingecko.com/api/v3';
+const CG_HEADERS = COINGECKO_API_KEY ? { 'x-cg-pro-api-key': COINGECKO_API_KEY } : undefined;
 
 const RISK_FREE = 0.01;
 const TARGET_DAYS = 30;
@@ -59,7 +80,7 @@ function impliedVol(price,S,K,T,r,isCall=true){
   const tol=1e-4;
   for (let i=0;i<100;i++){
     const model = bsCall(S,K,T,r,s);
-    let diff = model - callPx;
+    let diff = model - callPx;                     // <-- fixed undeclared var
     if (Math.abs(diff) < tol) return clamp(s, 0.0001, 5);
     const v = vega(S,K,T,r,s); if (!isFinite(v) || v<=1e-8) break;
     s = clamp(s - diff/v, 0.0001, 5);
@@ -124,14 +145,14 @@ async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDela
 
 /* =============== Data sources =============== */
 async function getSpotFromCoingecko(symbol){
+  if (!USE_CG) return null;                     // <-- quota gate
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const headers = COINGECKO_API_KEY ? { 'x-cg-pro-api-key': COINGECKO_API_KEY } : undefined;
-  const r = await httpGet('https://api.coingecko.com/api/v3/simple/price',
-    { params:{ ids:id, vs_currencies:'usd' }, headers });
+  const r = await httpGet(`${CG_BASE}/simple/price`,
+    { params:{ ids:id, vs_currencies:'usd' }, headers: CG_HEADERS });
   return r?.data?.[id]?.usd ?? null;
 }
 async function getSpotFromDeribitIndex(symbol){
-  // Deribit commonly supports BTC/ETH index; others may be absent.
+  // Deribit commonly supports BTC/ETH (others may be absent).
   const idx = `${symbol.toLowerCase()}_usd`;
   try{
     const r = await httpGet('https://www.deribit.com/api/v2/public/get_index_price',
@@ -158,11 +179,11 @@ async function getMarkOrLast(instrument_name){
 }
 // 30d realized vol proxy if no options (CoinGecko)
 async function getRealizedVol30d(symbol){
+  if (!USE_CG) return null;                     // <-- quota gate
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   try{
-    const headers = COINGECKO_API_KEY ? { 'x-cg-pro-api-key': COINGECKO_API_KEY } : undefined;
-    const r = await httpGet(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`,
-      { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers });
+    const r = await httpGet(`${CG_BASE}/coins/${id}/market_chart`,
+      { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers: CG_HEADERS });
     const prices = r?.data?.prices || [];
     if (prices.length < 10) return null;
     const rets = [];
@@ -344,7 +365,7 @@ async function buildForAsset(symbol){
     } else {
       let rv = await getRealizedVol30d(symbol);
       if (rv==null && series.length){
-        // compute realized vol from our own series if CoinGecko failed
+        // compute realized vol from our own series if CoinGecko failed/disabled
         const y = series.slice(-30).map(p => Number(p.vega_weighted_iv ?? p.atm_iv)).filter(x=>isFinite(x));
         if (y.length) rv = y.reduce((s,x)=>s+x,0)/y.length;
       }
@@ -368,6 +389,7 @@ async function buildForAsset(symbol){
   writeJSON(path.join(assetDir,'smile_meta.json'), {
     synthetic: !!smileSynthetic,
     source: smileSynthetic ? 'synthetic' : 'real',
+    coingecko_used: !!USE_CG,
     generated_at: new Date().toISOString()
   });
 
@@ -414,6 +436,7 @@ async function buildForAsset(symbol){
 (async function main(){
   if (EXCLUDE.length) console.log('Skipping assets:', EXCLUDE.join(', '));
   if (INCLUDE.length) console.log('Explicit include:', INCLUDE.join(', '));
+  console.log('CoinGecko mode:', CG_MODE, 'sample=', CG_SAMPLE, 'use=', USE_CG);
   console.log('Running for assets:', ASSETS.join(', '));
   if (!ASSETS.length) { console.log('No assets selected. Exiting.'); process.exit(0); }
 
