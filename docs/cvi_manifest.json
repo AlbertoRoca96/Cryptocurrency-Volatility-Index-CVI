@@ -8,11 +8,11 @@
         "signals": "/BTC/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T13:52:26.961Z",
-        "spot": 109120,
-        "days_to_expiry": "24.76",
-        "atm_iv": 0.00872776838857723,
-        "vega_weighted_iv": 0.023940966363191804
+        "t": "2025-09-01T14:22:32.815Z",
+        "spot": 109063,
+        "days_to_expiry": "24.73",
+        "atm_iv": 0.009299704853698581,
+        "vega_weighted_iv": 0.02356187054222693
       }
     },
     {
@@ -23,11 +23,11 @@
         "signals": "/ETH/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T13:52:30.289Z",
-        "spot": 4386.42,
-        "days_to_expiry": "24.76",
-        "atm_iv": 0.005156584312018931,
-        "vega_weighted_iv": 0.021781934083960758
+        "t": "2025-09-01T14:22:35.376Z",
+        "spot": 4392,
+        "days_to_expiry": "24.73",
+        "atm_iv": 0.0028499578944627397,
+        "vega_weighted_iv": 0.015377825518232668
       }
     },
     {
@@ -38,11 +38,11 @@
         "signals": "/SOL/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T13:52:33.924Z",
-        "spot": 199.75,
+        "t": "2025-09-01T14:22:37.820Z",
+        "spot": 200.22,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8535964893351137,
-        "vega_weighted_iv": 0.8535964893351137
+        "atm_iv": 0.8532071745868753,
+        "vega_weighted_iv": 0.8532071745868753
       }
     },
     {
@@ -53,11 +53,41 @@
         "signals": "/BNB/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T13:52:52.586Z",
-        "spot": 852.28,
+        "t": "2025-09-01T14:22:56.846Z",
+        "spot": 853.09,
         "days_to_expiry": "30.00",
         "atm_iv": 0.46878416213465995,
         "vega_weighted_iv": 0.46878416213465995
+      }
+    },
+    {
+      "symbol": "XRP",
+      "files": {
+        "smile": "/XRP/cvi.json",
+        "series": "/XRP/cvi_timeseries.json",
+        "signals": "/XRP/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T14:23:00.331Z",
+        "spot": 2.77,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.7442098840118438,
+        "vega_weighted_iv": 0.7442098840118438
+      }
+    },
+    {
+      "symbol": "ADA",
+      "files": {
+        "smile": "/ADA/cvi.json",
+        "series": "/ADA/cvi_timeseries.json",
+        "signals": "/ADA/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T14:23:03.914Z",
+        "spot": 0.816319,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.826264647253976,
+        "vega_weighted_iv": 0.826264647253976
       }
     },
     {
@@ -68,26 +98,41 @@
         "signals": "/AVAX/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T13:53:37.844Z",
-        "spot": 23.72,
+        "t": "2025-09-01T14:23:22.451Z",
+        "spot": 23.9,
         "days_to_expiry": "30.00",
         "atm_iv": 0.887169211086319,
         "vega_weighted_iv": 0.887169211086319
       }
     },
     {
-      "symbol": "DOGE",
+      "symbol": "LINK",
       "files": {
-        "smile": "/DOGE/cvi.json",
-        "series": "/DOGE/cvi_timeseries.json",
-        "signals": "/DOGE/signals.json"
+        "smile": "/LINK/cvi.json",
+        "series": "/LINK/cvi_timeseries.json",
+        "signals": "/LINK/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T13:53:40.593Z",
-        "spot": 0.214916,
+        "t": "2025-09-01T14:23:44.087Z",
+        "spot": 23.03,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.9503879020000421,
-        "vega_weighted_iv": 0.9503879020000421
+        "atm_iv": 1.1843599174942774,
+        "vega_weighted_iv": 1.1843599174942774
+      }
+    },
+    {
+      "symbol": "LTC",
+      "files": {
+        "smile": "/LTC/cvi.json",
+        "series": "/LTC/cvi_timeseries.json",
+        "signals": "/LTC/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T14:23:47.726Z",
+        "spot": 110,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.7446472376423281,
+        "vega_weighted_iv": 0.7446472376423281
       }
     }
   ]
