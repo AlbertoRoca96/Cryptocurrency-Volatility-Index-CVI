@@ -227,7 +227,7 @@ async function buildForAsset(symbol){
       const r = await buildForAsset(sym);
       if (r) results.push(r);
     }catch(e){ console.error(`[${sym}] failed:`, e.message); }
-    await delay(1200); // be gentle to public APIs
+    await delay(2000 + Math.floor(Math.random() * 800)); // be gentle to public APIs
   }
 
   const manifest = { assets: results.map(r=>({ symbol:r.symbol, files:r.files, latest:r.latest })) };
