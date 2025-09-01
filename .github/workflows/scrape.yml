@@ -2,7 +2,7 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/30 * * * *'   # runs every 30 minutes (UTC)
   push:
     branches: [ main ]
 
@@ -16,25 +16,35 @@ concurrency:
 jobs:
   fetch-options-data:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
 
-      - name: Build CVI data for all assets
-        run: node scripts/fetchOptionsData.js
-
-      - name: Bootstrap manifest on first run
+      # Make sure docs/ exists on very first run so the commit step always has a target
+      - name: Bootstrap docs/ + manifest on first run
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
+
+      - name: Build CVI data for all assets
+        run: node scripts/fetchOptionsData.js
 
       - name: Commit and push changes (only if there are changes)
         uses: EndBug/add-and-commit@v9
