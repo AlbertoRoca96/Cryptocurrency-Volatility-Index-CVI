@@ -8,11 +8,11 @@
         "signals": "/BTC/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T03:58:19.481Z",
-        "spot": 107648,
-        "days_to_expiry": "25.17",
-        "atm_iv": 0.0033451067381191925,
-        "vega_weighted_iv": 0.013085511230403283
+        "t": "2025-09-01T04:04:07.807Z",
+        "spot": 107616,
+        "days_to_expiry": "25.16",
+        "atm_iv": 0.003691434059948168,
+        "vega_weighted_iv": 0.013948636777663339
       }
     },
     {
@@ -23,11 +23,11 @@
         "signals": "/ETH/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T03:58:22.062Z",
-        "spot": 4404.93,
-        "days_to_expiry": "25.17",
-        "atm_iv": 0.031470297305787834,
-        "vega_weighted_iv": 0.05544112304638758
+        "t": "2025-09-01T04:04:11.428Z",
+        "spot": 4403.36,
+        "days_to_expiry": "25.16",
+        "atm_iv": 0.03190681660530327,
+        "vega_weighted_iv": 0.05590118054288353
       }
     },
     {
@@ -38,11 +38,11 @@
         "signals": "/SOL/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T03:58:24.697Z",
-        "spot": 198.47,
+        "t": "2025-09-01T04:04:14.349Z",
+        "spot": 198.28,
         "days_to_expiry": "30.00",
-        "atm_iv": 0.8551055173319052,
-        "vega_weighted_iv": 0.8551055173319052
+        "atm_iv": 0.8554757463352864,
+        "vega_weighted_iv": 0.8554757463352864
       }
     },
     {
@@ -53,11 +53,26 @@
         "signals": "/BNB/signals.json"
       },
       "latest": {
-        "t": "2025-09-01T03:58:26.894Z",
-        "spot": 856.02,
+        "t": "2025-09-01T04:04:33.811Z",
+        "spot": 855.86,
         "days_to_expiry": "30.00",
         "atm_iv": 0.46822993272570096,
         "vega_weighted_iv": 0.46822993272570096
+      }
+    },
+    {
+      "symbol": "AVAX",
+      "files": {
+        "smile": "/AVAX/cvi.json",
+        "series": "/AVAX/cvi_timeseries.json",
+        "signals": "/AVAX/signals.json"
+      },
+      "latest": {
+        "t": "2025-09-01T04:05:18.978Z",
+        "spot": 23.17,
+        "days_to_expiry": "30.00",
+        "atm_iv": 0.8881781531947832,
+        "vega_weighted_iv": 0.8881781531947832
       }
     }
   ]
