@@ -85,7 +85,7 @@
       return Math.max(0.05, m);
     }
 
-    // per-asset Y max from both series and smile
+    // Per-asset Y max from both series + smile
     function computeUnifiedYMax(series, smile){
       const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat();
       const b = (smile||[]).map(p => p.iv);
@@ -101,7 +101,7 @@
       });
     }
 
-    // one-dot synthetic reading from smile if series is all-null
+    // Build a one-dot synthetic reading from smile when the series is all-null/missing
     function synthFromSmile(smile, spot, ts){
       if (!Array.isArray(smile) || !smile.length) return null;
       const byDist = [...smile].sort((a,b)=>Math.abs(a.strike-spot)-Math.abs(b.strike-spot));
@@ -129,38 +129,41 @@
       const atm  = series.map(p => (nonNull(p.atm_iv) ? +p.atm_iv : null));
       const vega = series.map(p => (nonNull(p.vega_weighted_iv) ? +p.vega_weighted_iv : null));
 
-      // count how many timestamps have any real value
-      const nonNullIdxs = [];
+      // Count total non-null observations across both datasets
+      const idxs = [];
       for (let i=0;i<labels.length;i++){
-        if (atm[i]!=null || vega[i]!=null) nonNullIdxs.push(i);
+        if (atm[i]!=null || vega[i]!=null) idxs.push(i);
       }
-      const n = nonNullIdxs.length;
+      const n = idxs.length;
       if (n === 0){ seriesChart = drawEmpty(ctx); return; }
 
-      // base line datasets: span nulls, no points (pure line)
+      // Line layers (no points) + optional scatter overlays (visible dots when n < 2)
       const lineDatasets = [
         {
           label:'CVI (ATM 30-day IV)',
-          data: atm, borderWidth:2, tension:0.2, spanGaps:true,
+          data: atm,
+          borderWidth:2, tension:0.2, spanGaps:true,
           showLine: true, pointRadius: 0
         },
         {
           label:'CVI (Vega-weighted IV)',
-          data: vega, borderWidth:2, tension:0.2, spanGaps:true,
+          data: vega,
+          borderWidth:2, tension:0.2, spanGaps:true,
           showLine: true, pointRadius: 0
         }
       ];
 
-      // scatter overlay so a single reading is visible as a dot
-      const scatterDatasets = (n < 2) ? [
-        { type:'scatter', label:'ATM point',
-          data: nonNullIdxs.filter(i=>atm[i]!=null).map(i => ({ x: labels[i], y: atm[i] })),
-          pointRadius: 4, showLine:false
-        },
-        { type:'scatter', label:'Vega point',
-          data: nonNullIdxs.filter(i=>vega[i]!=null).map(i => ({ x: labels[i], y: vega[i] })),
-          pointRadius: 4, showLine:false
+      const scatterATM  = [];
+      const scatterVega = [];
+      if (n < 2){
+        for (const i of idxs){
+          if (atm[i]!=null)  scatterATM.push({ x: labels[i], y: atm[i] });
+          if (vega[i]!=null) scatterVega.push({ x: labels[i], y: vega[i] });
         }
+      }
+      const scatterDatasets = (n < 2) ? [
+        { type:'scatter', label:'ATM point',  data: scatterATM,  pointRadius: 4, showLine:false },
+        { type:'scatter', label:'Vega point', data: scatterVega, pointRadius: 4, showLine:false }
       ] : [];
 
       seriesChart = new Chart(ctx, {
@@ -258,7 +261,7 @@
 
         if (mySeq !== loadSeq) return;
 
-        // If series is missing/empty or effectively all-null, synthesize from smile or manifest
+        // If the series is missing/empty or effectively all-null, try to synthesize from smile or manifest
         const nonNullCount = (arr) => arr.reduce((n,p)=>n + (nonNull(p.atm_iv)||nonNull(p.vega_weighted_iv) ? 1 : 0), 0);
         if (!Array.isArray(series) || !series.length || nonNullCount(series) === 0) {
           const spot = manifestBySymbol[sym]?.latest?.spot ?? null;
