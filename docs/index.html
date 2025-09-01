@@ -85,12 +85,29 @@
       return m > 0 ? m : 1;
     }
 
+    // Build a flat proxy smile around spot when no smile file is available
+    function proxySmileFromSeries(series) {
+      if (!series?.length) return [];
+      const last = series[series.length - 1];
+      const iv = Number(last.vega_weighted_iv ?? last.atm_iv);
+      const S  = Number(last.spot);
+      if (!isFinite(iv) || !isFinite(S) || S <= 0) return [];
+      const points = [];
+      const steps = 12;
+      const low = 0.9 * S, high = 1.1 * S;
+      for (let i = 0; i < steps; i++) {
+        const w = i / (steps - 1);
+        const strike = Math.round(low * (1 - w) + high * w);
+        points.push({ strike, iv });
+      }
+      return points;
+    }
+
     function computeUnifiedYMax(series, smile){
       const a = (series||[]).map(p => [p.atm_iv, p.vega_weighted_iv]).flat().filter(v => v!=null && isFinite(v));
       const b = (smile||[]).map(p => p.iv).filter(v => v!=null && isFinite(v));
       const m = Math.max(0.0001, ...(a.length? [Math.max(...a)] : [0.0001]), ...(b.length? [Math.max(...b)] : [0.0001]));
-      // pad 20%, clamp to [0.05, 3] to keep the axis readable
-      return Math.min(Math.max(m * 1.2, 0.05), 3);
+      return Math.min(Math.max(m * 1.2, 0.05), 3); // pad 20%, clamp to keep readable
     }
 
     function drawEmpty(ctx){
@@ -134,7 +151,6 @@
             tooltip: {
               mode: 'index',
               intersect: false,
-              // Avoid parsed.x when data points are null
               callbacks: { title: (items) => (items && items[0]) ? String(items[0].label) : '' }
             }
           }
@@ -191,25 +207,27 @@
       setActiveTab(sym);
 
       try {
-        const [series, smile = [], sigs = []] = await Promise.all([
+        const [series, smileRaw = [], sigs = []] = await Promise.all([
           json(`${sym}/cvi_timeseries.json`),
           json(`${sym}/cvi.json`).catch(() => []),
           json(`${sym}/signals.json`).catch(() => [])
         ]);
         if (mySeq !== loadSeq) return;
 
+        // Build proxy smile if we didn't get one from the file
+        const smile = (smileRaw && smileRaw.length) ? smileRaw : proxySmileFromSeries(series);
+        const yMax = computeUnifiedYMax(series, smile);
+
         if (series?.length){
           const last = series[series.length - 1];
           document.getElementById('runInfo').textContent =
             `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry ?? 'n/a'}d`;
-          const yMax = computeUnifiedYMax(series, smile);
           drawSeries(series, yMax);
-          drawSmile(smile, yMax);
         } else {
           document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
-          drawSeries([], 1);
-          drawSmile([], 1);
+          drawSeries([], yMax);
         }
+        drawSmile(smile, yMax);
         renderSignals(sigs);
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
