@@ -43,7 +43,7 @@ function impliedVol(price,S,K,T,r,isCall=true){
   return null;
 }
 
-/* =============== Generic helpers =============== */
+/* =============== Helpers =============== */
 const delay = (ms) => new Promise(r => setTimeout(r, ms));
 function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
@@ -73,6 +73,7 @@ async function getMarkOrLast(instrument_name){
     return isFinite(p)?p:null;
   }catch{ return null; }
 }
+// 30d realized vol proxy if no options
 async function getRealizedVol30d(symbol){
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   const url=`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=30&interval=daily`;
@@ -195,10 +196,8 @@ async function buildForAsset(symbol){
     }
   }
 
-  // write smile (can be empty)
   writeJSON(path.join(assetDir,'cvi.json'), smile);
 
-  // append to timeseries
   series.push({
     t: new Date().toISOString(),
     spot: S,
@@ -208,7 +207,6 @@ async function buildForAsset(symbol){
   if (series.length>MAX_TS_POINTS) series = series.slice(series.length-MAX_TS_POINTS);
   writeJSON(tsPath, series);
 
-  // signals
   const sig = buildSignal(series);
   const sigPath = path.join(assetDir,'signals.json');
   let sigs = readJSON(sigPath, []);
