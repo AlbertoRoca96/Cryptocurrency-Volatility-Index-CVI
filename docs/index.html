@@ -6,86 +6,139 @@
   <title>Cryptocurrency Volatility Index (CVI)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
-    h1 { margin-bottom: 8px; }
-    .chart-wrap { max-width: 1200px; }
-    .muted { color:#666; font-size: 12px; margin-bottom: 12px; }
+    :root { --fg:#111; --muted:#666; --pill:#eef3ff; --pill-active:#d8e4ff; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; color: var(--fg); }
+    h1 { margin: 0 0 8px 0; }
+    .muted { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+    .tabs { display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; }
+    .tab { white-space:nowrap; padding:6px 10px; border-radius:999px; background:var(--pill); cursor:pointer; font-weight:600; }
+    .tab.active { background:var(--pill-active); }
+    .layout { max-width: 1200px; }
+    .row { display:grid; grid-template-columns: 2fr 1fr; gap:16px; align-items:start; }
+    .card { border:1px solid #eee; border-radius:12px; padding:12px; }
+    .signal-title { font-weight:700; }
+    .signal-meta { font-size:12px; color:#555; margin-top:4px; }
+    canvas { background:white; }
   </style>
 </head>
 <body>
   <h1>Cryptocurrency Volatility Index (CVI)</h1>
-  <div class="muted" id="runInfo"></div>
+  <div class="muted" id="runInfo">Loading…</div>
 
-  <div class="chart-wrap">
-    <canvas id="cviSeries" height="160"></canvas>
-  </div>
+  <div class="tabs" id="assetTabs"></div>
 
-  <h3 style="margin-top:28px">Volatility smile — ~30-day expiry</h3>
-  <div class="chart-wrap">
-    <canvas id="cviSmile" height="260"></canvas>
+  <div class="layout">
+    <div class="row">
+      <div class="card">
+        <canvas id="cviSeries" height="180"></canvas>
+      </div>
+      <div class="card" id="signalCard">
+        <div class="signal-title">Signal</div>
+        <div id="signalBody" class="signal-meta">Waiting…</div>
+        <hr/>
+        <div class="signal-title" style="margin-top:8px;">Recent signals</div>
+        <div id="signalTable" class="signal-meta"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px">Volatility smile — ~30-day expiry</h3>
+    <div class="card">
+      <canvas id="cviSmile" height="280"></canvas>
+    </div>
   </div>
 
   <script>
-    async function safeJSON(url) {
-      try {
-        const r = await fetch(url, { cache: 'no-store' });
-        if (!r.ok) throw new Error('HTTP '+r.status);
-        return await r.json();
-      } catch (e) { return null; }
+    let seriesChart=null, smileChart=null;
+
+    async function json(url){
+      const r = await fetch(url, { cache:'no-store' });
+      if (!r.ok) throw new Error('HTTP '+r.status);
+      return await r.json();
+    }
+    function setActiveTab(sym){
+      document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.sym===sym));
+    }
+    function drawSeries(series){
+      const ctx=document.getElementById('cviSeries').getContext('2d');
+      if (seriesChart) seriesChart.destroy();
+      const labels = series.map(p => new Date(p.t));
+      const atm = series.map(p => p.atm_iv ?? null);
+      const vega= series.map(p => p.vega_weighted_iv ?? null);
+      seriesChart = new Chart(ctx,{
+        type:'line',
+        data:{ labels, datasets:[
+          { label:'CVI (ATM 30-day IV)', data:atm, borderWidth:2, tension:0.2, pointRadius:0 },
+          { label:'CVI (Vega-weighted IV)', data:vega, borderWidth:2, tension:0.2, pointRadius:0 }
+        ]},
+        options:{
+          maintainAspectRatio:false,
+          parsing:false,
+          scales:{ y:{ title:{display:true,text:'IV'} }, x:{ ticks:{ maxTicksLimit:10 } } },
+          plugins:{ legend:{ position:'top' } }
+        }
+      });
+    }
+    function drawSmile(smile){
+      const ctx=document.getElementById('cviSmile').getContext('2d');
+      if (smileChart) smileChart.destroy();
+      if (!smile || !smile.length){
+        smileChart = new Chart(ctx,{ type:'line', data:{labels:[],datasets:[]}, options:{plugins:{legend:{display:false}}} });
+        return;
+      }
+      smileChart = new Chart(ctx,{
+        type:'line',
+        data:{ labels:smile.map(p=>p.strike),
+          datasets:[{ label:'Implied Volatility', data:smile.map(p=>p.iv), borderWidth:2, tension:0.2, pointRadius:0 }]},
+        options:{ maintainAspectRatio:false,
+          scales:{ x:{ title:{ display:true, text:'Strike'}}, y:{ title:{ display:true, text:'IV'}}},
+          plugins:{ legend:{ position:'top' } }
+        }
+      });
+    }
+    function renderSignals(sigs){
+      const body=document.getElementById('signalBody');
+      const tbl=document.getElementById('signalTable');
+      if (!sigs || !sigs.length){ body.textContent='No signals yet.'; tbl.textContent=''; return; }
+      const last=sigs[sigs.length-1];
+      body.innerHTML = `
+        <div><b>${last.recommendation}</b> — strength ${Math.round(last.strength*100)}% (size hint ${last.size_hint}x)</div>
+        <div>${last.reason}</div>
+        <div>IV: ${last.last_iv?.toFixed?.(4) ?? 'n/a'} | EMA20: ${last.ema20?.toFixed?.(4) ?? 'n/a'} | EMA100: ${last.ema100?.toFixed?.(4) ?? 'n/a'}</div>
+        <div>${new Date(last.ts).toLocaleString()}</div>`;
+      const recent = sigs.slice(-10).reverse().map(s =>
+        `<div>• ${new Date(s.ts).toLocaleString()}: <b>${s.recommendation}</b> (${Math.round(s.strength*100)}%)</div>`).join('');
+      tbl.innerHTML = recent;
     }
 
-    (async function init() {
-      // time series
-      const series = await safeJSON('cvi_timeseries.json');
-      const seriesEl = document.getElementById('cviSeries').getContext('2d');
-
-      if (series && series.length) {
-        const labels = series.map(p => new Date(p.t).toLocaleString());
-        const atm = series.map(p => p.atm_iv ?? null);
-        const vegaW = series.map(p => p.vega_weighted_iv ?? null);
-        const last = series[series.length - 1];
+    async function loadAsset(sym){
+      setActiveTab(sym);
+      const series = await json(`${sym}/cvi_timeseries.json`);
+      const smile  = await json(`${sym}/cvi.json`).catch(()=>[]);
+      const sigs   = await json(`${sym}/signals.json`).catch(()=>[]);
+      if (series?.length){
+        const last=series[series.length-1];
         document.getElementById('runInfo').textContent =
-          `Last update: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry}d`;
-
-        new Chart(seriesEl, {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [
-              { label: 'CVI (ATM 30-day IV)', data: atm, borderWidth: 2, tension: 0.2, pointRadius: 0 },
-              { label: 'CVI (Vega-weighted IV)', data: vegaW, borderWidth: 2, tension: 0.2, pointRadius: 0 }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            scales: { y: { title: { text: 'IV', display: true } }, x: { ticks: { autoSkip: true, maxTicksLimit: 12 } } },
-            plugins: { legend: { position: 'top' } }
-          }
-        });
+          `Asset: ${sym} — Last: ${new Date(last.t).toLocaleString()} — Spot: $${(last.spot||0).toLocaleString()} — DTE: ${last.days_to_expiry}d`;
+        drawSeries(series);
       } else {
-        document.getElementById('runInfo').textContent = 'No CVI history yet – will populate on the next workflow run.';
+        document.getElementById('runInfo').textContent = `Asset: ${sym} — No history yet.`;
       }
+      drawSmile(smile);
+      renderSignals(sigs);
+    }
 
-      // smile
-      const smile = await safeJSON('cvi.json');
-      const smileEl = document.getElementById('cviSmile').getContext('2d');
-
-      if (smile && smile.length) {
-        new Chart(smileEl, {
-          type: 'line',
-          data: {
-            labels: smile.map(p => p.strike),
-            datasets: [
-              { label: 'Implied Volatility', data: smile.map(p => p.iv), borderWidth: 2, tension: 0.2, pointRadius: 0 }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            scales: { y: { title: { text: 'IV', display: true } }, x: { title: { text: 'Strike', display: true } } },
-            plugins: { legend: { position: 'top' } }
-          }
-        });
+    (async function init(){
+      const manifest = await json('cvi_manifest.json');
+      const tabs=document.getElementById('assetTabs'); tabs.innerHTML='';
+      if (!manifest?.assets?.length){
+        document.getElementById('runInfo').textContent='No assets available yet.'; return;
       }
+      manifest.assets.forEach(a=>{
+        const el=document.createElement('button');
+        el.className='tab'; el.dataset.sym=a.symbol; el.textContent=a.symbol;
+        el.onclick=()=>loadAsset(a.symbol); tabs.appendChild(el);
+      });
+      loadAsset(manifest.assets[0].symbol);
     })();
   </script>
 </body>
