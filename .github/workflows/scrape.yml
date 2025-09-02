@@ -1,26 +1,26 @@
 name: CVI Calculation and Dashboard Update
 
 on:
-  # Run once per hour at hh:05 UTC (gives APIs a minute to roll)
   schedule:
-    - cron: '5 * * * *'
-  # Optional: run manually from the Actions tab
-  workflow_dispatch:
-  # Still run on pushes to main (keeps your dev flow intact)
+    - cron: '5 * * * *'   # hourly at hh:05 UTC
   push:
     branches: [ main ]
+  workflow_dispatch: {}
 
 permissions:
   contents: write
+  pages: write          # allow Pages rebuild API
+  id-token: write       # (some Pages setups require this)
 
 concurrency:
   group: cvi-scrape
   cancel-in-progress: true
 
 jobs:
-  fetch-options-data:
+  build-and-deploy:
     runs-on: ubuntu-latest
     env:
+      TZ: UTC
       CVI_EXCLUDE: ""
       CVI_INCLUDE: ""
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
@@ -29,7 +29,7 @@ jobs:
       TO_EMAIL:   ${{ secrets.TO_EMAIL }}
       NOTIFY_ON: "strong"
       NOTIFY_MIN_STRENGTH: "0.5"
-
+      # EMA_CROSS_THRESHOLD: "0.02"  # optional: min cross magnitude to include in subject
     steps:
       - name: Checkout repository (full history)
         uses: actions/checkout@v4
@@ -41,18 +41,16 @@ jobs:
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
-          echo "Initial docs listing:"
           ls -la docs || true
 
-      - name: Configure run mode (CoinGecko ON for hourly/manual)
+      - name: Decide CoinGecko mode based on trigger
         run: |
-          echo "event_name=${{ github.event_name }}"
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ]; then
             echo "COINGECKO_MODE=on" >> "$GITHUB_ENV"
-            echo "CoinGecko: ON"
+            echo "CoinGecko: ON (scheduled refresh)"
           else
             echo "COINGECKO_MODE=off" >> "$GITHUB_ENV"
-            echo "CoinGecko: OFF (push build)"
+            echo "CoinGecko: OFF (push/dispatch)"
           fi
 
       - name: Set up Node.js
@@ -69,7 +67,7 @@ jobs:
       - name: Generate ERI + trade recommendations
         run: node scripts/strategyEngine.js
 
-      - name: Send Email alerts (deduped)
+      - name: Send email alerts (deduped)
         run: node scripts/notifyEmail.js
 
       - name: Show changes (debug)
@@ -81,7 +79,7 @@ jobs:
           echo "Manifest head:"
           head -n 60 docs/cvi_manifest.json || true
 
-      - name: Commit & push docs if changed (plain git)
+      - name: Commit & push docs (always push)
         env:
           BRANCH: main
         run: |
@@ -89,12 +87,26 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Stage all real changes
           git add -A docs
+
+          # Ensure a diff exists so Pages rebuilds even when data is identical
           if git diff --cached --quiet; then
-            echo "No changes staged in docs/. Nothing to commit."
-            exit 0
+            mkdir -p docs
+            echo "{\"last_run\":\"$(date -u +%FT%TZ)\",\"run_id\":\"${GITHUB_RUN_ID}\"}" > docs/.heartbeat.json
+            git add docs/.heartbeat.json
           fi
 
-          git commit -m "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk, orders, notify_state"
+          # Commit even if nothing changed (defense-in-depth)
+          git commit -m "CVI tick: update artifacts (or heartbeat)" --allow-empty
+
+          # Push
           git push origin HEAD:$BRANCH
           echo "Push complete."
+
+      - name: Trigger GitHub Pages rebuild (backstop)
+        run: |
+          curl -sSL -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages/builds
