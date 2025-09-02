@@ -2,8 +2,8 @@ name: CVI Calculation and Dashboard Update
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # frequent runs (Deribit + cached/series-based fallbacks)
-    - cron: '5 * * * *'      # once per hour, allow CoinGecko
+    - cron: '*/15 * * * *'   # every 15 min (UTC)
+    - cron: '5 * * * *'      # ~hourly CG refresh (UTC hh:05)
   push:
     branches: [ main ]
 
@@ -18,45 +18,52 @@ jobs:
   fetch-options-data:
     runs-on: ubuntu-latest
     env:
-      CVI_EXCLUDE: ""              # No skip by default
-      CVI_INCLUDE: ""              # Optional include list (can be set for specific assets)
+      CVI_EXCLUDE: ""
+      CVI_INCLUDE: ""
       COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
-      EMAIL_USER: ${{ secrets.EMAIL_USER }}     # Your email
-      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}     # App password
-      TO_EMAIL: ${{ secrets.TO_EMAIL }}         # Recipient email
-      NOTIFY_ON: "strong"                         # strong | non-hold | all
-      NOTIFY_MIN_STRENGTH: "0.5"                  # Threshold used for "strong" mode alerts
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      TO_EMAIL:   ${{ secrets.TO_EMAIL }}
+      NOTIFY_ON: "strong"              # strong | non-hold | all
+      NOTIFY_MIN_STRENGTH: "0.5"
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (full history on main)
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0   # allow commits/pushes cleanly
 
-      - name: Pull the latest changes from the remote main branch
-        run: git pull origin main
+      # Don't run 'git pull' on detached HEAD — it’s unnecessary and brittle
 
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
+          echo "Initial docs state:"
+          ls -la docs || true
 
       - name: Decide CoinGecko mode based on schedule
         run: |
-          # Enable CoinGecko only on the hourly cron ('5 * * * *') trigger
           if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "5 * * * *" ]; then
             echo "COINGECKO_MODE=on" >> "$GITHUB_ENV"
             echo "CoinGecko: ON (hourly refresh)"
           else
             echo "COINGECKO_MODE=off" >> "$GITHUB_ENV"
-            echo "CoinGecko: OFF (15-min run uses Deribit + fallbacks)"
+            echo "CoinGecko: OFF (15-min runs use Deribit + fallbacks)"
           fi
 
-      - name: Set up Node.js (no cache, first-run friendly)
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Print node versions
         run: |
-          npm install --no-audit --no-fund
+          node -v
+          npm -v
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
 
       - name: Build CVI data for all assets
         run: node scripts/fetchOptionsData.js
@@ -67,9 +74,18 @@ jobs:
       - name: Send Email alerts (deduped)
         run: node scripts/notifyEmail.js
 
+      - name: Show changes (debug)
+        run: |
+          echo "Git status:"
+          git status
+          echo "Diff (stat) in docs/:"
+          git diff --name-status -- docs || true
+          echo "Latest manifest head:"
+          tail -n +1 docs/cvi_manifest.json | head -n 40 || true
+
       - name: Commit and push changes (only if there are changes)
         uses: EndBug/add-and-commit@v9
         with:
           add: docs/**
-          message: "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk index, orders, notify_state"
+          message: "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk, orders, notify_state"
           default_author: github_actions
