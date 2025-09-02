@@ -24,9 +24,7 @@ const COINGECKO_IDS = {
 
 /* ---- CoinGecko usage gate (quota control) ----
    COINGECKO_MODE: 'on' | 'off' | 'sample' | 'auto'
-   - Default 'off' to protect your monthly cap.
-   - In workflow, set to 'on' for hourly (or 4x/day) runs.
-   COINGECKO_SAMPLE: 0..1 probability if MODE='sample' (default 0).
+   COINGECKO_SAMPLE: 0..1 probability if MODE='sample'
 */
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || '';
 const CG_MODE   = (process.env.COINGECKO_MODE || 'off').toLowerCase();
@@ -36,8 +34,7 @@ function shouldUseCG(mode = CG_MODE) {
   if (mode === 'on') return true;
   if (mode === 'off') return false;
   if (mode === 'sample') return Math.random() < CG_SAMPLE;
-  // 'auto' => treat as conservative (off); enable via workflow env on a schedule
-  return false;
+  return false; // 'auto' => conservative
 }
 
 const USE_CG = shouldUseCG();
@@ -146,7 +143,7 @@ async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDela
 
 /* =============== Data sources =============== */
 async function getSpotFromCoingecko(symbol){
-  if (!USE_CG) return null; 
+  if (!USE_CG) return null;
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   const r = await httpGet(`${CG_BASE}/simple/price`, { params:{ ids:id, vs_currencies:'usd' }, headers: CG_HEADERS });
   return r?.data?.[id]?.usd ?? null;
@@ -175,7 +172,7 @@ async function getMarkOrLast(instrument_name){
 }
 // 30d realized vol proxy if no options (CoinGecko)
 async function getRealizedVol30d(symbol){
-  if (!USE_CG) return null; 
+  if (!USE_CG) return null;
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   try{
     const r = await httpGet(`${CG_BASE}/coins/${id}/market_chart`, { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers: CG_HEADERS });
@@ -427,7 +424,7 @@ async function buildForAsset(symbol){
   };
 }
 
-/* =============== Orchestrate all assets + manifest =============== */
+/* =============== Orchestrate all assets + manifest (with MERGE) =============== */
 (async function main(){
   if (EXCLUDE.length) console.log('Skipping assets:', EXCLUDE.join(', '));
   if (INCLUDE.length) console.log('Explicit include:', INCLUDE.join(', '));
@@ -436,6 +433,11 @@ async function buildForAsset(symbol){
   if (!ASSETS.length) { console.log('No assets selected. Exiting.'); process.exit(0); }
 
   const docsDir = path.join(process.cwd(),'docs'); ensureDir(docsDir);
+
+  // Load previous manifest to protect the dashboard on partial failures
+  const prevManifestPath = path.join(docsDir,'cvi_manifest.json');
+  const prevManifest = readJSON(prevManifestPath, { assets: [] });
+  const prevMap = new Map((prevManifest.assets || []).map(a => [a.symbol, a]));
 
   const results = [];
   for (const sym of ASSETS){
@@ -447,7 +449,13 @@ async function buildForAsset(symbol){
     await delay(2000 + Math.random()*1500);
   }
 
-  const manifest = { assets: results.map(r=>({ symbol:r.symbol, files:r.files, latest:r.latest })) };
-  writeJSON(path.join(docsDir,'cvi_manifest.json'), manifest);
-  console.log('Updated manifest with', manifest.assets.length, 'asset(s).');
+  // Merge new results into previous manifest (don’t blank on a bad run)
+  for (const r of results) {
+    prevMap.set(r.symbol, { symbol:r.symbol, files:r.files, latest:r.latest });
+  }
+  const mergedAssets = Array.from(prevMap.values());
+
+  const manifest = { assets: mergedAssets };
+  writeJSON(prevManifestPath, manifest);
+  console.log('Updated manifest with', manifest.assets.length, 'asset(s). (merged previous + current)');
 })();
