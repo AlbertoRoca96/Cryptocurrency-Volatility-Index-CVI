@@ -1,9 +1,12 @@
 name: CVI Calculation and Dashboard Update
 
 on:
+  # Run once per hour at hh:05 UTC (gives APIs a minute to roll)
   schedule:
-    - cron: '*/15 * * * *'   # every 15 min (UTC)
-    - cron: '5 * * * *'      # hourly CoinGecko (UTC hh:05)
+    - cron: '5 * * * *'
+  # Optional: run manually from the Actions tab
+  workflow_dispatch:
+  # Still run on pushes to main (keeps your dev flow intact)
   push:
     branches: [ main ]
 
@@ -26,12 +29,13 @@ jobs:
       TO_EMAIL:   ${{ secrets.TO_EMAIL }}
       NOTIFY_ON: "strong"
       NOTIFY_MIN_STRENGTH: "0.5"
+
     steps:
       - name: Checkout repository (full history)
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0        # allow committing & pushing
+          fetch-depth: 0
 
       - name: Bootstrap manifest on first run
         run: |
@@ -40,14 +44,15 @@ jobs:
           echo "Initial docs listing:"
           ls -la docs || true
 
-      - name: Decide CoinGecko mode based on schedule
+      - name: Configure run mode (CoinGecko ON for hourly/manual)
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "5 * * * *" ]; then
+          echo "event_name=${{ github.event_name }}"
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "COINGECKO_MODE=on" >> "$GITHUB_ENV"
-            echo "CoinGecko: ON (hourly refresh)"
+            echo "CoinGecko: ON"
           else
             echo "COINGECKO_MODE=off" >> "$GITHUB_ENV"
-            echo "CoinGecko: OFF (15-min run uses Deribit + fallbacks)"
+            echo "CoinGecko: OFF (push build)"
           fi
 
       - name: Set up Node.js
@@ -84,19 +89,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage only the site artifacts
           git add -A docs
-
-          # If nothing staged, bail noisily
           if git diff --cached --quiet; then
             echo "No changes staged in docs/. Nothing to commit."
             exit 0
           fi
 
-          echo "Committing changes..."
           git commit -m "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk, orders, notify_state"
-
-          echo "Pushing to $BRANCH..."
           git push origin HEAD:$BRANCH
-
           echo "Push complete."
