@@ -3,7 +3,7 @@ name: CVI Calculation and Dashboard Update
 on:
   schedule:
     - cron: '*/15 * * * *'   # every 15 min (UTC)
-    - cron: '5 * * * *'      # ~hourly CG refresh (UTC hh:05)
+    - cron: '5 * * * *'      # hourly CoinGecko (UTC hh:05)
   push:
     branches: [ main ]
 
@@ -24,22 +24,20 @@ jobs:
       EMAIL_USER: ${{ secrets.EMAIL_USER }}
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       TO_EMAIL:   ${{ secrets.TO_EMAIL }}
-      NOTIFY_ON: "strong"              # strong | non-hold | all
+      NOTIFY_ON: "strong"
       NOTIFY_MIN_STRENGTH: "0.5"
     steps:
-      - name: Checkout repository (full history on main)
+      - name: Checkout repository (full history)
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0   # allow commits/pushes cleanly
-
-      # Don't run 'git pull' on detached HEAD — it’s unnecessary and brittle
+          fetch-depth: 0        # allow committing & pushing
 
       - name: Bootstrap manifest on first run
         run: |
           mkdir -p docs
           [ -f docs/cvi_manifest.json ] || echo '{"assets":[]}' > docs/cvi_manifest.json
-          echo "Initial docs state:"
+          echo "Initial docs listing:"
           ls -la docs || true
 
       - name: Decide CoinGecko mode based on schedule
@@ -49,18 +47,13 @@ jobs:
             echo "CoinGecko: ON (hourly refresh)"
           else
             echo "COINGECKO_MODE=off" >> "$GITHUB_ENV"
-            echo "CoinGecko: OFF (15-min runs use Deribit + fallbacks)"
+            echo "CoinGecko: OFF (15-min run uses Deribit + fallbacks)"
           fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Print node versions
-        run: |
-          node -v
-          npm -v
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
@@ -80,12 +73,30 @@ jobs:
           git status
           echo "Diff (stat) in docs/:"
           git diff --name-status -- docs || true
-          echo "Latest manifest head:"
-          tail -n +1 docs/cvi_manifest.json | head -n 40 || true
+          echo "Manifest head:"
+          head -n 60 docs/cvi_manifest.json || true
 
-      - name: Commit and push changes (only if there are changes)
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: docs/**
-          message: "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk, orders, notify_state"
-          default_author: github_actions
+      - name: Commit & push docs if changed (plain git)
+        env:
+          BRANCH: main
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage only the site artifacts
+          git add -A docs
+
+          # If nothing staged, bail noisily
+          if git diff --cached --quiet; then
+            echo "No changes staged in docs/. Nothing to commit."
+            exit 0
+          fi
+
+          echo "Committing changes..."
+          git commit -m "Update CVI + ERI + Alerts: smiles, timeseries, manifest, signals, risk, orders, notify_state"
+
+          echo "Pushing to $BRANCH..."
+          git push origin HEAD:$BRANCH
+
+          echo "Push complete."
