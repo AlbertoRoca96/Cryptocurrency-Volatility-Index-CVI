@@ -9,8 +9,8 @@ on:
 
 permissions:
   contents: write
-  pages: write          # allow Pages rebuild API
-  id-token: write       # (some Pages setups require this)
+  pages: write
+  id-token: write
 
 concurrency:
   group: cvi-scrape
@@ -29,7 +29,8 @@ jobs:
       TO_EMAIL:   ${{ secrets.TO_EMAIL }}
       NOTIFY_ON: "strong"
       NOTIFY_MIN_STRENGTH: "0.5"
-      # EMA_CROSS_THRESHOLD: "0.02"  # optional: min cross magnitude to include in subject
+      ALWAYS_TICK: "1"               # <— guarantee a new dot every run
+      # EMA_CROSS_THRESHOLD: "0.02"  # optional
     steps:
       - name: Checkout repository (full history)
         uses: actions/checkout@v4
@@ -87,20 +88,16 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stage all real changes
           git add -A docs
 
-          # Ensure a diff exists so Pages rebuilds even when data is identical
+          # Ensure a diff so Pages rebuilds even if data identical
           if git diff --cached --quiet; then
             mkdir -p docs
             echo "{\"last_run\":\"$(date -u +%FT%TZ)\",\"run_id\":\"${GITHUB_RUN_ID}\"}" > docs/.heartbeat.json
             git add docs/.heartbeat.json
           fi
 
-          # Commit even if nothing changed (defense-in-depth)
           git commit -m "CVI tick: update artifacts (or heartbeat)" --allow-empty
-
-          # Push
           git push origin HEAD:$BRANCH
           echo "Push complete."
 
