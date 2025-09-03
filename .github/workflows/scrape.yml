@@ -24,8 +24,8 @@ jobs:
       CVI_EXCLUDE: ""
       CVI_INCLUDE: ""
       # --- API keys / email ---
-      COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
-      COINGECKO_PLAN: "demo"        # set to "pro" only if you pay for Pro
+      COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}   # optional, used only as fallback
+      COINGECKO_PLAN: "demo"                                # leave "demo" unless you pay for Pro
       EMAIL_USER: ${{ secrets.EMAIL_USER }}
       EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       TO_EMAIL:   ${{ secrets.TO_EMAIL }}
