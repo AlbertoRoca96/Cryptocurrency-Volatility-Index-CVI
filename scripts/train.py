@@ -1,99 +1,143 @@
-import json, pathlib
+import json, pathlib, math
 from datetime import datetime, timezone
 
 import numpy as np
 import pandas as pd
 
+from sklearn.model_selection import TimeSeriesSplit
 from sklearn.ensemble import HistGradientBoostingRegressor, HistGradientBoostingClassifier
+from sklearn.metrics import mean_squared_error, roc_auc_score
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-DOCS = ROOT / "docs"
 DATA = ROOT / "data"
+DOCS = ROOT / "docs"
 
 SYMBOLS = ["BTC", "ETH", "LINK"]
+FEATURES = ["iv", "rv7", "rv30", "mom7", "mom30", "rsi14", "iv_minus_rv30"]
 
-FEATURE_COLS = ["iv","rv7","rv30","mom7","mom30","rsi14","iv_minus_rv30"]
+MIN_TRAIN_ROWS = 120
+MAX_SPLITS = 5
+SEED = 42
 
-def load_features(sym: str) -> pd.DataFrame:
-    p = DATA / f"{sym}_features.csv"
-    if not p.exists():
-        return pd.DataFrame(columns=["date", *FEATURE_COLS, "target_next_ret"])
-    df = pd.read_csv(p)
-    # types
-    if "date" in df.columns:
-        df["date"] = pd.to_datetime(df["date"])
-    for c in FEATURE_COLS + ["target_next_ret"]:
-        if c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce")
+def now_iso():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+def safe_auc(y_true, y_prob):
+    try:
+        if len(np.unique(y_true)) < 2:
+            return None
+        return float(roc_auc_score(y_true, y_prob))
+    except Exception:
+        return None
+
+def ensure_cols(df: pd.DataFrame, cols):
+    for c in cols:
+        if c not in df.columns:
+            df[c] = np.nan
     return df
 
-def train_and_predict(df: pd.DataFrame):
-    """Return (ret_pred, prob_up, model_name, last_feats)"""
-    if df.empty:
-        return 0.0, 0.5, "naive-empty", {}
+def train_and_forecast(df: pd.DataFrame):
+    # split into training rows (known target) and live row
+    train = df.dropna(subset=["target_next_ret"]).copy()
+    live  = df.tail(1).copy()
 
-    # last row features (forward-fill so it's usable)
-    X_full = df[FEATURE_COLS].copy()
-    X_full = X_full.fillna(method="ffill").fillna(method="bfill")
-    x_last = X_full.iloc[-1].values.reshape(1, -1)
+    if len(train) < MIN_TRAIN_ROWS or live.empty:
+        return None, {"status": "insufficient_data", "sample_size": int(len(train)), "needed": MIN_TRAIN_ROWS}
 
-    # training set (drop rows where y is NaN)
-    if "target_next_ret" not in df or df["target_next_ret"].dropna().empty or len(df) < 50:
-        # Not enough data to train anything meaningful
-        return 0.0, 0.5, "naive", dict(zip(FEATURE_COLS, X_full.iloc[-1].tolist()))
+    # Fill feature NAs with ffill/bfill to avoid dropping rows
+    X_full = df[FEATURES].ffill().bfill().astype(float)
+    y_full = df["target_next_ret"].astype(float)
 
-    y = pd.to_numeric(df["target_next_ret"], errors="coerce")
-    train_mask = y.notna()
-    X = X_full[train_mask]
-    y = y[train_mask]
+    X_train = X_full.iloc[:-1, :]
+    y_train = y_full.iloc[:-1]
+    X_live  = X_full.iloc[[-1], :]
 
-    if len(y) < 50:
-        return 0.0, 0.5, "naive-small", dict(zip(FEATURE_COLS, X_full.iloc[-1].tolist()))
+    # models
+    reg = HistGradientBoostingRegressor(
+        learning_rate=0.05, max_leaf_nodes=31, min_samples_leaf=20, random_state=SEED
+    )
+    cls = HistGradientBoostingClassifier(
+        learning_rate=0.05, max_leaf_nodes=31, min_samples_leaf=20, random_state=SEED
+    )
 
-    # Regressor for next-day return
-    regr = HistGradientBoostingRegressor(max_depth=3, learning_rate=0.05, max_iter=300, random_state=0)
-    regr.fit(X, y)
-    ret_pred = float(regr.predict(x_last)[0])
+    # time-series CV for quick diagnostics
+    n_splits = min(MAX_SPLITS, max(2, len(train)//50))
+    reg_rmse = None
+    auc = None
+    if n_splits >= 2:
+        tscv = TimeSeriesSplit(n_splits=n_splits)
+        preds, truth = [], []
+        probs, truth_c = [], []
+        for tr, te in tscv.split(X_train):
+            Xtr, Xte = X_train.iloc[tr, :], X_train.iloc[te, :]
+            ytr, yte = y_train.iloc[tr], y_train.iloc[te]
 
-    # Classifier for probability of up day
-    y_cls = (y > 0).astype(int)
-    clf = HistGradientBoostingClassifier(max_depth=3, learning_rate=0.05, max_iter=300, random_state=0)
-    clf.fit(X, y_cls)
-    prob_up = float(clf.predict_proba(x_last)[0][1])
+            reg.fit(Xtr, ytr)
+            yp = reg.predict(Xte)
+            preds.append(yp)
+            truth.append(yte.values)
 
-    return ret_pred, prob_up, "histgb", dict(zip(FEATURE_COLS, X_full.iloc[-1].tolist()))
+            cls.fit(Xtr, (ytr > 0).astype(int))
+            p = cls.predict_proba(Xte)[:, 1]
+            probs.append(p)
+            truth_c.append((yte > 0).astype(int).values)
 
-def write_predictions(sym: str, ret_pred: float, prob_up: float, model: str, last_feats: dict, last_date: pd.Timestamp):
-    asset_dir = DOCS / sym
-    asset_dir.mkdir(parents=True, exist_ok=True)
-    out = {
-        "symbol": sym,
-        "ts": pd.to_datetime(last_date).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "next_day_return_pred": ret_pred,
-        "prob_up": prob_up,
-        "model": model,
-        "features_snapshot": last_feats
-    }
-    (asset_dir / "predictions.json").write_text(json.dumps(out, indent=2), encoding="utf-8")
-    return out
+        preds = np.concatenate(preds) if preds else np.array([])
+        truth = np.concatenate(truth) if truth else np.array([])
+        if preds.size and truth.size:
+            reg_rmse = float(math.sqrt(mean_squared_error(truth, preds)))
+        if probs and truth_c:
+            auc = safe_auc(np.concatenate(truth_c), np.concatenate(probs))
+
+    # fit on all training rows and forecast the last row
+    reg.fit(X_train, y_train)
+    cls.fit(X_train, (y_train > 0).astype(int))
+    y_live = float(reg.predict(X_live)[0])
+    p_up   = float(cls.predict_proba(X_live)[0, 1])
+
+    return {
+        "ts": now_iso(),
+        "horizon_days": 1,
+        "features": FEATURES,
+        "sample_size": int(len(train)),
+        "predicted_return": y_live,          # UI key
+        "next_day_return_pred": y_live,      # compatibility key
+        "prob_up": p_up,
+        "rmse": reg_rmse,
+        "auc": auc,
+        "model": "histgb"
+    }, None
 
 def main():
-    aggregate = []
+    agg = []
     for sym in SYMBOLS:
-        df = load_features(sym)
-        if df.empty:
-            # still write a neutral file
-            ret_pred, prob_up, model, last_feats = 0.0, 0.5, "naive-empty", {}
-            last_date = datetime.now(timezone.utc)
+        csv_path = DATA / f"{sym}_features.csv"
+        out_sym  = DOCS / sym / "predictions.json"
+        out_sym.parent.mkdir(parents=True, exist_ok=True)
+
+        if not csv_path.exists():
+            out = {"symbol": sym, "ts": now_iso(), "status": "no_features_csv"}
+            out_sym.write_text(json.dumps(out, indent=2))
+            print(f"[{sym}] no features CSV; wrote status=no_features_csv")
+            continue
+
+        df = pd.read_csv(csv_path)
+        df = ensure_cols(df, FEATURES + ["target_next_ret"])
+
+        forecast, meta = train_and_forecast(df)
+        if forecast:
+            out = {"symbol": sym, **forecast}
+            print(f"[{sym}] forecast: ret≈{forecast['predicted_return']:.5f}, prob_up≈{forecast['prob_up']:.3f}, "
+                  f"rmse={forecast['rmse']}, auc={forecast['auc']}, n={forecast['sample_size']}")
         else:
-            last_date = df["date"].iloc[-1]
-            ret_pred, prob_up, model, last_feats = train_and_predict(df)
+            out = {"symbol": sym, "ts": now_iso(), **meta}
+            print(f"[{sym}] skipped: {meta}")
 
-        agg = write_predictions(sym, ret_pred, prob_up, model, last_feats, last_date)
-        aggregate.append(agg)
+        out_sym.write_text(json.dumps(out, indent=2))
+        agg.append(out)
 
-    # also write a top-level aggregator for the UI
-    (DOCS / "predictions.json").write_text(json.dumps(aggregate, indent=2), encoding="utf-8")
+    # also write aggregator for the homepage/network tab you showed
+    (DOCS / "predictions.json").write_text(json.dumps(agg, indent=2))
 
 if __name__ == "__main__":
     main()
