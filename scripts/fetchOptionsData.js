@@ -7,32 +7,46 @@ const fs = require('fs');
 const path = require('path');
 
 /* ========= Config ========= */
-const BASE_ASSETS = ['BTC','ETH','SOL','BNB','XRP','ADA','AVAX','DOGE','LINK','LTC'];
-const INCLUDE = (process.env.CVI_INCLUDE || '').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
-const EXCLUDE = (process.env.CVI_EXCLUDE || '').split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+// Track only these three by default
+const BASE_ASSETS = ['BTC','ETH','LINK'];
+
+// Optional include/exclude lists (comma-separated)
+const INCLUDE = (process.env.CVI_INCLUDE || '')
+  .split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+const EXCLUDE = (process.env.CVI_EXCLUDE || '')
+  .split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+
+// Final asset set (INCLUDE narrows, EXCLUDE removes)
 const UNIVERSE = Array.from(new Set([...BASE_ASSETS, ...INCLUDE]));
-const ASSETS = (INCLUDE.length ? UNIVERSE.filter(s => INCLUDE.includes(s)) : UNIVERSE).filter(s => !EXCLUDE.includes(s));
+const ASSETS = (INCLUDE.length ? UNIVERSE.filter(s => INCLUDE.includes(s)) : UNIVERSE)
+  .filter(s => !EXCLUDE.includes(s));
 
 const COINGECKO_IDS = {
-  BTC:'bitcoin', ETH:'ethereum', SOL:'solana', BNB:'binancecoin', XRP:'ripple',
-  ADA:'cardano', AVAX:'avalanche-2', DOGE:'dogecoin', LINK:'chainlink', LTC:'litecoin'
+  BTC:'bitcoin', ETH:'ethereum', LINK:'chainlink',
+  // kept for safety if INCLUDE adds others later
+  SOL:'solana', BNB:'binancecoin', XRP:'ripple',
+  ADA:'cardano', AVAX:'avalanche-2', DOGE:'dogecoin', LTC:'litecoin'
 };
 
+// API gating / modes
 const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || '';
-const CG_MODE   = (process.env.COINGECKO_MODE || 'off').toLowerCase();
+const CG_MODE   = (process.env.COINGECKO_MODE || 'off').toLowerCase(); // on|off|sample
 const CG_SAMPLE = Math.max(0, Math.min(1, parseFloat(process.env.COINGECKO_SAMPLE || '0')));
 const ALWAYS_TICK = (process.env.ALWAYS_TICK || '1') !== '0';
 
-const USE_CG = (()=>{
+// Decide whether to hit CoinGecko this run
+const USE_CG = (() => {
   if (CG_MODE === 'on') return true;
   if (CG_MODE === 'off') return false;
   if (CG_MODE === 'sample') return Math.random() < CG_SAMPLE;
   return false;
 })();
 
-const CG_BASE = COINGECKO_API_KEY ? 'https://pro-api.coingecko.com/api/v3' : 'https://api.coingecko.com/api/v3';
+const CG_BASE = COINGECKO_API_KEY ? 'https://pro-api.coingecko.com/api/v3'
+                                  : 'https://api.coingecko.com/api/v3';
 const CG_HEADERS = COINGECKO_API_KEY ? { 'x-cg-pro-api-key': COINGECKO_API_KEY } : undefined;
 
+// Quant knobs
 const RISK_FREE = 0.01;
 const TARGET_DAYS = 30;
 const MAX_TS_POINTS = 2000;
@@ -45,27 +59,57 @@ function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8'))
 function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
 function clamp(x,lo,hi){ return Math.max(lo, Math.min(hi, x)); }
 
+// tiny concurrency helper
+async function pMapLimit(items, limit, iter){
+  const ret = new Array(items.length);
+  let idx = 0;
+  const workers = Array(Math.min(limit, items.length)).fill(0).map(async () => {
+    while (true) {
+      const i = idx++; if (i >= items.length) break;
+      ret[i] = await iter(items[i], i);
+    }
+  });
+  await Promise.all(workers);
+  return ret;
+}
+
+/* ---- Black–Scholes helpers ---- */
 function normPDF(x){ return Math.exp(-0.5*x*x)/Math.sqrt(2*Math.PI); }
-function normCDF(x){ const k=1/(1+0.2316419*Math.abs(x)); const a1=0.319381530,a2=-0.356563782,a3=1.781477937,a4=-1.821255978,a5=1.330274429;
-  const poly=(((a5*k+a4)*k+a3)*k+a2)*k+a1; const cnd=1-normPDF(x)*poly; return x>=0?cnd:1-cnd; }
-function bsCall(S,K,T,r,s){ const st=Math.sqrt(T),d1=(Math.log(S/K)+(r+0.5*s*s)*T)/(s*st),d2=d1-s*st; return S*normCDF(d1)-K*Math.exp(-r*T)*normCDF(d2); }
+function normCDF(x){
+  const k=1/(1+0.2316419*Math.abs(x));
+  const a1=0.319381530,a2=-0.356563782,a3=1.781477937,a4=-1.821255978,a5=1.330274429;
+  const poly=(((a5*k+a4)*k+a3)*k+a2)*k+a1;
+  const cnd=1-normPDF(x)*poly;
+  return x>=0?cnd:1-cnd;
+}
+function bsCall(S,K,T,r,s){ const st=Math.sqrt(T),d1=(Math.log(S/K)+(r+0.5*s*s)*T)/(s*st),d2=d1-s*st;
+  return S*normCDF(d1)-K*Math.exp(-r*T)*normCDF(d2); }
 function vega(S,K,T,r,s){ const st=Math.sqrt(T),d1=(Math.log(S/K)+(r+0.5*s*s)*T)/(s*st); return S*st*normPDF(d1); }
 function impliedVol(price,S,K,T,r,isCall=true){
   if (price<=0||S<=0||K<=0||T<=0) return null;
   const callPx = isCall ? price : (price + S - K*Math.exp(-r*T));
   let s = clamp(Math.sqrt(2*Math.PI/T) * (callPx/Math.max(S,1e-9)), 0.0001, 3.0);
-  for (let i=0;i<100;i++){ const model=bsCall(S,K,T,r,s), diff=model-callPx, vg=vega(S,K,T,r,s);
-    if (Math.abs(diff)<1e-4) return clamp(s,0.0001,5); if (!isFinite(vg)||vg<=1e-8) break; s=clamp(s-diff/vg,0.0001,5); }
+  for (let i=0;i<100;i++){
+    const model=bsCall(S,K,T,r,s), diff=model-callPx, vg=vega(S,K,T,r,s);
+    if (Math.abs(diff)<1e-4) return clamp(s,0.0001,5);
+    if (!isFinite(vg)||vg<=1e-8) break;
+    s=clamp(s-diff/vg,0.0001,5);
+  }
   return null;
 }
 
+/* ========= Resilient HTTP ========= */
 async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDelay=800} = {}) {
   headers = { 'User-Agent':'cvi-bot/1.0', ...headers };
   for (let i=0;i<=retries;i++){
     try { return await axios.get(url, { params, timeout, headers }); }
     catch(e){
       const s = e?.response?.status;
-      if (s===429 || (s>=500 && s<=599)) { const backoff = baseDelay*Math.pow(1.7,i) + Math.random()*300; await delay(backoff); continue; }
+      if (s===429 || (s>=500 && s<=599)) {
+        const backoff = baseDelay*Math.pow(1.7,i) + Math.random()*300;
+        await delay(backoff);
+        continue;
+      }
       throw e;
     }
   }
@@ -96,10 +140,12 @@ async function getInstruments(symbol){
 async function getMarkOrLast(instrument_name){
   try{
     const r = await httpGet('https://www.deribit.com/api/v2/public/ticker', { params:{instrument_name}, timeout:15000 });
-    const t=r?.data?.result||{}; const p = Number(t.mark_price ?? t.last_price ?? NaN);
+    const t=r?.data?.result||{};
+    const p = Number(t.mark_price ?? t.last_price ?? NaN);
     return isFinite(p)?p:null;
   }catch{ return null; }
 }
+// 30d realized (CoinGecko), used when options fail
 async function getRealizedVol30d(symbol){
   if (!USE_CG) return null;
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
@@ -107,7 +153,8 @@ async function getRealizedVol30d(symbol){
     const r = await httpGet(`${CG_BASE}/coins/${id}/market_chart`, { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers: CG_HEADERS });
     const prices = r?.data?.prices || [];
     if (prices.length < 10) return null;
-    const rets = []; for (let i=1;i<prices.length;i++) rets.push(Math.log(prices[i][1]/prices[i-1][1]));
+    const rets = [];
+    for (let i=1;i<prices.length;i++) rets.push(Math.log(prices[i][1]/prices[i-1][1]));
     const mean = rets.reduce((s,x)=>s+x,0)/rets.length;
     const varc = rets.reduce((s,x)=>s+(x-mean)*(x-mean),0)/rets.length;
     const std = Math.sqrt(varc);
@@ -189,28 +236,49 @@ async function buildForAsset(symbol){
         days_to_expiry = ((tgt-now)/86400000).toFixed(2);
         const T = (tgt-now)/(365*24*3600*1000);
 
+        // ±40% around spot, fewer strikes, low concurrency
         const rawAtT = instruments
           .filter(x => x.expiration_timestamp === tgt && x.is_active)
           .filter(x => Math.abs(x.strike / (S||1) - 1) <= 0.40);
 
-        const calls = rawAtT.filter(x => x.option_type === 'call').sort((a,b)=>Math.abs(a.strike-(S||a.strike))-Math.abs(b.strike-(S||b.strike))).slice(0,180);
-        const puts  = rawAtT.filter(x => x.option_type === 'put' ).sort((a,b)=>Math.abs(a.strike-(S||a.strike))-Math.abs(b.strike-(S||b.strike))).slice(0,180);
+        const calls = rawAtT.filter(x => x.option_type === 'call')
+          .sort((a,b)=>Math.abs(a.strike-(S||a.strike))-Math.abs(b.strike-(S||b.strike)))
+          .slice(0, 80);
+        const puts  = rawAtT.filter(x => x.option_type === 'put')
+          .sort((a,b)=>Math.abs(a.strike-(S||a.strike))-Math.abs(b.strike-(S||b.strike)))
+          .slice(0, 80);
 
-        const callTicks = await Promise.all(calls.map(async inst => ({ inst, price: await getMarkOrLast(inst.instrument_name) })));
-        const putTicks  = await Promise.all(puts .map(async inst => ({ inst, price: await getMarkOrLast(inst.instrument_name) })));
+        // polite to the API
+        const callTicks = await pMapLimit(calls, 3, async inst => {
+          const price = await getMarkOrLast(inst.instrument_name);
+          await delay(120); // tiny jitter
+          return { inst, price };
+        });
+        const putTicks  = await pMapLimit(puts,  3, async inst => {
+          const price = await getMarkOrLast(inst.instrument_name);
+          await delay(120);
+          return { inst, price };
+        });
 
         const putByStrike = new Map();
-        for (const kv of putTicks) { const price = kv?.price; if (price && isFinite(price)) putByStrike.set(kv.inst.strike, price); }
+        for (const kv of putTicks) {
+          const price = kv?.price;
+          if (price && isFinite(price)) putByStrike.set(kv.inst.strike, price);
+        }
 
         for (const kv of callTicks) {
           const {inst} = kv || {}; if (!inst) continue;
           let px = (kv.price && isFinite(kv.price)) ? kv.price : null;
-          if (!px) { const p = putByStrike.get(inst.strike); if (p && isFinite(p)) px = p + (S||0) - inst.strike*Math.exp(-RISK_FREE*T); }
+          if (!px) {
+            const p = putByStrike.get(inst.strike);
+            if (p && isFinite(p)) px = p + (S||0) - inst.strike*Math.exp(-RISK_FREE*T);
+          }
           if (!px || px <= 0) continue;
           const iv = impliedVol(px, (S||inst.strike), inst.strike, T, RISK_FREE, true);
           if (iv && isFinite(iv)) smile.push({ strike: inst.strike, iv: clamp(iv, 0.01, 3.0) });
         }
 
+        // if still sparse, use puts directly
         if (smile.length < 3) {
           for (const kv of putTicks) {
             const {inst, price} = kv || {};
@@ -223,7 +291,8 @@ async function buildForAsset(symbol){
         smile.sort((a,b)=>a.strike-b.strike);
 
         if (smile.length){
-          const atm = smile.reduce((best,p)=>Math.abs(p.strike-(S||p.strike))<Math.abs(best.strike-(S||best.strike))?p:best, smile[0]);
+          const atm = smile.reduce((best,p)=>
+            Math.abs(p.strike-(S||p.strike))<Math.abs(best.strike-(S||best.strike))?p:best, smile[0]);
           atm_iv = atm.iv;
 
           const band20 = smile.filter(p=>Math.abs(p.strike/(S||p.strike)-1)<=0.10);
@@ -236,6 +305,7 @@ async function buildForAsset(symbol){
           const ivsum = parts.reduce((s,x)=>s+x.w*x.iv,0);
           vega_weighted_iv = ivsum/wsum;
 
+          // keep display tidy
           const displayBand = smile.filter(p => Math.abs(p.strike/(S||p.strike) - 1) <= 0.20);
           if (displayBand.length >= 3) smile = displayBand;
         }
@@ -254,19 +324,37 @@ async function buildForAsset(symbol){
       if (!series.length) smileSynthetic = true;
     }
 
-    // If no smile, synthesize from base IV so charts never blank
-    if (!Array.isArray(series)) series = [];
-    if (Array.isArray(series) && !fs.existsSync(path.join(assetDir,'cvi.json')) || true) {
-      let baseIV = Number(vega_weighted_iv ?? atm_iv); if (!isFinite(baseIV)) baseIV = 0.5;
-      const width = 0.35; const n=7; const Sguess = (series[series.length-1]?.spot ?? 100);
+    // If we have a real smile, write it; else synthesize one so charts never blank
+    if (Array.isArray(smile) && smile.length) {
+      writeJSON(path.join(assetDir,'cvi.json'), smile);
+      writeJSON(path.join(assetDir,'smile_meta.json'), {
+        synthetic:false, source:'real', coingecko_used:!!USE_CG, generated_at: nowISO
+      });
+    } else {
+      // synthesize from base IV so the UI always has a curve
+      const baseIV = Number(vega_weighted_iv ?? atm_iv); 
+      const Sguess = (series[series.length-1]?.spot ?? 100);
+      const width = 0.35, n=7;
       const ks = Array.from({length:n}, (_,i)=>{ const t=i/(n-1); return Sguess*(1 - width + 2*width*t); });
-      const smileSynth = ks.map(K => { const m=Math.log(K / (Sguess||1)); const iv=Math.max(0.01, baseIV*(1 + 2*m*m - 0.25*m)); return { strike: Math.round(K), iv: clamp(iv, 0.01, 3.0) }; });
+      const smileSynth = ks.map(K => { 
+        const m=Math.log(K / (Sguess||1));
+        const iv=Math.max(0.01, (baseIV||0.5)*(1 + 2*m*m - 0.25*m));
+        return { strike: Math.round(K), iv: clamp(iv, 0.01, 3.0) };
+      });
       writeJSON(path.join(assetDir,'cvi.json'), smileSynth);
-      writeJSON(path.join(assetDir,'smile_meta.json'), { synthetic:true, source:'synthetic', coingecko_used:!!USE_CG, generated_at: nowISO });
+      writeJSON(path.join(assetDir,'smile_meta.json'), {
+        synthetic:true, source:'synthetic', coingecko_used:!!USE_CG, generated_at: nowISO
+      });
     }
 
     // ---- Append row (real or fallback) ----
-    const newRow = { t: nowISO, spot: (series.length? (S ?? series[series.length-1].spot) : (S ?? 100)), days_to_expiry: (typeof days_to_expiry==='string' || typeof days_to_expiry==='number') ? days_to_expiry : TARGET_DAYS.toFixed(2), atm_iv, vega_weighted_iv };
+    const newRow = {
+      t: nowISO,
+      spot: (series.length? (S ?? series[series.length-1].spot) : (S ?? 100)),
+      days_to_expiry: (typeof days_to_expiry==='string' || typeof days_to_expiry==='number')
+        ? days_to_expiry : TARGET_DAYS.toFixed(2),
+      atm_iv, vega_weighted_iv
+    };
     series.push(newRow);
   } catch (err) {
     console.error(`[${symbol}] build failed, ticking last row:`, err?.message || err);
@@ -318,11 +406,12 @@ async function buildForAsset(symbol){
   for (const sym of ASSETS){
     try { results.push(await buildForAsset(sym)); }
     catch (e) { console.error(`[${sym}] unrecoverable error`, e?.message||e); }
-    await delay(1200 + Math.random()*600);
+    await delay(600 + Math.random()*400); // lighter overall cadence now that we track only 3
   }
 
   for (const r of results) prevMap.set(r.symbol, { symbol:r.symbol, files:r.files, latest:r.latest });
-  const mergedAssets = Array.from(prevMap.values());
+  const mergedAssets = Array.from(prevMap.values())
+    .filter(a => ASSETS.includes(a.symbol)); // keep manifest tight to tracked set
   writeJSON(manifestPath, { assets: mergedAssets });
   console.log('Updated manifest with', mergedAssets.length, 'asset(s).');
 })();
