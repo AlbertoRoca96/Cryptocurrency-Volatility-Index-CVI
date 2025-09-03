@@ -1,4 +1,3 @@
-# scripts/backfill.py
 import os, json, pathlib, time
 from typing import Dict, List, Tuple
 from datetime import datetime, timezone
@@ -38,17 +37,10 @@ def _req(url: str, params: dict = None, headers: dict = None, timeout: int = 30)
 def binance_klines_daily(symbol_ccy: str, lookback_days: int = 365) -> pd.DataFrame:
     """
     Fetch ~lookback_days of daily closes from Binance Klines.
-    Uses /api/v3/klines (max 1000 bars per call, default 500). We only need 365. :contentReference[oaicite:0]{index=0}
-    """
+    Uses /api/v3/klines (max 1000 bars per call)."""
     end = int(time.time() * 1000)
     start = end - lookback_days * 86400000
-    params = {
-        "symbol": symbol_ccy,
-        "interval": "1d",
-        "startTime": start,
-        "endTime": end,
-        "limit": 1000
-    }
+    params = {"symbol": symbol_ccy, "interval": "1d", "startTime": start, "endTime": end, "limit": 1000}
     last_err = None
     for base in BINANCE_BASES:
         try:
@@ -61,30 +53,20 @@ def binance_klines_daily(symbol_ccy: str, lookback_days: int = 365) -> pd.DataFr
                 "openTime","open","high","low","close","volume",
                 "closeTime","qav","trades","takerBase","takerQuote","ignore"
             ])
-            df["date"] = pd.to_datetime(df["closeTime"], unit="ms", utc=True).dt.date
+            df["date"]  = pd.to_datetime(df["closeTime"], unit="ms", utc=True).dt.date
             df["close"] = df["close"].astype(float)
             return df[["date","close"]].groupby("date", as_index=False)["close"].last()
         except Exception as e:
             last_err = e
             continue
-    # If both bases failed, raise the last error
     raise last_err or RuntimeError("Binance klines fetch failed")
 
 def coingecko_market_chart_daily(coin_id: str, plan: str) -> pd.DataFrame:
-    """
-    Fallback: CoinGecko daily closes.
-    On the public/demo plan, historical is limited to the *past 365 days*; Pro allows longer ranges. 
-    """
-    params = {"vs_currency": "usd", "interval": "daily"}
-    if plan == "pro":
-        params["days"] = "max"
-    else:
-        params["days"] = "365"
-
+    """Fallback: CoinGecko daily closes (365-day cap on the public plan)."""
+    params = {"vs_currency": "usd", "interval": "daily", "days": ("max" if plan == "pro" else "365")}
     r = _req(f"{CG_BASE}/coins/{coin_id}/market_chart", params=params, headers=CG_HEADERS)
-    # If a proxy strips our header, retry with query key on public/demo
     if r.status_code == 401 and plan != "pro" and API_KEY:
-        params["x_cg_demo_api_key"] = API_KEY
+        params["x_cg_demo_api_key"] = API_KEY  # retry via query param if header stripped
         r = _req(f"{CG_BASE}/coins/{coin_id}/market_chart", params=params)
     r.raise_for_status()
     rows = r.json().get("prices", [])
@@ -95,9 +77,7 @@ def coingecko_market_chart_daily(coin_id: str, plan: str) -> pd.DataFrame:
     return df[["date","close"]].groupby("date", as_index=False)["close"].last()
 
 def read_iv_series(symbol: str) -> pd.DataFrame:
-    """
-    Collapse intraday JSON into daily last observation for IV + spot (from docs/*/cvi_timeseries.json).
-    """
+    """Collapse intraday JSON into daily last observation for IV + spot (from docs/*/cvi_timeseries.json)."""
     p = DOCS / symbol / "cvi_timeseries.json"
     if not p.exists():
         return pd.DataFrame(columns=["date","spot_last","iv_atm","iv_vega"])
@@ -140,16 +120,16 @@ def build_features(df_price: pd.DataFrame, df_iv: pd.DataFrame) -> pd.DataFrame:
     df["mom30"] = df["close"] / df["close"].shift(30) - 1.0
     df["rsi14"] = rsi(df["close"], 14)
 
-    # IV features — fill with RV30 when missing so we keep rows
-    iv_pref = df["vega_weighted_iv"].fillna(df["atm_iv"])
-    df["iv"] = iv_pref.fillna(df["rv30"])
+    # IV features — NOTE: columns here are iv_vega / iv_atm after the merge
+    iv_pref = df["iv_vega"].fillna(df["iv_atm"])
+    df["iv"] = iv_pref.fillna(df["rv30"])        # fallback to realized
     df["iv_minus_rv30"] = df["iv"] - df["rv30"]
 
     # target: next-day simple return
     df["target_next_ret"] = df["close"].pct_change().shift(-1)
 
     cols = ["date","close","spot_last","iv","rv7","rv30","mom7","mom30","rsi14","iv_minus_rv30","target_next_ret"]
-    return df[cols]   # keep last row even if target is NaN (needed for prediction)
+    return df[cols]   # keep last row even if target is NaN (trainer handles it)
 
 def main():
     for sym in SYMBOLS:
