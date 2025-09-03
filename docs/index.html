@@ -53,7 +53,7 @@
         <div class="signal-title" style="margin-top:8px;">Risk & Trade</div>
         <div id="riskBody" class="signal-meta">Calculating…</div>
 
-        <!-- NEW: Model Forecast block -->
+        <!-- Model Forecast block -->
         <hr/>
         <div class="signal-title" style="margin-top:8px;">Model Forecast (1d)</div>
         <div id="modelBox" class="signal-meta">Loading…</div>
@@ -77,6 +77,7 @@
     let seriesChart = null, smileChart = null;
     let loadSeq = 0;
     let manifestBySymbol = {};
+    let lastSeriesRowBySymbol = {}; // remember last series row per asset for USD calcs
 
     async function json(url){
       const r = await fetch(url, { cache: 'no-store' });
@@ -303,25 +304,73 @@
       }
     }
 
-    // NEW: model forecast renderer
-    function renderModel(pred){
+    // ---------- PREDICTIONS: loader + normalization + render ----------
+    // pick first finite number from possible keys
+    function coalesceNum(obj, keys){
+      for (const k of keys){
+        const v = Number(obj?.[k]);
+        if (isFinite(v)) return v;
+      }
+      return null;
+    }
+
+    // normalize one prediction object into { ts, next_day_return, prob_up, model, cv }
+    function normalizePred(o){
+      if (!o || typeof o !== 'object') return null;
+
+      // some writers nest under "prediction"
+      const base = o.prediction && typeof o.prediction === 'object' ? o.prediction : o;
+
+      const ts = o.ts || o.time || base.ts || null;
+      const next = coalesceNum(base, ['next_day_return','next_day_return_pred','predicted_return','return']);
+      const probUp = coalesceNum(base, ['prob_up','probability_up','p_up']);
+      const model = o.model || base.model || 'histgb';
+      const cv = o.cv || null;
+
+      if (next==null && probUp==null) return null;
+      return { ts, next_day_return: next ?? 0, prob_up: probUp ?? 0.5, model, cv };
+    }
+
+    // Load per-asset predictions, falling back to root aggregator array
+    async function loadPredictionsFor(sym){
+      // try docs/{SYM}/predictions.json
+      try {
+        const obj = await json(`${sym}/predictions.json`);
+        const norm = normalizePred(obj);
+        if (norm) return norm;
+      } catch {}
+
+      // fallback: root docs/predictions.json (array of {symbol,...})
+      try {
+        const arr = await json(`predictions.json`);
+        if (Array.isArray(arr)) {
+          const hit = arr.find(x => (x.symbol||x.sym||'').toUpperCase() === sym.toUpperCase());
+          const norm = normalizePred(hit);
+          if (norm) return norm;
+        }
+      } catch {}
+
+      return null;
+    }
+
+    function renderForecast(pred){
       const box = document.getElementById('modelBox');
-      if (!pred || !pred.prediction){
+      if (!pred){
         box.textContent = 'n/a';
         return;
       }
-      const p = pred.prediction || {};
-      const pct = (p.next_day_return*100);
-      const up  = p.prob_up;
+      const pct = pred.next_day_return * 100;
+      const up  = pred.prob_up;
       const hue = up >= 0.55 ? 'var(--ok)' : (up <= 0.45 ? 'var(--bad)' : 'var(--warn)');
       box.innerHTML = `
         <div>Next-day return: <b>${pct.toFixed(2)}%</b></div>
         <div>Prob(up): <b style="color:${hue}">${(up*100).toFixed(1)}%</b></div>
         <div class="muted">CV (RMSE): ${pred.cv?.rmse_mean?.toFixed?.(4) ?? '—'}
         ${pred.cv?.auc_mean ? ` | AUC: ${pred.cv.auc_mean.toFixed(3)}` : ''}</div>
-        <div class="muted">${new Date(pred.t).toLocaleString()}</div>
+        <div class="muted">${pred.ts ? new Date(pred.ts).toLocaleString() : ''}</div>
       `;
     }
+    // -----------------------------------------------------------------
 
     function buildSyntheticSeriesFromManifest(symbol){
       const snap = manifestBySymbol[symbol]?.latest;
@@ -340,17 +389,25 @@
       setActiveTab(sym);
 
       try {
-        let series = [], smile = [], sigs = [], risk = null, orders = [], smileMeta=null, pred=null;
+        let series = [], smile = [], sigs = [], risk = null, orders = [], smileMeta=null;
+
         try { series = await json(`${sym}/cvi_timeseries.json`); } catch {}
         try { smile  = await json(`${sym}/cvi.json`); } catch {}
         try { sigs   = await json(`${sym}/signals.json`); } catch {}
         try { risk   = await json(`${sym}/risk.json`); } catch {}
         try { orders = await json(`${sym}/orders.json`); } catch {}
         try { smileMeta = await json(`${sym}/smile_meta.json`); } catch {}
-        try { pred = await json(`${sym}/predictions.json`); } catch {}
 
         if (mySeq !== loadSeq) return;
 
+        // remember last series row for this symbol (for USD expectations etc.)
+        if (Array.isArray(series) && series.length) {
+          lastSeriesRowBySymbol[sym] = series[series.length - 1];
+        } else {
+          lastSeriesRowBySymbol[sym] = null;
+        }
+
+        // if series is empty or all nulls, synthesize one point
         const nonNullCount = (arr) => arr.reduce((n,p)=>n + ((p && (nonNull(p.atm_iv)||nonNull(p.vega_weighted_iv))) ? 1 : 0), 0);
         if (!Array.isArray(series) || !series.length || nonNullCount(series) === 0) {
           const spot = manifestBySymbol[sym]?.latest?.spot ?? null;
@@ -359,7 +416,7 @@
           series = synth;
           if (!series || !series.length) {
             document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
-            drawSeries([], 1); drawSmile([], 1); renderSignals([]); renderRisk(null); renderOrders(null); setSmileBadge(null); renderModel(null);
+            drawSeries([], 1); drawSmile([], 1); renderSignals([]); renderRisk(null); renderOrders(null); setSmileBadge(null); renderForecast(null);
             return;
           } else {
             document.getElementById('runInfo').textContent = `Asset: ${sym} — showing latest snapshot (synthetic).`;
@@ -377,7 +434,12 @@
         renderRisk(risk);
         renderOrders(orders);
         setSmileBadge(smileMeta);
-        renderModel(pred);
+
+        // predictions (per-asset, with root fallback), then render
+        const pred = await loadPredictionsFor(sym);
+        if (mySeq !== loadSeq) return;
+        renderForecast(pred);
+
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
         ctxFor('cviSeries'); ctxFor('cviSmile');
