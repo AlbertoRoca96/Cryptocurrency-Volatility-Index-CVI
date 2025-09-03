@@ -29,7 +29,8 @@ const COINGECKO_IDS = {
 };
 
 // API gating / modes
-const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY || '';
+const COINGECKO_API_KEY = (process.env.COINGECKO_API_KEY || '').trim();
+const COINGECKO_PLAN    = (process.env.COINGECKO_PLAN || 'demo').toLowerCase(); // 'demo' or 'pro'
 const CG_MODE   = (process.env.COINGECKO_MODE || 'off').toLowerCase(); // on|off|sample
 const CG_SAMPLE = Math.max(0, Math.min(1, parseFloat(process.env.COINGECKO_SAMPLE || '0')));
 const ALWAYS_TICK = (process.env.ALWAYS_TICK || '1') !== '0';
@@ -42,11 +43,36 @@ const USE_CG = (() => {
   return false;
 })();
 
-const CG_BASE = COINGECKO_API_KEY ? 'https://pro-api.coingecko.com/api/v3'
-                                  : 'https://api.coingecko.com/api/v3';
-const CG_HEADERS = COINGECKO_API_KEY ? { 'x-cg-pro-api-key': COINGECKO_API_KEY } : undefined;
+// Correct base + headers per plan
+const CG_BASE = COINGECKO_PLAN === 'pro'
+  ? 'https://pro-api.coingecko.com/api/v3'
+  : 'https://api.coingecko.com/api/v3';
 
-// Quant knobs
+const CG_HEADERS = (() => {
+  if (!COINGECKO_API_KEY) return { 'accept': 'application/json' };
+  return COINGECKO_PLAN === 'pro'
+    ? { 'accept': 'application/json', 'x-cg-pro-api-key': COINGECKO_API_KEY }
+    : { 'accept': 'application/json', 'x-cg-demo-api-key': COINGECKO_API_KEY };
+})();
+
+// helper: one CG GET with 401 fallback to query param (x_cg_demo_api_key / x_cg_pro_api_key)
+async function cgGet(path, params = {}) {
+  const url = `${CG_BASE}${path}`;
+  try {
+    const r = await axios.get(url, { params, timeout: 20000, headers: CG_HEADERS });
+    return r.data;
+  } catch (e) {
+    const s = e?.response?.status;
+    const qp = COINGECKO_PLAN === 'pro' ? 'x_cg_pro_api_key' : 'x_cg_demo_api_key';
+    if (s === 401 && COINGECKO_API_KEY) {
+      const p2 = { ...params, [qp]: COINGECKO_API_KEY };
+      const r2 = await axios.get(url, { params: p2, timeout: 20000 });
+      return r2.data;
+    }
+    throw e;
+  }
+}
+
 const RISK_FREE = 0.01;
 const TARGET_DAYS = 30;
 const MAX_TS_POINTS = 2000;
@@ -120,8 +146,8 @@ async function httpGet(url, {params, timeout=20000, headers, retries=4, baseDela
 async function getSpotFromCoingecko(symbol){
   if (!USE_CG) return null;
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
-  const r = await httpGet(`${CG_BASE}/simple/price`, { params:{ ids:id, vs_currencies:'usd' }, headers: CG_HEADERS });
-  return r?.data?.[id]?.usd ?? null;
+  const data = await cgGet('/simple/price', { ids:id, vs_currencies:'usd' });
+  return data?.[id]?.usd ?? null;
 }
 async function getSpotFromDeribitIndex(symbol){
   const idx = `${symbol.toLowerCase()}_usd`;
@@ -150,8 +176,8 @@ async function getRealizedVol30d(symbol){
   if (!USE_CG) return null;
   const id = COINGECKO_IDS[symbol]; if (!id) return null;
   try{
-    const r = await httpGet(`${CG_BASE}/coins/${id}/market_chart`, { params:{ vs_currency:'usd', days:30, interval:'daily' }, timeout:20000, headers: CG_HEADERS });
-    const prices = r?.data?.prices || [];
+    const data = await cgGet(`/coins/${id}/market_chart`, { vs_currency:'usd', days:30, interval:'daily' });
+    const prices = data?.prices || [];
     if (prices.length < 10) return null;
     const rets = [];
     for (let i=1;i<prices.length;i++) rets.push(Math.log(prices[i][1]/prices[i-1][1]));
@@ -321,22 +347,20 @@ async function buildForAsset(symbol){
       }
       const val = (rv!=null) ? rv : (series.length ? (series[series.length-1].vega_weighted_iv ?? series[series.length-1].atm_iv ?? 0.5) : 0.5);
       atm_iv = vega_weighted_iv = clamp(val, 0.05, 2.0);
-      if (!series.length) smileSynthetic = true;
     }
 
-    // If we have a real smile, write it; else synthesize one so charts never blank
+    // Write real smile if present; else synthesize one so charts never blank
     if (Array.isArray(smile) && smile.length) {
       writeJSON(path.join(assetDir,'cvi.json'), smile);
       writeJSON(path.join(assetDir,'smile_meta.json'), {
         synthetic:false, source:'real', coingecko_used:!!USE_CG, generated_at: nowISO
       });
     } else {
-      // synthesize from base IV so the UI always has a curve
-      const baseIV = Number(vega_weighted_iv ?? atm_iv); 
+      const baseIV = Number(vega_weighted_iv ?? atm_iv);
       const Sguess = (series[series.length-1]?.spot ?? 100);
       const width = 0.35, n=7;
       const ks = Array.from({length:n}, (_,i)=>{ const t=i/(n-1); return Sguess*(1 - width + 2*width*t); });
-      const smileSynth = ks.map(K => { 
+      const smileSynth = ks.map(K => {
         const m=Math.log(K / (Sguess||1));
         const iv=Math.max(0.01, (baseIV||0.5)*(1 + 2*m*m - 0.25*m));
         return { strike: Math.round(K), iv: clamp(iv, 0.01, 3.0) };
@@ -395,6 +419,7 @@ async function buildForAsset(symbol){
 (async function main(){
   if (!ASSETS.length) { console.log('No assets selected. Exiting.'); process.exit(0); }
   console.log('CoinGecko mode:', CG_MODE, 'use=', USE_CG, 'ALWAYS_TICK=', ALWAYS_TICK);
+  console.log('CoinGecko plan:', COINGECKO_PLAN);
   console.log('Assets:', ASSETS.join(', '));
 
   const docsDir = path.join(process.cwd(),'docs'); ensureDir(docsDir);
@@ -406,7 +431,7 @@ async function buildForAsset(symbol){
   for (const sym of ASSETS){
     try { results.push(await buildForAsset(sym)); }
     catch (e) { console.error(`[${sym}] unrecoverable error`, e?.message||e); }
-    await delay(600 + Math.random()*400); // lighter overall cadence now that we track only 3
+    await delay(600 + Math.random()*400);
   }
 
   for (const r of results) prevMap.set(r.symbol, { symbol:r.symbol, files:r.files, latest:r.latest });
