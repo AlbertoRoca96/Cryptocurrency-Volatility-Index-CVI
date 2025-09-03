@@ -75,11 +75,12 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+          cache-dependency-path: 'requirements.txt'  # ensure pip cache keys off this file
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas scikit-learn
+          pip install -r requirements.txt
 
       - name: Build historical CSVs (backfill)
         run: python scripts/backfill.py
