@@ -1,6 +1,6 @@
 # Cryptocurrency Volatility Index (CVI)
 
-> Tracks and forecasts crypto market volatility (BTC, ETH, more), computes **CVI** and **Expected Risk Index (ERI)**, evaluates **EMA/RSI** signals, and publishes a **real-time dashboard** with alerts, paper trades, and volatility smiles — automated via GitHub Actions on a 15-minute or hourly cadence.
+> Tracks and forecasts crypto market volatility (BTC, ETH, more), computes **CVI** and **Expected Risk Index (ERI)**, evaluates **EMA/RSI** signals, and publishes a **real-time dashboard** with alerts, paper trades, and volatility smiles — automated via GitHub Actions on an hourly cadence.
 
 ---
 
