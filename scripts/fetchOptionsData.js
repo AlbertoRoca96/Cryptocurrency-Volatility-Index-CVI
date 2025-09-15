@@ -80,9 +80,8 @@ const SIGNAL_HISTORY = 50;
 
 /* ========= Utils ========= */
 const delay = (ms) => new Promise(r => setTimeout(r, ms));
-function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
-function readJSON(p,fallback){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch{ return fallback; } }
-function writeJSON(p,data){ fs.writeFileSync(p, JSON.stringify(data,null,2)); }
+const { ensureDir, readJSON, writeJSONAtomic } = require('./lib/io');
+function writeJSON(p,data){ writeJSONAtomic(p,data); }
 function clamp(x,lo,hi){ return Math.max(lo, Math.min(hi, x)); }
 
 // tiny concurrency helper
