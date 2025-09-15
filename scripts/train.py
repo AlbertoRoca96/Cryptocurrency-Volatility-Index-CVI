@@ -95,6 +95,7 @@ def train_and_forecast(df: pd.DataFrame):
     y_live = float(reg.predict(X_live)[0])
     p_up   = float(cls.predict_proba(X_live)[0, 1])
 
+    # Log-friendly payload includes the 'for_date' we are predicting
     return {
         "ts": now_iso(),
         "horizon_days": 1,
@@ -124,17 +125,34 @@ def main():
         df = pd.read_csv(csv_path)
         df = ensure_cols(df, FEATURES + ["target_next_ret"])
 
+        # Determine the date this forecast is for (next row's date if present, else last date + 1d naive)
+        for_date = None
+        try:
+            if 'date' in df.columns and len(df['date']):
+                for_date = str(pd.to_datetime(df['date']).iloc[-1])[:10]
+        except Exception:
+            pass
+
         forecast, meta = train_and_forecast(df)
         if forecast:
-            out = {"symbol": sym, **forecast}
+            out = {"symbol": sym, **forecast, "for_date": for_date}
             print(f"[{sym}] forecast: ret≈{forecast['predicted_return']:.5f}, prob_up≈{forecast['prob_up']:.3f}, "
-                  f"rmse={forecast['rmse']}, auc={forecast['auc']}, n={forecast['sample_size']}")
+                  f"rmse={forecast['rmse']}, auc={forecast['auc']}, n={forecast['sample_size']} for_date={for_date}")
         else:
-            out = {"symbol": sym, "ts": now_iso(), **meta}
+            out = {"symbol": sym, "ts": now_iso(), **meta, "for_date": for_date}
             print(f"[{sym}] skipped: {meta}")
 
         out_sym.write_text(json.dumps(out, indent=2))
         agg.append(out)
+
+        # Append to rolling forecast log for evaluation
+        log_path = DOCS / sym / "forecast_log.json"
+        try:
+            prev = json.loads(log_path.read_text()) if log_path.exists() else []
+        except Exception:
+            prev = []
+        prev.append(out)
+        log_path.write_text(json.dumps(prev[-1000:], indent=2))
 
     # also write aggregator for the homepage/network tab you showed
     (DOCS / "predictions.json").write_text(json.dumps(agg, indent=2))

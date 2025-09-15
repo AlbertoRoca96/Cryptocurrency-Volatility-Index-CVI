@@ -10,7 +10,8 @@
     "notify": "node scripts/notifyEmail.js",
     "validate": "node scripts/validateDocs.js",
     "backfill": "python scripts/backfill.py",
-    "train": "python scripts/train.py"
+    "train": "python scripts/train.py",
+    "evaluate": "python scripts/evaluate_forecasts.py"
   },
   "dependencies": {
     "axios": "^1.6.8",

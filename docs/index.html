@@ -64,6 +64,11 @@
         <hr/>
         <div class="signal-title" style="margin-top:8px;">Orders (paper)</div>
         <div id="ordersBox" class="orders"></div>
+
+        <!-- Forecast evaluation -->
+        <hr/>
+        <div class="signal-title" style="margin-top:8px;">Forecast Metrics</div>
+        <div id="metricsBox" class="signal-meta">Loading…</div>
       </div>
     </div>
 
@@ -370,6 +375,35 @@
         <div class="muted">${pred.ts ? new Date(pred.ts).toLocaleString() : ''}</div>
       `;
     }
+
+    async function renderMetrics(sym){
+      const box = document.getElementById('metricsBox');
+      try {
+        const obj = await json(`${sym}/forecast_metrics.json`);
+        if (!obj || !obj.n){ box.textContent = 'n/a'; return; }
+        const br = (obj.brier==null) ? '—' : obj.brier.toFixed(4);
+        box.innerHTML = `
+          <div>Samples: <b>${obj.n}</b> — Last evaluated: ${obj.last_eval_date}</div>
+          <div>MAE: <b>${obj.mae.toFixed(5)}</b> | RMSE: <b>${obj.rmse.toFixed(5)}</b> | Bias: <b>${obj.bias.toFixed(5)}</b></div>
+          <div>Hit rate: <b>${(obj.hit_rate*100).toFixed(1)}%</b> | Brier: <b>${br}</b></div>
+        `;
+      } catch {
+        // try root aggregated
+        try {
+          const arr = await json(`forecast_metrics.json`);
+          const obj = Array.isArray(arr) ? arr.find(x => (x.symbol||'').toUpperCase()===sym.toUpperCase()) : null;
+          if (!obj || !obj.n){ box.textContent = 'n/a'; return; }
+          const br = (obj.brier==null) ? '—' : obj.brier.toFixed(4);
+          box.innerHTML = `
+            <div>Samples: <b>${obj.n}</b> — Last evaluated: ${obj.last_eval_date}</div>
+            <div>MAE: <b>${obj.mae.toFixed(5)}</b> | RMSE: <b>${obj.rmse.toFixed(5)}</b> | Bias: <b>${obj.bias.toFixed(5)}</b></div>
+            <div>Hit rate: <b>${(obj.hit_rate*100).toFixed(1)}%</b> | Brier: <b>${br}</b></div>
+          `;
+        } catch {
+          box.textContent = 'n/a';
+        }
+      }
+    }
     // -----------------------------------------------------------------
 
     function buildSyntheticSeriesFromManifest(symbol){
@@ -439,6 +473,9 @@
         const pred = await loadPredictionsFor(sym);
         if (mySeq !== loadSeq) return;
         renderForecast(pred);
+
+        // metrics
+        await renderMetrics(sym);
 
       } catch {
         document.getElementById('runInfo').textContent = `Asset: ${sym} — failed to load data.`;
