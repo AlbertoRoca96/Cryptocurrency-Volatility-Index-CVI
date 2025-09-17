@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-09-17T07:25:44Z",
+    "ts": "2025-09-17T08:35:02Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0108756866615115,
-    "next_day_return_pred": 0.0108756866615115,
-    "prob_up": 0.7492993979238439,
-    "rmse": 0.0248017783277661,
-    "auc": 0.5356364768129475,
+    "predicted_return": 0.00727913221134212,
+    "next_day_return_pred": 0.00727913221134212,
+    "prob_up": 0.5456846011100552,
+    "rmse": 0.024807365736317206,
+    "auc": 0.5310277382645803,
     "model": "histgb",
     "for_date": "2025-09-17"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-09-17T07:25:45Z",
+    "ts": "2025-09-17T08:35:03Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.001969046649954182,
-    "next_day_return_pred": 0.001969046649954182,
-    "prob_up": 0.6009547192286164,
-    "rmse": 0.042527751216685214,
-    "auc": 0.5389960358113224,
+    "predicted_return": 0.012634331130288124,
+    "next_day_return_pred": 0.012634331130288124,
+    "prob_up": 0.3906018618490807,
+    "rmse": 0.04252906028826252,
+    "auc": 0.5417556980056981,
     "model": "histgb",
     "for_date": "2025-09-17"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-09-17T07:25:46Z",
+    "ts": "2025-09-17T08:35:04Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.012119027394909495,
-    "next_day_return_pred": 0.012119027394909495,
-    "prob_up": 0.7479329029827516,
-    "rmse": 0.05943767629268544,
-    "auc": 0.46537162162162166,
+    "predicted_return": 0.009892581567163427,
+    "next_day_return_pred": 0.009892581567163427,
+    "prob_up": 0.37487488449943557,
+    "rmse": 0.05944370649472675,
+    "auc": 0.4599759989332859,
     "model": "histgb",
     "for_date": "2025-09-17"
   }
