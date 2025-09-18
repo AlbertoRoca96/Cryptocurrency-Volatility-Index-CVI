@@ -1868,5 +1868,27 @@
     "auc": 0.5302213709857022,
     "model": "histgb",
     "for_date": "2025-09-18"
+  },
+  {
+    "symbol": "ETH",
+    "ts": "2025-09-18T12:54:06Z",
+    "horizon_days": 1,
+    "features": [
+      "iv",
+      "rv7",
+      "rv30",
+      "mom7",
+      "mom30",
+      "rsi14",
+      "iv_minus_rv30"
+    ],
+    "sample_size": 364,
+    "predicted_return": 0.008194632963574706,
+    "next_day_return_pred": 0.008194632963574706,
+    "prob_up": 0.47940819848722294,
+    "rmse": 0.042592664531904606,
+    "auc": 0.5302213709857022,
+    "model": "histgb",
+    "for_date": "2025-09-18"
   }
 ]
