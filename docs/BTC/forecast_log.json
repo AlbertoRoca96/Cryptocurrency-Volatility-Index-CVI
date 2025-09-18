@@ -2022,5 +2022,27 @@
     "auc": 0.5498088549075391,
     "model": "histgb",
     "for_date": "2025-09-18"
+  },
+  {
+    "symbol": "BTC",
+    "ts": "2025-09-18T19:21:28Z",
+    "horizon_days": 1,
+    "features": [
+      "iv",
+      "rv7",
+      "rv30",
+      "mom7",
+      "mom30",
+      "rsi14",
+      "iv_minus_rv30"
+    ],
+    "sample_size": 364,
+    "predicted_return": -0.0024572413014773663,
+    "next_day_return_pred": -0.0024572413014773663,
+    "prob_up": 0.21132349378722556,
+    "rmse": 0.02441522756616436,
+    "auc": 0.5498088549075391,
+    "model": "histgb",
+    "for_date": "2025-09-18"
   }
 ]
