@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-09-25T06:43:59Z",
+    "ts": "2025-09-25T07:27:09Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.012378076764165396,
-    "next_day_return_pred": 0.012378076764165396,
-    "prob_up": 0.757126060220003,
-    "rmse": 0.024661697601469905,
-    "auc": 0.5307610241820768,
+    "predicted_return": 0.004919057715615831,
+    "next_day_return_pred": 0.004919057715615831,
+    "prob_up": 0.38474617527426846,
+    "rmse": 0.025085845399780513,
+    "auc": 0.5394514580369842,
     "model": "histgb",
     "for_date": "2025-09-25"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-09-25T06:44:00Z",
+    "ts": "2025-09-25T07:27:10Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.033708201833763385,
-    "next_day_return_pred": 0.033708201833763385,
-    "prob_up": 0.7186833504062885,
-    "rmse": 0.044233914076590455,
-    "auc": 0.44213076136717183,
+    "predicted_return": 0.011708405322580233,
+    "next_day_return_pred": 0.011708405322580233,
+    "prob_up": 0.3824755516587964,
+    "rmse": 0.044500714555915345,
+    "auc": 0.4645161290322581,
     "model": "histgb",
     "for_date": "2025-09-25"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-09-25T06:44:01Z",
+    "ts": "2025-09-25T07:27:11Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.02825646436969883,
-    "next_day_return_pred": 0.02825646436969883,
-    "prob_up": 0.572969897227301,
-    "rmse": 0.05908481154118098,
-    "auc": 0.45874844333748444,
+    "predicted_return": 0.022115512723784612,
+    "next_day_return_pred": 0.022115512723784612,
+    "prob_up": 0.5881443442801234,
+    "rmse": 0.059480664885953494,
+    "auc": 0.4539918207681366,
     "model": "histgb",
     "for_date": "2025-09-25"
   }
