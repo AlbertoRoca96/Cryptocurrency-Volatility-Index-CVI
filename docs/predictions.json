@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-09-28T14:23:00Z",
+    "ts": "2025-09-28T15:23:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.005574486009811656,
-    "next_day_return_pred": 0.005574486009811656,
-    "prob_up": 0.8698265515280892,
-    "rmse": 0.02467610604990001,
-    "auc": 0.5239206793828644,
+    "predicted_return": 0.006490363744518017,
+    "next_day_return_pred": 0.006490363744518017,
+    "prob_up": 0.6691827123586819,
+    "rmse": 0.024680436504874906,
+    "auc": 0.5175364509246089,
     "model": "histgb",
     "for_date": "2025-09-28"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-09-28T14:23:00Z",
+    "ts": "2025-09-28T15:23:45Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.008176593815229718,
-    "next_day_return_pred": -0.008176593815229718,
-    "prob_up": 0.1655967772559505,
-    "rmse": 0.04312042727317388,
-    "auc": 0.5107632093933464,
+    "predicted_return": -0.006238879647702396,
+    "next_day_return_pred": -0.006238879647702396,
+    "prob_up": 0.32179585429473434,
+    "rmse": 0.04312442359730876,
+    "auc": 0.511635150166852,
     "model": "histgb",
     "for_date": "2025-09-28"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-09-28T14:23:01Z",
+    "ts": "2025-09-28T15:23:46Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.009955529560486396,
-    "next_day_return_pred": -0.009955529560486396,
-    "prob_up": 0.3780768856695862,
-    "rmse": 0.05524935044698335,
+    "predicted_return": -0.002464224447554229,
+    "next_day_return_pred": -0.002464224447554229,
+    "prob_up": 0.3500829279010069,
+    "rmse": 0.05524856713014255,
     "auc": 0.4522475656929438,
     "model": "histgb",
     "for_date": "2025-09-28"
