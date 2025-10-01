@@ -1,6 +1,6 @@
 {
   "symbol": "BTC",
-  "ts": "2025-10-01T10:31:09Z",
+  "ts": "2025-10-01T11:23:53Z",
   "horizon_days": 1,
   "features": [
     "iv",
@@ -12,10 +12,10 @@
     "iv_minus_rv30"
   ],
   "sample_size": 364,
-  "predicted_return": 0.0010158595454875503,
-  "next_day_return_pred": 0.0010158595454875503,
-  "prob_up": 0.17567030204630227,
-  "rmse": 0.02463017810717028,
+  "predicted_return": 8.600006729330787e-05,
+  "next_day_return_pred": 8.600006729330787e-05,
+  "prob_up": 0.20051558973720446,
+  "rmse": 0.02462192927712331,
   "auc": 0.5473892545810355,
   "model": "histgb",
   "for_date": "2025-10-01"
