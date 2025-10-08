@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-10-08T22:28:01Z",
+    "ts": "2025-10-08T23:24:09Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.017493266633307757,
-    "next_day_return_pred": 0.017493266633307757,
-    "prob_up": 0.891576452690119,
-    "rmse": 0.024025823330041798,
-    "auc": 0.5302483974358975,
+    "predicted_return": 0.009572918017214162,
+    "next_day_return_pred": 0.009572918017214162,
+    "prob_up": 0.7832813086907662,
+    "rmse": 0.024224572061791648,
+    "auc": 0.5131924360400445,
     "model": "histgb",
     "for_date": "2025-10-08"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-10-08T22:28:01Z",
+    "ts": "2025-10-08T23:24:10Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.011337903750799674,
-    "next_day_return_pred": 0.011337903750799674,
-    "prob_up": 0.7563172727502715,
-    "rmse": 0.042799208138524274,
-    "auc": 0.5124866452991452,
+    "predicted_return": 0.020106712352772393,
+    "next_day_return_pred": 0.020106712352772393,
+    "prob_up": 0.7795887390221341,
+    "rmse": 0.04371549752939649,
+    "auc": 0.4861277844471122,
     "model": "histgb",
     "for_date": "2025-10-08"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-10-08T22:28:02Z",
+    "ts": "2025-10-08T23:24:10Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.011723060449118857,
-    "next_day_return_pred": 0.011723060449118857,
-    "prob_up": 0.6011412376602678,
-    "rmse": 0.05728813407286871,
-    "auc": 0.45584248188808396,
+    "predicted_return": 0.013829419107510845,
+    "next_day_return_pred": 0.013829419107510845,
+    "prob_up": 0.6263479030700025,
+    "rmse": 0.05711943362759836,
+    "auc": 0.454026054866391,
     "model": "histgb",
     "for_date": "2025-10-08"
   }
