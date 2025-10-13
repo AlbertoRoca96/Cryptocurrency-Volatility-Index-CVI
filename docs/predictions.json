@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-10-13T02:07:06Z",
+    "ts": "2025-10-13T03:47:29Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.004204137936477133,
-    "next_day_return_pred": -0.004204137936477133,
-    "prob_up": 0.5984370217092151,
-    "rmse": 0.024806895343545552,
-    "auc": 0.5272998088124138,
+    "predicted_return": -0.006175344018331068,
+    "next_day_return_pred": -0.006175344018331068,
+    "prob_up": 0.37832091163040754,
+    "rmse": 0.02480986338558837,
+    "auc": 0.5225151137980085,
     "model": "histgb",
     "for_date": "2025-10-13"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-10-13T02:07:07Z",
+    "ts": "2025-10-13T03:47:29Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.01709180652420865,
-    "next_day_return_pred": -0.01709180652420865,
-    "prob_up": 0.6501575554481743,
-    "rmse": 0.044397684947739664,
-    "auc": 0.4684093437152391,
+    "predicted_return": -0.015407762986967785,
+    "next_day_return_pred": -0.015407762986967785,
+    "prob_up": 0.3812413795745996,
+    "rmse": 0.04437606454295036,
+    "auc": 0.47315869062444404,
     "model": "histgb",
     "for_date": "2025-10-13"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-10-13T02:07:07Z",
+    "ts": "2025-10-13T03:47:30Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.006235325572198339,
-    "next_day_return_pred": -0.006235325572198339,
-    "prob_up": 0.386794498139684,
-    "rmse": 0.058512733791511444,
+    "predicted_return": -0.01246765342815309,
+    "next_day_return_pred": -0.01246765342815309,
+    "prob_up": 0.5547479826385409,
+    "rmse": 0.058493098704479544,
     "auc": 0.43533045913151697,
     "model": "histgb",
     "for_date": "2025-10-13"
