@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-10-15T08:38:29Z",
+    "ts": "2025-10-15T09:30:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.011037679542858767,
-    "next_day_return_pred": 0.011037679542858767,
-    "prob_up": 0.4644933584685043,
-    "rmse": 0.023580833387269986,
-    "auc": 0.5530821917808219,
+    "predicted_return": 0.008781365100879023,
+    "next_day_return_pred": 0.008781365100879023,
+    "prob_up": 0.31396295341162456,
+    "rmse": 0.02358638829689784,
+    "auc": 0.5474411987017029,
     "model": "histgb",
     "for_date": "2025-10-15"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-10-15T08:38:30Z",
+    "ts": "2025-10-15T09:30:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.007303972502194799,
-    "next_day_return_pred": -0.007303972502194799,
-    "prob_up": 0.49237735165488955,
-    "rmse": 0.04479108441504658,
+    "predicted_return": -0.011435586588176073,
+    "next_day_return_pred": -0.011435586588176073,
+    "prob_up": 0.5871100711538295,
+    "rmse": 0.044754359869203404,
     "auc": 0.5026264245014245,
     "model": "histgb",
     "for_date": "2025-10-15"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-10-15T08:38:30Z",
+    "ts": "2025-10-15T09:30:52Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.017341193855604394,
-    "next_day_return_pred": -0.017341193855604394,
-    "prob_up": 0.5082906834723971,
-    "rmse": 0.05455480653741246,
-    "auc": 0.44268888888888885,
+    "predicted_return": -0.014920814112026429,
+    "next_day_return_pred": -0.014920814112026429,
+    "prob_up": 0.2939902535406551,
+    "rmse": 0.05452756937611144,
+    "auc": 0.4486199386639406,
     "model": "histgb",
     "for_date": "2025-10-15"
   }
