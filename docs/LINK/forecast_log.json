@@ -16014,5 +16014,27 @@
     "auc": 0.4486199386639406,
     "model": "histgb",
     "for_date": "2025-10-15"
+  },
+  {
+    "symbol": "LINK",
+    "ts": "2025-10-15T23:24:46Z",
+    "horizon_days": 1,
+    "features": [
+      "iv",
+      "rv7",
+      "rv30",
+      "mom7",
+      "mom30",
+      "rsi14",
+      "iv_minus_rv30"
+    ],
+    "sample_size": 364,
+    "predicted_return": -0.0024179933174017887,
+    "next_day_return_pred": -0.0024179933174017887,
+    "prob_up": 0.5829707661156039,
+    "rmse": 0.054537765744851564,
+    "auc": 0.4486199386639406,
+    "model": "histgb",
+    "for_date": "2025-10-15"
   }
 ]
