@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-10-16T05:28:18Z",
+    "ts": "2025-10-16T06:39:43Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.017536096259783755,
-    "next_day_return_pred": 0.017536096259783755,
-    "prob_up": 0.4689582057641799,
-    "rmse": 0.02433173875930447,
-    "auc": 0.5278049431009958,
+    "predicted_return": 0.018066607894879808,
+    "next_day_return_pred": 0.018066607894879808,
+    "prob_up": 0.7407022069388267,
+    "rmse": 0.02432202505506133,
+    "auc": 0.5342581477035259,
     "model": "histgb",
     "for_date": "2025-10-16"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-10-16T05:28:19Z",
+    "ts": "2025-10-16T06:39:43Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.013708495889208992,
-    "next_day_return_pred": -0.013708495889208992,
-    "prob_up": 0.3502177777841861,
-    "rmse": 0.04410061490861523,
+    "predicted_return": -0.015551494267629588,
+    "next_day_return_pred": -0.015551494267629588,
+    "prob_up": 0.4131671374027855,
+    "rmse": 0.04411398343576657,
     "auc": 0.48709677419354835,
     "model": "histgb",
     "for_date": "2025-10-16"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-10-16T05:28:20Z",
+    "ts": "2025-10-16T06:39:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0034715854368956847,
-    "next_day_return_pred": -0.0034715854368956847,
-    "prob_up": 0.34762676990884883,
-    "rmse": 0.05577220611539202,
-    "auc": 0.44907983641536275,
+    "predicted_return": -0.0043127260328317246,
+    "next_day_return_pred": -0.0043127260328317246,
+    "prob_up": 0.6697056736251398,
+    "rmse": 0.055774302768503835,
+    "auc": 0.44706431396950974,
     "model": "histgb",
     "for_date": "2025-10-16"
   }
