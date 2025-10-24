@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-10-24T22:28:24Z",
+    "ts": "2025-10-24T23:25:30Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0038160504589955105,
-    "next_day_return_pred": -0.0038160504589955105,
-    "prob_up": 0.506055074966011,
-    "rmse": 0.023377246143890168,
-    "auc": 0.5458993061732786,
+    "predicted_return": -0.004556176895649642,
+    "next_day_return_pred": -0.004556176895649642,
+    "prob_up": 0.3823636432897959,
+    "rmse": 0.02269759601293265,
+    "auc": 0.5349359544565023,
     "model": "histgb",
     "for_date": "2025-10-24"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-10-24T22:28:24Z",
+    "ts": "2025-10-24T23:25:31Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -4.077973119088113e-05,
-    "next_day_return_pred": -4.077973119088113e-05,
-    "prob_up": 0.7390300644246892,
-    "rmse": 0.043516865730495936,
-    "auc": 0.46366505178007916,
+    "predicted_return": -0.008112756367268926,
+    "next_day_return_pred": -0.008112756367268926,
+    "prob_up": 0.70801130414823,
+    "rmse": 0.04362758560664156,
+    "auc": 0.48888098203166697,
     "model": "histgb",
     "for_date": "2025-10-24"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-10-24T22:28:25Z",
+    "ts": "2025-10-24T23:25:31Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.005635785564516499,
-    "next_day_return_pred": -0.005635785564516499,
-    "prob_up": 0.6518721974389566,
-    "rmse": 0.05363021540452861,
-    "auc": 0.4646603840682788,
+    "predicted_return": 0.005676670366509262,
+    "next_day_return_pred": 0.005676670366509262,
+    "prob_up": 0.4062267504487149,
+    "rmse": 0.05246911188905601,
+    "auc": 0.43688608382594785,
     "model": "histgb",
     "for_date": "2025-10-24"
   }
