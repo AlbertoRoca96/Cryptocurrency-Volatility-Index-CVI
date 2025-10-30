@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-10-30T05:29:40Z",
+    "ts": "2025-10-30T06:40:33Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.002171473958776856,
-    "next_day_return_pred": 0.002171473958776856,
-    "prob_up": 0.5107389824135233,
-    "rmse": 0.02296086956817628,
-    "auc": 0.5554098506401138,
+    "predicted_return": -0.007173682665290283,
+    "next_day_return_pred": -0.007173682665290283,
+    "prob_up": 0.6952819443389545,
+    "rmse": 0.02297489508834012,
+    "auc": 0.5538437597261126,
     "model": "histgb",
     "for_date": "2025-10-30"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-10-30T05:29:40Z",
+    "ts": "2025-10-30T06:40:34Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.002502363923579294,
-    "next_day_return_pred": -0.002502363923579294,
-    "prob_up": 0.3967580261805519,
-    "rmse": 0.04375812453533381,
-    "auc": 0.4536139758179231,
+    "predicted_return": 0.008670434729459036,
+    "next_day_return_pred": 0.008670434729459036,
+    "prob_up": 0.8160167208219062,
+    "rmse": 0.04375479866660006,
+    "auc": 0.4575830332132853,
     "model": "histgb",
     "for_date": "2025-10-30"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-10-30T05:29:41Z",
+    "ts": "2025-10-30T06:40:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.004500096787277489,
-    "next_day_return_pred": 0.004500096787277489,
-    "prob_up": 0.5966726902505185,
-    "rmse": 0.05585757224404956,
+    "predicted_return": 0.0022713857110619614,
+    "next_day_return_pred": 0.0022713857110619614,
+    "prob_up": 0.451440902232316,
+    "rmse": 0.05586028532142984,
     "auc": 0.4788212809458198,
     "model": "histgb",
     "for_date": "2025-10-30"
