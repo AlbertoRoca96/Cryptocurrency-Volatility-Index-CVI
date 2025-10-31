@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2025-10-28T22:28:43.530Z",
-    "recommendation": "Short Volatility",
-    "strength": 1,
-    "size_hint": 1,
-    "reason": "EMA20 > EMA100 (bullish IV trend); IV at 90th percentile",
-    "last_iv": 0.05653798833921932,
-    "ema20": 0.03705541749624997,
-    "ema100": 0.03669424026196522
-  },
-  {
     "ts": "2025-10-28T23:25:57.855Z",
     "recommendation": "Short Volatility",
     "strength": 0.6,
@@ -498,5 +488,15 @@
     "last_iv": 0.04700332516745203,
     "ema20": 0.04095828980768516,
     "ema100": 0.036719079438309175
+  },
+  {
+    "ts": "2025-10-31T06:40:42.691Z",
+    "recommendation": "Hold",
+    "strength": 0,
+    "size_hint": 0.5,
+    "reason": "",
+    "last_iv": 0.03374098528695742,
+    "ema20": 0.04027092747237775,
+    "ema100": 0.03666010727689627
   }
 ]
