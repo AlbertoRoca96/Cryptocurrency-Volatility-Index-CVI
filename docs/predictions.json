@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-11-02T19:19:57Z",
+    "ts": "2025-11-02T20:27:36Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.012412018373791748,
-    "next_day_return_pred": -0.012412018373791748,
-    "prob_up": 0.3879087060957913,
-    "rmse": 0.023218553599001792,
-    "auc": 0.5458405584456005,
+    "predicted_return": -0.012226635985038916,
+    "next_day_return_pred": -0.012226635985038916,
+    "prob_up": 0.5082606905990825,
+    "rmse": 0.02321654552254407,
+    "auc": 0.5467860953058321,
     "model": "histgb",
     "for_date": "2025-11-02"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-11-02T19:19:58Z",
+    "ts": "2025-11-02T20:27:37Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0032389407545210056,
-    "next_day_return_pred": -0.0032389407545210056,
-    "prob_up": 0.2259995599023235,
-    "rmse": 0.04450425036477035,
+    "predicted_return": 0.007953331659298853,
+    "next_day_return_pred": 0.007953331659298853,
+    "prob_up": 0.3080166523408596,
+    "rmse": 0.04450215105104748,
     "auc": 0.4605707681365576,
     "model": "histgb",
     "for_date": "2025-11-02"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-11-02T19:19:58Z",
+    "ts": "2025-11-02T20:27:37Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.006436155226201282,
-    "next_day_return_pred": -0.006436155226201282,
-    "prob_up": 0.2820564685564724,
-    "rmse": 0.055348365312596,
-    "auc": 0.4975328947368421,
+    "predicted_return": -0.01338333682792724,
+    "next_day_return_pred": -0.01338333682792724,
+    "prob_up": 0.1214491954279295,
+    "rmse": 0.05534985443775043,
+    "auc": 0.49804366190920807,
     "model": "histgb",
     "for_date": "2025-11-02"
   }
