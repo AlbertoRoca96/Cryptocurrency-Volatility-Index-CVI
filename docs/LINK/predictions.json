@@ -1,6 +1,6 @@
 {
   "symbol": "LINK",
-  "ts": "2025-11-10T03:55:07Z",
+  "ts": "2025-11-10T04:36:26Z",
   "horizon_days": 1,
   "features": [
     "iv",
@@ -12,10 +12,10 @@
     "iv_minus_rv30"
   ],
   "sample_size": 364,
-  "predicted_return": 0.001175839784361917,
-  "next_day_return_pred": 0.001175839784361917,
-  "prob_up": 0.6527554030707822,
-  "rmse": 0.05369662397035149,
+  "predicted_return": -0.0003687880163284915,
+  "next_day_return_pred": -0.0003687880163284915,
+  "prob_up": 0.6656758090305007,
+  "rmse": 0.053689025853886706,
   "auc": 0.49144444444444446,
   "model": "histgb",
   "for_date": "2025-11-10"
