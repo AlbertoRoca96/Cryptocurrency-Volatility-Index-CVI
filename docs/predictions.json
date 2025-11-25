@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-11-25T22:30:55Z",
+    "ts": "2025-11-25T23:27:48Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.011734110297690703,
-    "next_day_return_pred": -0.011734110297690703,
-    "prob_up": 0.5116563997415864,
-    "rmse": 0.02405743780695319,
+    "predicted_return": -0.007155517926289329,
+    "next_day_return_pred": -0.007155517926289329,
+    "prob_up": 0.6152382556413473,
+    "rmse": 0.024041236134732986,
     "auc": 0.4800880039112849,
     "model": "histgb",
     "for_date": "2025-11-25"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-11-25T22:30:56Z",
+    "ts": "2025-11-25T23:27:49Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0263257025910924,
-    "next_day_return_pred": -0.0263257025910924,
-    "prob_up": 0.20194347402749738,
-    "rmse": 0.044494800862016015,
-    "auc": 0.45999288762446655,
+    "predicted_return": -0.014963317882563842,
+    "next_day_return_pred": -0.014963317882563842,
+    "prob_up": 0.5520666227445764,
+    "rmse": 0.04449625928838056,
+    "auc": 0.46218487394957986,
     "model": "histgb",
     "for_date": "2025-11-25"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-11-25T22:30:57Z",
+    "ts": "2025-11-25T23:27:49Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.02952775617034668,
-    "next_day_return_pred": -0.02952775617034668,
-    "prob_up": 0.35677766535352456,
-    "rmse": 0.05315603643915798,
-    "auc": 0.471433017651505,
+    "predicted_return": -0.021959352686024638,
+    "next_day_return_pred": -0.021959352686024638,
+    "prob_up": 0.6190332472730881,
+    "rmse": 0.053155819382677404,
+    "auc": 0.4776849217638691,
     "model": "histgb",
     "for_date": "2025-11-25"
   }
