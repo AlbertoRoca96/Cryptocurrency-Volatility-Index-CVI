@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-01T06:49:33Z",
+    "ts": "2025-12-01T07:32:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.002520623489265569,
-    "next_day_return_pred": -0.002520623489265569,
-    "prob_up": 0.602376741684273,
-    "rmse": 0.023953565913622535,
-    "auc": 0.5196230943597493,
+    "predicted_return": 0.004895512174978497,
+    "next_day_return_pred": 0.004895512174978497,
+    "prob_up": 0.6386843440325527,
+    "rmse": 0.023946304918440846,
+    "auc": 0.5228010133783724,
     "model": "histgb",
     "for_date": "2025-12-01"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-01T06:49:33Z",
+    "ts": "2025-12-01T07:32:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0102461835682362,
-    "next_day_return_pred": 0.0102461835682362,
-    "prob_up": 0.6324412375667462,
-    "rmse": 0.045008617224848606,
-    "auc": 0.45800542439197894,
+    "predicted_return": 0.013630456700183147,
+    "next_day_return_pred": 0.013630456700183147,
+    "prob_up": 0.6584406165103285,
+    "rmse": 0.04502225749641761,
+    "auc": 0.4568716375439064,
     "model": "histgb",
     "for_date": "2025-12-01"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-01T06:49:34Z",
+    "ts": "2025-12-01T07:32:45Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.003049256564438592,
-    "next_day_return_pred": 0.003049256564438592,
-    "prob_up": 0.6651459565601322,
-    "rmse": 0.050940447388704985,
-    "auc": 0.5036247998576766,
+    "predicted_return": 0.004609215033933821,
+    "next_day_return_pred": 0.004609215033933821,
+    "prob_up": 0.820534014526005,
+    "rmse": 0.050954357268659274,
+    "auc": 0.5087395481231098,
     "model": "histgb",
     "for_date": "2025-12-01"
   }
