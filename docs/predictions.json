@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-04T02:17:36Z",
+    "ts": "2025-12-04T03:57:30Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.012750859959566827,
-    "next_day_return_pred": -0.012750859959566827,
-    "prob_up": 0.27853489424894695,
-    "rmse": 0.025528880719315278,
-    "auc": 0.48748666429587484,
+    "predicted_return": -0.014285129752076327,
+    "next_day_return_pred": -0.014285129752076327,
+    "prob_up": 0.6739451644675769,
+    "rmse": 0.025529241473659908,
+    "auc": 0.4894179894179894,
     "model": "histgb",
     "for_date": "2025-12-04"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-04T02:17:37Z",
+    "ts": "2025-12-04T03:57:31Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.020861799209579236,
-    "next_day_return_pred": -0.020861799209579236,
-    "prob_up": 0.35187592140682655,
-    "rmse": 0.04522072084056428,
+    "predicted_return": -0.0033971445281412937,
+    "next_day_return_pred": -0.0033971445281412937,
+    "prob_up": 0.5855698145253891,
+    "rmse": 0.04522038954244924,
     "auc": 0.4613570634037819,
     "model": "histgb",
     "for_date": "2025-12-04"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-04T02:17:38Z",
+    "ts": "2025-12-04T03:57:32Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.010986274032557324,
-    "next_day_return_pred": -0.010986274032557324,
-    "prob_up": 0.5949319207966743,
-    "rmse": 0.05261637638110943,
-    "auc": 0.47157651451175603,
+    "predicted_return": -0.016270761960368835,
+    "next_day_return_pred": -0.016270761960368835,
+    "prob_up": 0.1835598045217178,
+    "rmse": 0.05259037885225369,
+    "auc": 0.47741820768136556,
     "model": "histgb",
     "for_date": "2025-12-04"
   }
