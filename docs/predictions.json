@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-07T04:01:55Z",
+    "ts": "2025-12-07T04:40:39Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.011526888295907825,
-    "next_day_return_pred": -0.011526888295907825,
+    "predicted_return": -0.012198030762168783,
+    "next_day_return_pred": -0.012198030762168783,
     "prob_up": 0.8394128542378627,
-    "rmse": 0.024895467549617956,
+    "rmse": 0.024893654797525516,
     "auc": 0.5074235419630156,
     "model": "histgb",
     "for_date": "2025-12-07"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-07T04:01:56Z",
+    "ts": "2025-12-07T04:40:39Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.012615853268309515,
-    "next_day_return_pred": -0.012615853268309515,
-    "prob_up": 0.4217091571496417,
-    "rmse": 0.04601506500000423,
+    "predicted_return": -0.015839780548652115,
+    "next_day_return_pred": -0.015839780548652115,
+    "prob_up": 0.5375385700498245,
+    "rmse": 0.046008046557549885,
     "auc": 0.4713796477495107,
     "model": "histgb",
     "for_date": "2025-12-07"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-07T04:01:57Z",
+    "ts": "2025-12-07T04:40:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.005299713817032669,
-    "next_day_return_pred": 0.005299713817032669,
-    "prob_up": 0.4200510378089275,
-    "rmse": 0.051811256235230974,
-    "auc": 0.49235419630156474,
+    "predicted_return": -0.00014222007979828818,
+    "next_day_return_pred": -0.00014222007979828818,
+    "prob_up": 0.2584692867830763,
+    "rmse": 0.051803152039423636,
+    "auc": 0.4933973589435774,
     "model": "histgb",
     "for_date": "2025-12-07"
   }
