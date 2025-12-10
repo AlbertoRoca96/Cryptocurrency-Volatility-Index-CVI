@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-10T20:36:19Z",
+    "ts": "2025-12-10T21:33:14Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.005059776560180148,
-    "next_day_return_pred": -0.005059776560180148,
-    "prob_up": 0.5890772671196071,
-    "rmse": 0.023916764873527202,
-    "auc": 0.5083615015121864,
+    "predicted_return": -0.008800616517616695,
+    "next_day_return_pred": -0.008800616517616695,
+    "prob_up": 0.2668969669172427,
+    "rmse": 0.023894108173259158,
+    "auc": 0.508203281312525,
     "model": "histgb",
     "for_date": "2025-12-10"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-10T20:36:20Z",
+    "ts": "2025-12-10T21:33:14Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.01608330762752013,
-    "next_day_return_pred": -0.01608330762752013,
-    "prob_up": 0.4323821402672535,
-    "rmse": 0.04523242547665776,
+    "predicted_return": -0.025149131494136227,
+    "next_day_return_pred": -0.025149131494136227,
+    "prob_up": 0.4974670362571083,
+    "rmse": 0.04519491956847865,
     "auc": 0.4685496794871795,
     "model": "histgb",
     "for_date": "2025-12-10"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-10T20:36:21Z",
+    "ts": "2025-12-10T21:33:15Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0038411294803587484,
-    "next_day_return_pred": 0.0038411294803587484,
-    "prob_up": 0.6318304965679955,
-    "rmse": 0.05095319621251928,
-    "auc": 0.5126894528645717,
+    "predicted_return": -0.007839515188551815,
+    "next_day_return_pred": -0.007839515188551815,
+    "prob_up": 0.38681446950616755,
+    "rmse": 0.050927637565416684,
+    "auc": 0.5115131578947368,
     "model": "histgb",
     "for_date": "2025-12-10"
   }
