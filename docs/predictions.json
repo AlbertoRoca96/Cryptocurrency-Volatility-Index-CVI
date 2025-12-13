@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-13T14:28:45Z",
+    "ts": "2025-12-13T15:28:32Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.010615038275516896,
-    "next_day_return_pred": -0.010615038275516896,
-    "prob_up": 0.2697635353358498,
-    "rmse": 0.023597421207697228,
-    "auc": 0.5420296941678521,
+    "predicted_return": -0.007266074448413079,
+    "next_day_return_pred": -0.007266074448413079,
+    "prob_up": 0.7042918717629062,
+    "rmse": 0.023603684010171603,
+    "auc": 0.5357031701569517,
     "model": "histgb",
     "for_date": "2025-12-13"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-13T14:28:45Z",
+    "ts": "2025-12-13T15:28:33Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.010687815918324952,
-    "next_day_return_pred": 0.010687815918324952,
-    "prob_up": 0.6108437213218045,
-    "rmse": 0.0450743085448445,
+    "predicted_return": 0.0003552841332977553,
+    "next_day_return_pred": 0.0003552841332977553,
+    "prob_up": 0.4114139262588404,
+    "rmse": 0.04507649504697293,
     "auc": 0.48655626780626776,
     "model": "histgb",
     "for_date": "2025-12-13"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-13T14:28:46Z",
+    "ts": "2025-12-13T15:28:34Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.016083654514748993,
-    "next_day_return_pred": 0.016083654514748993,
-    "prob_up": 0.4161836216079792,
-    "rmse": 0.05086227421512706,
-    "auc": 0.5107820906140234,
+    "predicted_return": 0.013425157251312037,
+    "next_day_return_pred": 0.013425157251312037,
+    "prob_up": 0.7046880811555054,
+    "rmse": 0.05085808439971345,
+    "auc": 0.515647226173542,
     "model": "histgb",
     "for_date": "2025-12-13"
   }
