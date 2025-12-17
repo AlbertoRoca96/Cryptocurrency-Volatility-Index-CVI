@@ -1,28 +1,6 @@
 [
   {
     "symbol": "LINK",
-    "ts": "2025-11-03T13:38:28Z",
-    "horizon_days": 1,
-    "features": [
-      "iv",
-      "rv7",
-      "rv30",
-      "mom7",
-      "mom30",
-      "rsi14",
-      "iv_minus_rv30"
-    ],
-    "sample_size": 364,
-    "predicted_return": 0.02501013693541035,
-    "next_day_return_pred": 0.02501013693541035,
-    "prob_up": 0.7143090805672155,
-    "rmse": 0.054252261234720864,
-    "auc": 0.48075213371266,
-    "model": "histgb",
-    "for_date": "2025-11-03"
-  },
-  {
-    "symbol": "LINK",
     "ts": "2025-11-03T14:31:17Z",
     "horizon_days": 1,
     "features": [
@@ -21980,6 +21958,28 @@
   {
     "symbol": "LINK",
     "ts": "2025-12-17T06:48:13Z",
+    "horizon_days": 1,
+    "features": [
+      "iv",
+      "rv7",
+      "rv30",
+      "mom7",
+      "mom30",
+      "rsi14",
+      "iv_minus_rv30"
+    ],
+    "sample_size": 364,
+    "predicted_return": -0.0028739454891173,
+    "next_day_return_pred": -0.0028739454891173,
+    "prob_up": 0.44673634804498946,
+    "rmse": 0.05024122228871404,
+    "auc": 0.5233276996975627,
+    "model": "histgb",
+    "for_date": "2025-12-17"
+  },
+  {
+    "symbol": "LINK",
+    "ts": "2025-12-17T06:49:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
