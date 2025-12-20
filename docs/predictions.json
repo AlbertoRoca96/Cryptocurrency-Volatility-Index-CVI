@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-19T23:28:37Z",
+    "ts": "2025-12-20T02:08:08Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.002131705629610974,
-    "next_day_return_pred": -0.002131705629610974,
-    "prob_up": 0.375818970651569,
-    "rmse": 0.023453084874639603,
-    "auc": 0.4908205903271693,
+    "predicted_return": -0.01501867429765057,
+    "next_day_return_pred": -0.01501867429765057,
+    "prob_up": 0.261864786616846,
+    "rmse": 0.023056568584103678,
+    "auc": 0.4908428165007112,
     "model": "histgb",
-    "for_date": "2025-12-19"
+    "for_date": "2025-12-20"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-19T23:28:38Z",
+    "ts": "2025-12-20T02:08:08Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0378202458779937,
-    "next_day_return_pred": -0.0378202458779937,
-    "prob_up": 0.18712838129459972,
-    "rmse": 0.04370938911345546,
-    "auc": 0.509670534880619,
+    "predicted_return": -0.0023697844803069958,
+    "next_day_return_pred": -0.0023697844803069958,
+    "prob_up": 0.4169187866681677,
+    "rmse": 0.04269842379799906,
+    "auc": 0.4801298008534851,
     "model": "histgb",
-    "for_date": "2025-12-19"
+    "for_date": "2025-12-20"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-19T23:28:38Z",
+    "ts": "2025-12-20T02:08:09Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,12 +57,12 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.024903204415849086,
-    "next_day_return_pred": -0.024903204415849086,
-    "prob_up": 0.5688552465613627,
-    "rmse": 0.051069751778119225,
-    "auc": 0.4799857676570005,
+    "predicted_return": -0.018299861143517338,
+    "next_day_return_pred": -0.018299861143517338,
+    "prob_up": 0.7122152459680091,
+    "rmse": 0.05109798779028748,
+    "auc": 0.4864834822818016,
     "model": "histgb",
-    "for_date": "2025-12-19"
+    "for_date": "2025-12-20"
   }
 ]
