@@ -1,28 +1,6 @@
 [
   {
     "symbol": "LINK",
-    "ts": "2025-11-10T08:38:56Z",
-    "horizon_days": 1,
-    "features": [
-      "iv",
-      "rv7",
-      "rv30",
-      "mom7",
-      "mom30",
-      "rsi14",
-      "iv_minus_rv30"
-    ],
-    "sample_size": 364,
-    "predicted_return": 0.001175839784361917,
-    "next_day_return_pred": 0.001175839784361917,
-    "prob_up": 0.6527554030707822,
-    "rmse": 0.05369662397035149,
-    "auc": 0.49144444444444446,
-    "model": "histgb",
-    "for_date": "2025-11-10"
-  },
-  {
-    "symbol": "LINK",
     "ts": "2025-11-10T09:34:22Z",
     "horizon_days": 1,
     "features": [
@@ -21995,6 +21973,28 @@
     "next_day_return_pred": -0.013418347189345117,
     "prob_up": 0.3579087151362962,
     "rmse": 0.05065462332875301,
+    "auc": 0.48783958027655505,
+    "model": "histgb",
+    "for_date": "2025-12-24"
+  },
+  {
+    "symbol": "LINK",
+    "ts": "2025-12-24T04:03:03Z",
+    "horizon_days": 1,
+    "features": [
+      "iv",
+      "rv7",
+      "rv30",
+      "mom7",
+      "mom30",
+      "rsi14",
+      "iv_minus_rv30"
+    ],
+    "sample_size": 364,
+    "predicted_return": -0.005240896129169643,
+    "next_day_return_pred": -0.005240896129169643,
+    "prob_up": 0.348752210180296,
+    "rmse": 0.05067392616044802,
     "auc": 0.48783958027655505,
     "model": "histgb",
     "for_date": "2025-12-24"
