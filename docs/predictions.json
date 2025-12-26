@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-26T17:28:45Z",
+    "ts": "2025-12-26T18:41:47Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.004484650410391029,
-    "next_day_return_pred": 0.004484650410391029,
-    "prob_up": 0.8091912570923706,
-    "rmse": 0.023249611430112782,
-    "auc": 0.5099150771419678,
+    "predicted_return": 0.006647539966996806,
+    "next_day_return_pred": 0.006647539966996806,
+    "prob_up": 0.7926368519652105,
+    "rmse": 0.023225216238070064,
+    "auc": 0.510448623894002,
     "model": "histgb",
     "for_date": "2025-12-26"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-26T17:28:46Z",
+    "ts": "2025-12-26T18:41:48Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.004253477471237796,
-    "next_day_return_pred": 0.004253477471237796,
-    "prob_up": 0.4766964031264294,
-    "rmse": 0.042647730021409834,
-    "auc": 0.5068743047830924,
+    "predicted_return": 0.002412252430834376,
+    "next_day_return_pred": 0.002412252430834376,
+    "prob_up": 0.3811770161454769,
+    "rmse": 0.042665613528001634,
+    "auc": 0.5070522803114572,
     "model": "histgb",
     "for_date": "2025-12-26"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-26T17:28:47Z",
+    "ts": "2025-12-26T18:41:48Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.008500408354652465,
-    "next_day_return_pred": 0.008500408354652465,
-    "prob_up": 0.6620091204021992,
-    "rmse": 0.05076830420122534,
-    "auc": 0.49290985064011383,
+    "predicted_return": 0.015386814487004975,
+    "next_day_return_pred": 0.015386814487004975,
+    "prob_up": 0.5917187151791853,
+    "rmse": 0.05073954009962943,
+    "auc": 0.49602151493598856,
     "model": "histgb",
     "for_date": "2025-12-26"
   }
