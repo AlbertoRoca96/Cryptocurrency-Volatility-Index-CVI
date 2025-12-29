@@ -34,5 +34,17 @@
     "exchange": "paper",
     "risk_budget_usd": 100,
     "horizon_days": 1
+  },
+  {
+    "t": "2025-12-29T07:35:13.137Z",
+    "symbol": "LINK",
+    "type": "entry",
+    "side": "buy",
+    "reason": "EMA20 > EMA100 and ERI <= median",
+    "qty": 206.88662086869687,
+    "price": "mkt",
+    "exchange": "paper",
+    "risk_budget_usd": 100,
+    "horizon_days": 1
   }
 ]
