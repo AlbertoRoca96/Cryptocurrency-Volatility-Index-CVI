@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2025-12-29T11:29:14Z",
+    "ts": "2025-12-29T13:04:09Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0018665405953187525,
-    "next_day_return_pred": 0.0018665405953187525,
-    "prob_up": 0.717903699638577,
-    "rmse": 0.022097243825417476,
-    "auc": 0.5219865724067404,
+    "predicted_return": -0.0027558608613502977,
+    "next_day_return_pred": -0.0027558608613502977,
+    "prob_up": 0.4705629356352864,
+    "rmse": 0.022091390423743088,
+    "auc": 0.5201813655761024,
     "model": "histgb",
     "for_date": "2025-12-29"
   },
   {
     "symbol": "ETH",
-    "ts": "2025-12-29T11:29:15Z",
+    "ts": "2025-12-29T13:04:09Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.014479091587403698,
-    "next_day_return_pred": -0.014479091587403698,
-    "prob_up": 0.7241344118776277,
-    "rmse": 0.041704972766135426,
-    "auc": 0.4948139245014245,
+    "predicted_return": 0.003577077251766704,
+    "next_day_return_pred": 0.003577077251766704,
+    "prob_up": 0.6166591443868127,
+    "rmse": 0.04171647013597143,
+    "auc": 0.4902558398220245,
     "model": "histgb",
     "for_date": "2025-12-29"
   },
   {
     "symbol": "LINK",
-    "ts": "2025-12-29T11:29:15Z",
+    "ts": "2025-12-29T13:04:10Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0017917806992906668,
-    "next_day_return_pred": 0.0017917806992906668,
-    "prob_up": 0.5097762461483138,
-    "rmse": 0.05094428705580999,
+    "predicted_return": -0.004569336419355182,
+    "next_day_return_pred": -0.004569336419355182,
+    "prob_up": 0.35831709012235585,
+    "rmse": 0.050948439995313316,
     "auc": 0.4736619843527738,
     "model": "histgb",
     "for_date": "2025-12-29"
