@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-01-05T06:56:25Z",
+    "ts": "2026-01-05T07:38:12Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0017881100672965265,
-    "next_day_return_pred": -0.0017881100672965265,
-    "prob_up": 0.31972368509494364,
-    "rmse": 0.023047365767429388,
-    "auc": 0.5112847222222222,
+    "predicted_return": -0.00509948652390285,
+    "next_day_return_pred": -0.00509948652390285,
+    "prob_up": 0.3106439673163996,
+    "rmse": 0.023089314534803375,
+    "auc": 0.5115073005698005,
     "model": "histgb",
     "for_date": "2026-01-05"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-01-05T06:56:26Z",
+    "ts": "2026-01-05T07:38:13Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01930288732537019,
-    "next_day_return_pred": 0.01930288732537019,
-    "prob_up": 0.8549983152099139,
-    "rmse": 0.04333261031446436,
-    "auc": 0.5155107862364058,
+    "predicted_return": 0.02217299772168485,
+    "next_day_return_pred": 0.02217299772168485,
+    "prob_up": 0.8674184720976524,
+    "rmse": 0.043424359800293445,
+    "auc": 0.5145747905152434,
     "model": "histgb",
     "for_date": "2026-01-05"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-01-05T06:56:26Z",
+    "ts": "2026-01-05T07:38:13Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.013094115905428957,
-    "next_day_return_pred": -0.013094115905428957,
-    "prob_up": 0.6414042430603977,
-    "rmse": 0.050719713451595594,
+    "predicted_return": 0.0009247347982506027,
+    "next_day_return_pred": 0.0009247347982506027,
+    "prob_up": 0.755877713925532,
+    "rmse": 0.050728933047443886,
     "auc": 0.47377661229387985,
     "model": "histgb",
     "for_date": "2026-01-05"
