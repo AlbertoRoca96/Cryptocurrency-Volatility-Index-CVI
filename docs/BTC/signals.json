@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-01-06T10:37:08.097Z",
-    "recommendation": "Short Volatility",
-    "strength": 0.6,
-    "size_hint": 0.8,
-    "reason": "IV at 90th percentile",
-    "last_iv": 0.03803699988348483,
-    "ema20": 0.03111867951886,
-    "ema100": 0.027060787281482104
-  },
-  {
     "ts": "2026-01-06T11:28:27.340Z",
     "recommendation": "Short Volatility",
     "strength": 0.6,
@@ -498,5 +488,15 @@
     "last_iv": 0.032106854902619074,
     "ema20": 0.024848886099896418,
     "ema100": 0.026403690459429516
+  },
+  {
+    "ts": "2026-01-08T19:28:36.816Z",
+    "recommendation": "Hold",
+    "strength": 0,
+    "size_hint": 0.5,
+    "reason": "",
+    "last_iv": 0.03304145057896678,
+    "ema20": 0.025629130335998358,
+    "ema100": 0.0265351312538758
   }
 ]
