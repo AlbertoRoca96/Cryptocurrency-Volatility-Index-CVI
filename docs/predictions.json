@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-01-09T07:35:22Z",
+    "ts": "2026-01-09T08:45:01Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.011075552838934879,
-    "next_day_return_pred": -0.011075552838934879,
-    "prob_up": 0.30645856799277604,
-    "rmse": 0.02077485685072696,
+    "predicted_return": -0.01364550732856913,
+    "next_day_return_pred": -0.01364550732856913,
+    "prob_up": 0.29158911807238685,
+    "rmse": 0.02077273146149254,
     "auc": 0.5056022408963585,
     "model": "histgb",
     "for_date": "2026-01-09"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-01-09T07:35:23Z",
+    "ts": "2026-01-09T08:45:02Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0031771701433129444,
-    "next_day_return_pred": -0.0031771701433129444,
-    "prob_up": 0.7450940152519309,
-    "rmse": 0.040614754459921236,
-    "auc": 0.4819040827241932,
+    "predicted_return": -0.015199605463737378,
+    "next_day_return_pred": -0.015199605463737378,
+    "prob_up": 0.4022183762199542,
+    "rmse": 0.04060149382005783,
+    "auc": 0.48505634492895644,
     "model": "histgb",
     "for_date": "2026-01-09"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-01-09T07:35:23Z",
+    "ts": "2026-01-09T08:45:03Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0016420884051763375,
-    "next_day_return_pred": -0.0016420884051763375,
-    "prob_up": 0.3195624784688435,
-    "rmse": 0.04814041634481266,
-    "auc": 0.49157628022759603,
+    "predicted_return": 0.014256972065933122,
+    "next_day_return_pred": 0.014256972065933122,
+    "prob_up": 0.32568679247236254,
+    "rmse": 0.04813556556348492,
+    "auc": 0.49293050553554757,
     "model": "histgb",
     "for_date": "2026-01-09"
   }
