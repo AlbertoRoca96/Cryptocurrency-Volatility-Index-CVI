@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-01-18T22:31:32Z",
+    "ts": "2026-01-18T23:29:17Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.011832095572452093,
-    "next_day_return_pred": 0.011832095572452093,
-    "prob_up": 0.6220150568720427,
-    "rmse": 0.02116181602964184,
-    "auc": 0.4968199608610567,
+    "predicted_return": 0.011334599759616013,
+    "next_day_return_pred": 0.011334599759616013,
+    "prob_up": 0.31596874671309794,
+    "rmse": 0.02116799758825025,
+    "auc": 0.4956871637543907,
     "model": "histgb",
     "for_date": "2026-01-18"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-01-18T22:31:32Z",
+    "ts": "2026-01-18T23:29:17Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0057412336461335305,
-    "next_day_return_pred": -0.0057412336461335305,
-    "prob_up": 0.5936555556105996,
-    "rmse": 0.043085965634384445,
+    "predicted_return": -0.002222093647254282,
+    "next_day_return_pred": -0.002222093647254282,
+    "prob_up": 0.438186896796603,
+    "rmse": 0.04307694500813904,
     "auc": 0.47436639793327684,
     "model": "histgb",
     "for_date": "2026-01-18"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-01-18T22:31:33Z",
+    "ts": "2026-01-18T23:29:18Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0066234871239965,
-    "next_day_return_pred": -0.0066234871239965,
-    "prob_up": 0.24998958610693736,
-    "rmse": 0.04896449319358279,
-    "auc": 0.4906377868706635,
+    "predicted_return": -0.0048282562334273655,
+    "next_day_return_pred": -0.0048282562334273655,
+    "prob_up": 0.16040993370062087,
+    "rmse": 0.04895353172476383,
+    "auc": 0.49083426028921023,
     "model": "histgb",
     "for_date": "2026-01-18"
   }
