@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-02-03T04:56:20Z",
+    "ts": "2026-02-03T06:01:29Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.003945521717876513,
-    "next_day_return_pred": 0.003945521717876513,
-    "prob_up": 0.7643304582198135,
-    "rmse": 0.02305444643214545,
-    "auc": 0.48855504689097295,
+    "predicted_return": 0.016227092178229187,
+    "next_day_return_pred": 0.016227092178229187,
+    "prob_up": 0.8462765818168269,
+    "rmse": 0.02307180860809579,
+    "auc": 0.4894222222222222,
     "model": "histgb",
     "for_date": "2026-02-03"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-02-03T04:56:21Z",
+    "ts": "2026-02-03T06:01:30Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01068483955033844,
-    "next_day_return_pred": 0.01068483955033844,
-    "prob_up": 0.7959029747931025,
-    "rmse": 0.041664264332148294,
-    "auc": 0.46806471741843464,
+    "predicted_return": 0.012229906076439248,
+    "next_day_return_pred": 0.012229906076439248,
+    "prob_up": 0.6702110962553723,
+    "rmse": 0.0417064254825322,
+    "auc": 0.4676183688922542,
     "model": "histgb",
     "for_date": "2026-02-03"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-02-03T04:56:21Z",
+    "ts": "2026-02-03T06:01:31Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.004835479629080707,
-    "next_day_return_pred": -0.004835479629080707,
-    "prob_up": 0.19348343837760584,
-    "rmse": 0.05042656434313451,
+    "predicted_return": -0.006564841840629273,
+    "next_day_return_pred": -0.006564841840629273,
+    "prob_up": 0.2658517717204959,
+    "rmse": 0.05045063358816838,
     "auc": 0.46187252238207654,
     "model": "histgb",
     "for_date": "2026-02-03"
