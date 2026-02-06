@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-02-06T10:56:16Z",
+    "ts": "2026-02-06T11:44:34Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.016834987902820835,
-    "next_day_return_pred": 0.016834987902820835,
-    "prob_up": 0.6047445573502243,
-    "rmse": 0.024180313772231603,
-    "auc": 0.4751544513089471,
+    "predicted_return": 0.020592151244843742,
+    "next_day_return_pred": 0.020592151244843742,
+    "prob_up": 0.780486557777374,
+    "rmse": 0.02421575702104491,
+    "auc": 0.47926574514422865,
     "model": "histgb",
     "for_date": "2026-02-06"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-02-06T10:56:17Z",
+    "ts": "2026-02-06T11:44:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0014482610191327604,
-    "next_day_return_pred": 0.0014482610191327604,
-    "prob_up": 0.7172276427210605,
-    "rmse": 0.043737640656088386,
-    "auc": 0.47224448005698005,
+    "predicted_return": 0.016500172728879804,
+    "next_day_return_pred": 0.016500172728879804,
+    "prob_up": 0.7240945290684246,
+    "rmse": 0.043928574499285715,
+    "auc": 0.46943999287749283,
     "model": "histgb",
     "for_date": "2026-02-06"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-02-06T10:56:18Z",
+    "ts": "2026-02-06T11:44:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.02221769185310531,
-    "next_day_return_pred": 0.02221769185310531,
-    "prob_up": 0.8458713623962757,
-    "rmse": 0.04717173185956097,
+    "predicted_return": 0.036668465270795814,
+    "next_day_return_pred": 0.036668465270795814,
+    "prob_up": 0.8179819819842966,
+    "rmse": 0.047197818582660804,
     "auc": 0.48796576929934043,
     "model": "histgb",
     "for_date": "2026-02-06"
