@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-02-09T21:52:12Z",
+    "ts": "2026-02-09T22:53:05Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01290301515727476,
-    "next_day_return_pred": 0.01290301515727476,
-    "prob_up": 0.6017298790779129,
-    "rmse": 0.025196279084423057,
-    "auc": 0.4840881816969643,
+    "predicted_return": 0.013248866625790844,
+    "next_day_return_pred": 0.013248866625790844,
+    "prob_up": 0.6286804998717933,
+    "rmse": 0.02517861327624963,
+    "auc": 0.4880888888888889,
     "model": "histgb",
     "for_date": "2026-02-09"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-02-09T21:52:13Z",
+    "ts": "2026-02-09T22:53:05Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0058527574425469246,
-    "next_day_return_pred": -0.0058527574425469246,
-    "prob_up": 0.6730458143236606,
-    "rmse": 0.04488617553918806,
+    "predicted_return": -0.004838600063836617,
+    "next_day_return_pred": -0.004838600063836617,
+    "prob_up": 0.6364062244224303,
+    "rmse": 0.044895324738059086,
     "auc": 0.4308271346487907,
     "model": "histgb",
     "for_date": "2026-02-09"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-02-09T21:52:14Z",
+    "ts": "2026-02-09T22:53:06Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.030681608892369195,
-    "next_day_return_pred": 0.030681608892369195,
-    "prob_up": 0.4788533447694721,
-    "rmse": 0.04775901273587127,
-    "auc": 0.4772241041183812,
+    "predicted_return": 0.03452244602372204,
+    "next_day_return_pred": 0.03452244602372204,
+    "prob_up": 0.8041695826984466,
+    "rmse": 0.04773117404041098,
+    "auc": 0.4838537258919424,
     "model": "histgb",
     "for_date": "2026-02-09"
   }
