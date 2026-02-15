@@ -1,6 +1,6 @@
 {
   "symbol": "ETH",
-  "ts": "2026-02-15T08:49:03Z",
+  "ts": "2026-02-15T09:43:29Z",
   "horizon_days": 1,
   "features": [
     "iv",
@@ -12,10 +12,10 @@
     "iv_minus_rv30"
   ],
   "sample_size": 364,
-  "predicted_return": -0.0023787233128596966,
-  "next_day_return_pred": -0.0023787233128596966,
-  "prob_up": 0.5989541426125835,
-  "rmse": 0.04328623917915669,
+  "predicted_return": 0.00344244824120939,
+  "next_day_return_pred": 0.00344244824120939,
+  "prob_up": 0.6039405220309099,
+  "rmse": 0.04328464998811711,
   "auc": 0.45267471382121066,
   "model": "histgb",
   "for_date": "2026-02-15"
