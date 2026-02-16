@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-02-16T05:41:55Z",
+    "ts": "2026-02-16T07:18:41Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.012296658769905542,
-    "next_day_return_pred": 0.012296658769905542,
-    "prob_up": 0.6871430602693189,
-    "rmse": 0.023824378229900432,
+    "predicted_return": 0.0067605034922261975,
+    "next_day_return_pred": 0.0067605034922261975,
+    "prob_up": 0.42465556184888364,
+    "rmse": 0.02381868142379689,
     "auc": 0.49263626251390435,
     "model": "histgb",
     "for_date": "2026-02-16"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-02-16T05:41:56Z",
+    "ts": "2026-02-16T07:18:42Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0006468940130613637,
-    "next_day_return_pred": 0.0006468940130613637,
-    "prob_up": 0.3959013728356405,
-    "rmse": 0.04261226691215575,
-    "auc": 0.4463363603988604,
+    "predicted_return": 0.0038358020845202343,
+    "next_day_return_pred": 0.0038358020845202343,
+    "prob_up": 0.7903356220131469,
+    "rmse": 0.04259742016085881,
+    "auc": 0.45260790165248765,
     "model": "histgb",
     "for_date": "2026-02-16"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-02-16T05:41:57Z",
+    "ts": "2026-02-16T07:18:43Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.007201829572292599,
-    "next_day_return_pred": -0.007201829572292599,
-    "prob_up": 0.60839374760594,
-    "rmse": 0.04718800689664833,
-    "auc": 0.45387840670859536,
+    "predicted_return": -0.005958516909602269,
+    "next_day_return_pred": -0.005958516909602269,
+    "prob_up": 0.30083099432669835,
+    "rmse": 0.047188711375406825,
+    "auc": 0.45734375,
     "model": "histgb",
     "for_date": "2026-02-16"
   }
