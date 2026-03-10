@@ -1,28 +1,6 @@
 [
   {
     "symbol": "ETH",
-    "ts": "2026-01-18T09:31:28Z",
-    "horizon_days": 1,
-    "features": [
-      "iv",
-      "rv7",
-      "rv30",
-      "mom7",
-      "mom30",
-      "rsi14",
-      "iv_minus_rv30"
-    ],
-    "sample_size": 364,
-    "predicted_return": -0.001148155904555096,
-    "next_day_return_pred": -0.001148155904555096,
-    "prob_up": 0.4054123719440415,
-    "rmse": 0.04307837833368858,
-    "auc": 0.47436639793327684,
-    "model": "histgb",
-    "for_date": "2026-01-18"
-  },
-  {
-    "symbol": "ETH",
     "ts": "2026-01-18T10:33:30Z",
     "horizon_days": 1,
     "features": [
@@ -21995,6 +21973,28 @@
     "next_day_return_pred": -0.008276248841577719,
     "prob_up": 0.35297421255407263,
     "rmse": 0.040894656111433565,
+    "auc": 0.474411987017029,
+    "model": "histgb",
+    "for_date": "2026-03-10"
+  },
+  {
+    "symbol": "ETH",
+    "ts": "2026-03-10T21:38:36Z",
+    "horizon_days": 1,
+    "features": [
+      "iv",
+      "rv7",
+      "rv30",
+      "mom7",
+      "mom30",
+      "rsi14",
+      "iv_minus_rv30"
+    ],
+    "sample_size": 364,
+    "predicted_return": -0.008931150041813081,
+    "next_day_return_pred": -0.008931150041813081,
+    "prob_up": 0.32988034627973273,
+    "rmse": 0.04088931291677798,
     "auc": 0.474411987017029,
     "model": "histgb",
     "for_date": "2026-03-10"
