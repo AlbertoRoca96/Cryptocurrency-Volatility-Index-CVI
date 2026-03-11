@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-03-11T11:44:30Z",
+    "ts": "2026-03-11T13:24:21Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.026207117205580964,
-    "next_day_return_pred": 0.026207117205580964,
-    "prob_up": 0.8068864709496552,
-    "rmse": 0.024904086020223044,
-    "auc": 0.48112408628989134,
+    "predicted_return": 0.025512083911133066,
+    "next_day_return_pred": 0.025512083911133066,
+    "prob_up": 0.86812506787391,
+    "rmse": 0.024906463534980296,
+    "auc": 0.4756803705848292,
     "model": "histgb",
     "for_date": "2026-03-11"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-03-11T11:44:30Z",
+    "ts": "2026-03-11T13:24:21Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0014467234346417384,
-    "next_day_return_pred": 0.0014467234346417384,
-    "prob_up": 0.31289531366266643,
-    "rmse": 0.04062802408597843,
-    "auc": 0.4603841536614646,
+    "predicted_return": 0.0032512516350541847,
+    "next_day_return_pred": 0.0032512516350541847,
+    "prob_up": 0.2973841951409374,
+    "rmse": 0.040630798392670725,
+    "auc": 0.4548790250845046,
     "model": "histgb",
     "for_date": "2026-03-11"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-03-11T11:44:31Z",
+    "ts": "2026-03-11T13:24:22Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0011792325930912485,
-    "next_day_return_pred": 0.0011792325930912485,
-    "prob_up": 0.28096255886986826,
-    "rmse": 0.046054103869634065,
-    "auc": 0.5031949595603021,
+    "predicted_return": -0.0013409544454801073,
+    "next_day_return_pred": -0.0013409544454801073,
+    "prob_up": 0.5302690296843269,
+    "rmse": 0.046042674687475436,
+    "auc": 0.50875,
     "model": "histgb",
     "for_date": "2026-03-11"
   }
