@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-03-14T02:48:13Z",
+    "ts": "2026-03-14T04:51:20Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0035857751254245313,
-    "next_day_return_pred": -0.0035857751254245313,
-    "prob_up": 0.18679008966630808,
-    "rmse": 0.024890089662983624,
-    "auc": 0.4806579415954416,
+    "predicted_return": -0.0038335163988990743,
+    "next_day_return_pred": -0.0038335163988990743,
+    "prob_up": 0.5323007499689829,
+    "rmse": 0.024887522494615528,
+    "auc": 0.4751724137931035,
     "model": "histgb",
     "for_date": "2026-03-14"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-03-14T02:48:14Z",
+    "ts": "2026-03-14T04:51:20Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.003841146818459872,
-    "next_day_return_pred": -0.003841146818459872,
-    "prob_up": 0.26926195070660874,
-    "rmse": 0.040741675245372935,
-    "auc": 0.45259176863181316,
+    "predicted_return": -0.01551477312442203,
+    "next_day_return_pred": -0.01551477312442203,
+    "prob_up": 0.6715596911151098,
+    "rmse": 0.04074483909455605,
+    "auc": 0.44764957264957267,
     "model": "histgb",
     "for_date": "2026-03-14"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-03-14T02:48:14Z",
+    "ts": "2026-03-14T04:51:21Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.005809644697614615,
-    "next_day_return_pred": 0.005809644697614615,
-    "prob_up": 0.5557083483315367,
-    "rmse": 0.04570179537829601,
+    "predicted_return": 0.01219522253922314,
+    "next_day_return_pred": 0.01219522253922314,
+    "prob_up": 0.5065380471030031,
+    "rmse": 0.045702565649700905,
     "auc": 0.5010714285714286,
     "model": "histgb",
     "for_date": "2026-03-14"
