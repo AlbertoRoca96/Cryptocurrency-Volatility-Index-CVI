@@ -34,5 +34,17 @@
     "exchange": "paper",
     "risk_budget_usd": 100,
     "horizon_days": 1
+  },
+  {
+    "t": "2026-03-17T23:43:12.326Z",
+    "symbol": "ETH",
+    "type": "entry",
+    "side": "buy",
+    "reason": "EMA20 > EMA100 and ERI <= median",
+    "qty": 19.560190320918085,
+    "price": "mkt",
+    "exchange": "paper",
+    "risk_budget_usd": 100,
+    "horizon_days": 1
   }
 ]
