@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-03-21T20:39:32Z",
+    "ts": "2026-03-21T21:36:15Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.001353035815265614,
-    "next_day_return_pred": 0.001353035815265614,
-    "prob_up": 0.5729528068984633,
-    "rmse": 0.02634335383902622,
-    "auc": 0.5072602556678989,
+    "predicted_return": 0.001457244735636555,
+    "next_day_return_pred": 0.001457244735636555,
+    "prob_up": 0.5914707934123914,
+    "rmse": 0.026277200873913515,
+    "auc": 0.5014698677119059,
     "model": "histgb",
     "for_date": "2026-03-21"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-03-21T20:39:33Z",
+    "ts": "2026-03-21T21:36:16Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.008352520133960777,
-    "next_day_return_pred": -0.008352520133960777,
-    "prob_up": 0.5092541901841282,
-    "rmse": 0.041458512406901585,
-    "auc": 0.43610678531701885,
+    "predicted_return": -0.00867165258649636,
+    "next_day_return_pred": -0.00867165258649636,
+    "prob_up": 0.507360222760017,
+    "rmse": 0.04127179179118753,
+    "auc": 0.4373303670745272,
     "model": "histgb",
     "for_date": "2026-03-21"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-03-21T20:39:34Z",
+    "ts": "2026-03-21T21:36:16Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.002935912611595136,
-    "next_day_return_pred": -0.002935912611595136,
-    "prob_up": 0.22468508437139562,
-    "rmse": 0.04631817558234902,
+    "predicted_return": -0.005974989342233255,
+    "next_day_return_pred": -0.005974989342233255,
+    "prob_up": 0.2605783312218255,
+    "rmse": 0.04631692003852617,
     "auc": 0.46781249999999996,
     "model": "histgb",
     "for_date": "2026-03-21"
