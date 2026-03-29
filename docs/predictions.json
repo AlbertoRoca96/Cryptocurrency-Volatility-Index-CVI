@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-03-29T15:43:18Z",
+    "ts": "2026-03-29T16:49:48Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0063425632464030384,
-    "next_day_return_pred": 0.0063425632464030384,
-    "prob_up": 0.5688280315276808,
-    "rmse": 0.025207159931296873,
-    "auc": 0.47136357553860564,
+    "predicted_return": 0.00608239752179108,
+    "next_day_return_pred": 0.00608239752179108,
+    "prob_up": 0.8322539923047716,
+    "rmse": 0.025206816134814063,
+    "auc": 0.4699367088607595,
     "model": "histgb",
     "for_date": "2026-03-29"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-03-29T15:43:18Z",
+    "ts": "2026-03-29T16:49:49Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01196511165233617,
-    "next_day_return_pred": 0.01196511165233617,
-    "prob_up": 0.5422579224872127,
-    "rmse": 0.04142645531774221,
-    "auc": 0.4388335704125178,
+    "predicted_return": 0.00793742123192455,
+    "next_day_return_pred": 0.00793742123192455,
+    "prob_up": 0.6368705540841143,
+    "rmse": 0.04143361160424247,
+    "auc": 0.4324396425236761,
     "model": "histgb",
     "for_date": "2026-03-29"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-03-29T15:43:19Z",
+    "ts": "2026-03-29T16:49:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0002982760706223325,
-    "next_day_return_pred": -0.0002982760706223325,
-    "prob_up": 0.6869939745438725,
-    "rmse": 0.04653076685873009,
+    "predicted_return": 0.001404604499268018,
+    "next_day_return_pred": 0.001404604499268018,
+    "prob_up": 0.6481193689877768,
+    "rmse": 0.04652905330636082,
     "auc": 0.45553766326713185,
     "model": "histgb",
     "for_date": "2026-03-29"
