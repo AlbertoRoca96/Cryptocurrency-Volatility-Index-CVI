@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-03-30T03:34:58Z",
+    "ts": "2026-03-30T06:05:21Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.013599399182886862,
-    "next_day_return_pred": 0.013599399182886862,
-    "prob_up": 0.6298214400336986,
-    "rmse": 0.025313975783570582,
-    "auc": 0.4741932608308077,
+    "predicted_return": 0.002709626094934624,
+    "next_day_return_pred": 0.002709626094934624,
+    "prob_up": 0.6893089576818767,
+    "rmse": 0.025582013034344778,
+    "auc": 0.46891157068996253,
     "model": "histgb",
     "for_date": "2026-03-30"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-03-30T03:34:59Z",
+    "ts": "2026-03-30T06:05:22Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.022197259054381184,
-    "next_day_return_pred": 0.022197259054381184,
-    "prob_up": 0.6847594409187217,
-    "rmse": 0.041595351213076906,
-    "auc": 0.44875728069005383,
+    "predicted_return": 0.01094817558352201,
+    "next_day_return_pred": 0.01094817558352201,
+    "prob_up": 0.5818476118391319,
+    "rmse": 0.04174241308243017,
+    "auc": 0.44508914676981903,
     "model": "histgb",
     "for_date": "2026-03-30"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-03-30T03:35:00Z",
+    "ts": "2026-03-30T06:05:23Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.005086846978274662,
-    "next_day_return_pred": -0.005086846978274662,
-    "prob_up": 0.4203167759836087,
-    "rmse": 0.046343563941149656,
+    "predicted_return": -0.013720926090869954,
+    "next_day_return_pred": -0.013720926090869954,
+    "prob_up": 0.4360114224355449,
+    "rmse": 0.046370406108678555,
     "auc": 0.4651547682948649,
     "model": "histgb",
     "for_date": "2026-03-30"
