@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-04-01T03:38:27Z",
+    "ts": "2026-04-01T06:02:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.00265559534354773,
-    "next_day_return_pred": 0.00265559534354773,
-    "prob_up": 0.4323635900194891,
-    "rmse": 0.02511148625969728,
-    "auc": 0.4718498062447107,
+    "predicted_return": 0.008210124429144747,
+    "next_day_return_pred": 0.008210124429144747,
+    "prob_up": 0.5315052687175135,
+    "rmse": 0.02512036294569397,
+    "auc": 0.4705083689458689,
     "model": "histgb",
     "for_date": "2026-04-01"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-04-01T03:38:27Z",
+    "ts": "2026-04-01T06:02:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.017690476087722395,
-    "next_day_return_pred": 0.017690476087722395,
-    "prob_up": 0.6701439057880848,
-    "rmse": 0.04032283915727722,
-    "auc": 0.46776488373127023,
+    "predicted_return": -0.002128943298918208,
+    "next_day_return_pred": -0.002128943298918208,
+    "prob_up": 0.9075737304641869,
+    "rmse": 0.04033471582488824,
+    "auc": 0.4717799323963707,
     "model": "histgb",
     "for_date": "2026-04-01"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-04-01T03:38:28Z",
+    "ts": "2026-04-01T06:02:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.016551509862378737,
-    "next_day_return_pred": 0.016551509862378737,
-    "prob_up": 0.7544221712301424,
-    "rmse": 0.045392524786406256,
+    "predicted_return": 0.0011856814172324897,
+    "next_day_return_pred": 0.0011856814172324897,
+    "prob_up": 0.621394139845087,
+    "rmse": 0.04542119569294603,
     "auc": 0.4745089285714285,
     "model": "histgb",
     "for_date": "2026-04-01"
