@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-04-07T03:26:25Z",
+    "ts": "2026-04-07T05:53:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.005279169381907019,
-    "next_day_return_pred": -0.005279169381907019,
-    "prob_up": 0.11014618044761959,
-    "rmse": 0.02478949607184179,
+    "predicted_return": -0.004860981500832071,
+    "next_day_return_pred": -0.004860981500832071,
+    "prob_up": 0.09407885220928465,
+    "rmse": 0.024786027584591114,
     "auc": 0.5138052544716535,
     "model": "histgb",
     "for_date": "2026-04-07"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-04-07T03:26:26Z",
+    "ts": "2026-04-07T05:53:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0056460383943616604,
-    "next_day_return_pred": -0.0056460383943616604,
-    "prob_up": 0.6146657841330214,
-    "rmse": 0.0388285937522183,
-    "auc": 0.4402649948868436,
+    "predicted_return": -0.010848882303531062,
+    "next_day_return_pred": -0.010848882303531062,
+    "prob_up": 0.37152483551244747,
+    "rmse": 0.038826877942181696,
+    "auc": 0.4446568278805121,
     "model": "histgb",
     "for_date": "2026-04-07"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-04-07T03:26:27Z",
+    "ts": "2026-04-07T05:53:36Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0005438538989382775,
-    "next_day_return_pred": 0.0005438538989382775,
-    "prob_up": 0.4426978574084853,
-    "rmse": 0.046880315721305986,
-    "auc": 0.4819920461146611,
+    "predicted_return": -0.005276398347760033,
+    "next_day_return_pred": -0.005276398347760033,
+    "prob_up": 0.4172933619241491,
+    "rmse": 0.046868070067008924,
+    "auc": 0.4867633928571429,
     "model": "histgb",
     "for_date": "2026-04-07"
   }
