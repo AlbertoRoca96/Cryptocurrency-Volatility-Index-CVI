@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-04-15T03:35:44Z",
+    "ts": "2026-04-15T06:07:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.006890358601569884,
-    "next_day_return_pred": 0.006890358601569884,
-    "prob_up": 0.7641627832542692,
-    "rmse": 0.025192641841804024,
-    "auc": 0.4561266758718988,
+    "predicted_return": -0.005521854632110914,
+    "next_day_return_pred": -0.005521854632110914,
+    "prob_up": 0.42639509099058953,
+    "rmse": 0.02518376252097258,
+    "auc": 0.4599973257265109,
     "model": "histgb",
     "for_date": "2026-04-15"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-04-15T03:35:44Z",
+    "ts": "2026-04-15T06:07:36Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.018435111841925617,
-    "next_day_return_pred": 0.018435111841925617,
-    "prob_up": 0.4478521283347293,
-    "rmse": 0.04096806884611753,
-    "auc": 0.4366542022792023,
+    "predicted_return": 0.006005848209362575,
+    "next_day_return_pred": 0.006005848209362575,
+    "prob_up": 0.43458559921698825,
+    "rmse": 0.04096046089772654,
+    "auc": 0.4367964404894327,
     "model": "histgb",
     "for_date": "2026-04-15"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-04-15T03:35:45Z",
+    "ts": "2026-04-15T06:07:37Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0022130170726292475,
-    "next_day_return_pred": -0.0022130170726292475,
-    "prob_up": 0.2672623214637835,
-    "rmse": 0.046054178480609,
+    "predicted_return": 0.005777455756807076,
+    "next_day_return_pred": 0.005777455756807076,
+    "prob_up": 0.28061525694121087,
+    "rmse": 0.04603924245682735,
     "auc": 0.439292564342745,
     "model": "histgb",
     "for_date": "2026-04-15"
