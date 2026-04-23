@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-04-23T21:58:41Z",
+    "ts": "2026-04-23T23:01:34Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.007142953081942066,
-    "next_day_return_pred": -0.007142953081942066,
-    "prob_up": 0.28008542100408035,
-    "rmse": 0.02514230853261553,
-    "auc": 0.4399555061179088,
+    "predicted_return": -0.007449466905461819,
+    "next_day_return_pred": -0.007449466905461819,
+    "prob_up": 0.6478404852027018,
+    "rmse": 0.025146160268773497,
+    "auc": 0.43537626756804837,
     "model": "histgb",
     "for_date": "2026-04-23"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-04-23T21:58:41Z",
+    "ts": "2026-04-23T23:01:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0010377288809155624,
-    "next_day_return_pred": -0.0010377288809155624,
-    "prob_up": 0.45799315601848445,
-    "rmse": 0.04128739900929983,
+    "predicted_return": -0.0038580859698834,
+    "next_day_return_pred": -0.0038580859698834,
+    "prob_up": 0.5664345406703508,
+    "rmse": 0.041291168249044,
     "auc": 0.4229878401852924,
     "model": "histgb",
     "for_date": "2026-04-23"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-04-23T21:58:42Z",
+    "ts": "2026-04-23T23:01:35Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.009217186679311215,
-    "next_day_return_pred": 0.009217186679311215,
-    "prob_up": 0.5198017413586671,
-    "rmse": 0.04716611866416108,
-    "auc": 0.4704269923337493,
+    "predicted_return": 0.015323054411553084,
+    "next_day_return_pred": 0.015323054411553084,
+    "prob_up": 0.7982101240854783,
+    "rmse": 0.04716803097056648,
+    "auc": 0.46663845708431695,
     "model": "histgb",
     "for_date": "2026-04-23"
   }
