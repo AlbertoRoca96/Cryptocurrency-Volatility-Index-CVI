@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-05-07T00:02:30Z",
+    "ts": "2026-05-07T03:59:41Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0024895250138848145,
-    "next_day_return_pred": -0.0024895250138848145,
-    "prob_up": 0.5829153299528844,
-    "rmse": 0.026810473831746277,
-    "auc": 0.4030033370411568,
+    "predicted_return": -0.00835412714716032,
+    "next_day_return_pred": -0.00835412714716032,
+    "prob_up": 0.31661052601926387,
+    "rmse": 0.026799028328556948,
+    "auc": 0.4086315883190883,
     "model": "histgb",
     "for_date": "2026-05-07"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-05-07T00:02:30Z",
+    "ts": "2026-05-07T03:59:41Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01857873313122685,
-    "next_day_return_pred": 0.01857873313122685,
-    "prob_up": 0.7252984951575554,
-    "rmse": 0.04122305915270929,
-    "auc": 0.41646634615384615,
+    "predicted_return": 0.01983484097337543,
+    "next_day_return_pred": 0.01983484097337543,
+    "prob_up": 0.6663496328878906,
+    "rmse": 0.0412296536084038,
+    "auc": 0.4217797552836485,
     "model": "histgb",
     "for_date": "2026-05-07"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-05-07T00:02:31Z",
+    "ts": "2026-05-07T03:59:42Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.011375870024873959,
-    "next_day_return_pred": 0.011375870024873959,
-    "prob_up": 0.5684054590713341,
-    "rmse": 0.04638727514915211,
+    "predicted_return": -0.0035072497944842076,
+    "next_day_return_pred": -0.0035072497944842076,
+    "prob_up": 0.3760829529423235,
+    "rmse": 0.04639682578485942,
     "auc": 0.47763528307788555,
     "model": "histgb",
     "for_date": "2026-05-07"
