@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-05-10T21:59:48Z",
+    "ts": "2026-05-10T23:02:33Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0009087712324868646,
-    "next_day_return_pred": 0.0009087712324868646,
-    "prob_up": 0.7100454858642853,
-    "rmse": 0.026474430143657055,
-    "auc": 0.40302558398220245,
+    "predicted_return": -0.007979907567353554,
+    "next_day_return_pred": -0.007979907567353554,
+    "prob_up": 0.3131901813217318,
+    "rmse": 0.02667953364141565,
+    "auc": 0.3978420467185762,
     "model": "histgb",
     "for_date": "2026-05-10"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-05-10T21:59:49Z",
+    "ts": "2026-05-10T23:02:33Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.010958349160506163,
-    "next_day_return_pred": 0.010958349160506163,
-    "prob_up": 0.8651137005522382,
-    "rmse": 0.03963756899873823,
-    "auc": 0.4633190883190883,
+    "predicted_return": 0.017330405309845594,
+    "next_day_return_pred": 0.017330405309845594,
+    "prob_up": 0.7297050382998205,
+    "rmse": 0.03968589169783925,
+    "auc": 0.465923254985755,
     "model": "histgb",
     "for_date": "2026-05-10"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-05-10T21:59:50Z",
+    "ts": "2026-05-10T23:02:34Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.007083529617026469,
-    "next_day_return_pred": 0.007083529617026469,
-    "prob_up": 0.7035963577222919,
-    "rmse": 0.04574249771376775,
+    "predicted_return": 0.007210347005829523,
+    "next_day_return_pred": 0.007210347005829523,
+    "prob_up": 0.7605496729470058,
+    "rmse": 0.04575233136650534,
     "auc": 0.46578125000000004,
     "model": "histgb",
     "for_date": "2026-05-10"
