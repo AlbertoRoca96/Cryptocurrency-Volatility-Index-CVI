@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-05-22T21:22:10Z",
+    "ts": "2026-05-22T23:15:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0006818599155770234,
-    "next_day_return_pred": 0.0006818599155770234,
-    "prob_up": 0.4907363344668484,
-    "rmse": 0.026393711040414068,
-    "auc": 0.445659436105296,
+    "predicted_return": 0.003233413165211509,
+    "next_day_return_pred": 0.003233413165211509,
+    "prob_up": 0.6272834097034133,
+    "rmse": 0.026596535021899386,
+    "auc": 0.4397131530889492,
     "model": "histgb",
     "for_date": "2026-05-22"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-05-22T21:22:11Z",
+    "ts": "2026-05-22T23:15:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0028771526619859765,
-    "next_day_return_pred": 0.0028771526619859765,
-    "prob_up": 0.5401597692135521,
-    "rmse": 0.039182784952904594,
-    "auc": 0.458620383128139,
+    "predicted_return": 0.004769597263436205,
+    "next_day_return_pred": 0.004769597263436205,
+    "prob_up": 0.500515744645992,
+    "rmse": 0.039235689759269256,
+    "auc": 0.46195386461620513,
     "model": "histgb",
     "for_date": "2026-05-22"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-05-22T21:22:12Z",
+    "ts": "2026-05-22T23:15:41Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01765663499078252,
-    "next_day_return_pred": 0.01765663499078252,
-    "prob_up": 0.7714641152090458,
-    "rmse": 0.045413400184983785,
-    "auc": 0.5040179573512906,
+    "predicted_return": 0.014621686889025804,
+    "next_day_return_pred": 0.014621686889025804,
+    "prob_up": 0.813388365157617,
+    "rmse": 0.04541416070970526,
+    "auc": 0.5073849607182941,
     "model": "histgb",
     "for_date": "2026-05-22"
   }
