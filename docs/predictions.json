@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-05-23T15:14:21Z",
+    "ts": "2026-05-23T17:14:57Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0016244122708920898,
-    "next_day_return_pred": 0.0016244122708920898,
-    "prob_up": 0.4716357241652252,
-    "rmse": 0.026157354313272672,
-    "auc": 0.44269742995857647,
+    "predicted_return": 0.00962161380271749,
+    "next_day_return_pred": 0.00962161380271749,
+    "prob_up": 0.31917320117578,
+    "rmse": 0.026158444219072912,
+    "auc": 0.43866999465145307,
     "model": "histgb",
     "for_date": "2026-05-23"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-05-23T15:14:21Z",
+    "ts": "2026-05-23T17:14:58Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.012427614790439074,
-    "next_day_return_pred": -0.012427614790439074,
-    "prob_up": 0.7693160449797654,
-    "rmse": 0.03808283895798504,
-    "auc": 0.44890884039290635,
+    "predicted_return": -0.014035707716269096,
+    "next_day_return_pred": -0.014035707716269096,
+    "prob_up": 0.5116118176120963,
+    "rmse": 0.03808804758458397,
+    "auc": 0.44399004267425324,
     "model": "histgb",
     "for_date": "2026-05-23"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-05-23T15:14:22Z",
+    "ts": "2026-05-23T17:14:58Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.014054671080933943,
-    "next_day_return_pred": 0.014054671080933943,
-    "prob_up": 0.760246555063964,
-    "rmse": 0.04455224795293884,
+    "predicted_return": 0.018230129401856112,
+    "next_day_return_pred": 0.018230129401856112,
+    "prob_up": 0.727231627559368,
+    "rmse": 0.04455940092764596,
     "auc": 0.501281244380507,
     "model": "histgb",
     "for_date": "2026-05-23"
