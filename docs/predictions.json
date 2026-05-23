@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-05-23T04:04:50Z",
+    "ts": "2026-05-23T06:43:49Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0016241875824603645,
-    "next_day_return_pred": 0.0016241875824603645,
-    "prob_up": 0.4716357241652252,
-    "rmse": 0.026157355523686438,
-    "auc": 0.44269742995857647,
+    "predicted_return": 0.007287633810993689,
+    "next_day_return_pred": 0.007287633810993689,
+    "prob_up": 0.31917320117578,
+    "rmse": 0.026158742775595663,
+    "auc": 0.43866999465145307,
     "model": "histgb",
     "for_date": "2026-05-23"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-05-23T04:04:50Z",
+    "ts": "2026-05-23T06:43:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.011543590633465847,
-    "next_day_return_pred": -0.011543590633465847,
-    "prob_up": 0.7693160449797654,
-    "rmse": 0.038081794038008085,
-    "auc": 0.44890884039290635,
+    "predicted_return": -0.013994690454773204,
+    "next_day_return_pred": -0.013994690454773204,
+    "prob_up": 0.5116118176120963,
+    "rmse": 0.03808725569348555,
+    "auc": 0.44399004267425324,
     "model": "histgb",
     "for_date": "2026-05-23"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-05-23T04:04:51Z",
+    "ts": "2026-05-23T06:43:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.014286330996027547,
-    "next_day_return_pred": 0.014286330996027547,
-    "prob_up": 0.7475107648175388,
-    "rmse": 0.04454379967017476,
+    "predicted_return": 0.01649930330876089,
+    "next_day_return_pred": 0.01649930330876089,
+    "prob_up": 0.727231627559368,
+    "rmse": 0.044557793967791165,
     "auc": 0.501281244380507,
     "model": "histgb",
     "for_date": "2026-05-23"
