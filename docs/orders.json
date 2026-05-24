@@ -1,5 +1,17 @@
 [
   {
+    "t": "2026-05-24T23:09:14.930Z",
+    "symbol": "LINK",
+    "type": "entry",
+    "side": "buy",
+    "reason": "EMA20 > EMA100 and ERI <= median",
+    "qty": 475.32681214773294,
+    "price": "mkt",
+    "exchange": "paper",
+    "risk_budget_usd": 100,
+    "horizon_days": 1
+  },
+  {
     "t": "2026-05-06T12:00:56.638Z",
     "symbol": "LINK",
     "type": "entry",
@@ -66,18 +78,6 @@
     "side": "buy",
     "reason": "EMA20 > EMA100 and ERI <= median",
     "qty": 320.64412460102756,
-    "price": "mkt",
-    "exchange": "paper",
-    "risk_budget_usd": 100,
-    "horizon_days": 1
-  },
-  {
-    "t": "2025-12-29T07:35:13.137Z",
-    "symbol": "LINK",
-    "type": "entry",
-    "side": "buy",
-    "reason": "EMA20 > EMA100 and ERI <= median",
-    "qty": 206.88662086869687,
     "price": "mkt",
     "exchange": "paper",
     "risk_budget_usd": 100,
