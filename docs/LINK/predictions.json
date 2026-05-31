@@ -1,6 +1,6 @@
 {
   "symbol": "LINK",
-  "ts": "2026-05-31T00:12:05Z",
+  "ts": "2026-05-31T05:44:16Z",
   "horizon_days": 1,
   "features": [
     "iv",
@@ -12,10 +12,10 @@
     "iv_minus_rv30"
   ],
   "sample_size": 364,
-  "predicted_return": 0.00856818392126537,
-  "next_day_return_pred": 0.00856818392126537,
-  "prob_up": 0.8134725126078886,
-  "rmse": 0.044121571131703737,
+  "predicted_return": -0.003069236896068852,
+  "next_day_return_pred": -0.003069236896068852,
+  "prob_up": 0.44175788164082563,
+  "rmse": 0.04411670500486531,
   "auc": 0.44715865836729213,
   "model": "histgb",
   "for_date": "2026-05-31"
