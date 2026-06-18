@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-06-18T04:56:52Z",
+    "ts": "2026-06-18T09:23:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.004794582261485746,
-    "next_day_return_pred": -0.004794582261485746,
-    "prob_up": 0.5207802548616721,
-    "rmse": 0.02531137004052407,
-    "auc": 0.44161937530720763,
+    "predicted_return": 0.006310525440865761,
+    "next_day_return_pred": 0.006310525440865761,
+    "prob_up": 0.8821773277088356,
+    "rmse": 0.02531939380422476,
+    "auc": 0.4436607142857143,
     "model": "histgb",
     "for_date": "2026-06-18"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-06-18T04:56:52Z",
+    "ts": "2026-06-18T09:23:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0006843778646474244,
-    "next_day_return_pred": 0.0006843778646474244,
-    "prob_up": 0.39548181388410236,
-    "rmse": 0.041073164393301116,
-    "auc": 0.45423789173789175,
+    "predicted_return": 0.0025225882182685383,
+    "next_day_return_pred": 0.0025225882182685383,
+    "prob_up": 0.6759369490519903,
+    "rmse": 0.04106811428697195,
+    "auc": 0.46024471635150166,
     "model": "histgb",
     "for_date": "2026-06-18"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-06-18T04:56:53Z",
+    "ts": "2026-06-18T09:23:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0023637356104647313,
-    "next_day_return_pred": 0.0023637356104647313,
-    "prob_up": 0.5544854174587106,
-    "rmse": 0.04290667852442183,
+    "predicted_return": 0.011213888117812328,
+    "next_day_return_pred": 0.011213888117812328,
+    "prob_up": 0.43615313000007716,
+    "rmse": 0.04289193761428061,
     "auc": 0.4687429423189846,
     "model": "histgb",
     "for_date": "2026-06-18"
