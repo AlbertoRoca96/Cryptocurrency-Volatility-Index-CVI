@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-07-06T13:59:00Z",
+    "ts": "2026-07-06T17:11:54Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0022462314296738074,
-    "next_day_return_pred": 0.0022462314296738074,
-    "prob_up": 0.42056396246422045,
-    "rmse": 0.025955989395234434,
-    "auc": 0.42015700967928993,
+    "predicted_return": 0.0030374830677857064,
+    "next_day_return_pred": 0.0030374830677857064,
+    "prob_up": 0.6837179331531773,
+    "rmse": 0.02585528755308824,
+    "auc": 0.422691210554466,
     "model": "histgb",
     "for_date": "2026-07-06"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-07-06T13:59:01Z",
+    "ts": "2026-07-06T17:11:54Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.011997548900989098,
-    "next_day_return_pred": -0.011997548900989098,
-    "prob_up": 0.35428586201830914,
-    "rmse": 0.03946069998263447,
-    "auc": 0.4536369301994302,
+    "predicted_return": -0.008751412621539239,
+    "next_day_return_pred": -0.008751412621539239,
+    "prob_up": 0.7430635988015457,
+    "rmse": 0.039444378296531905,
+    "auc": 0.45483870967741935,
     "model": "histgb",
     "for_date": "2026-07-06"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-07-06T13:59:02Z",
+    "ts": "2026-07-06T17:11:55Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.01958335717103712,
-    "next_day_return_pred": -0.01958335717103712,
-    "prob_up": 0.07929623667294376,
-    "rmse": 0.042424402658192785,
+    "predicted_return": -0.009156249791153356,
+    "next_day_return_pred": -0.009156249791153356,
+    "prob_up": 0.29027361421032966,
+    "rmse": 0.04242030271517608,
     "auc": 0.48904220779220775,
     "model": "histgb",
     "for_date": "2026-07-06"
