@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-07-09T04:08:28Z",
+    "ts": "2026-07-09T08:37:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.013688963138128564,
-    "next_day_return_pred": -0.013688963138128564,
-    "prob_up": 0.14668506220854183,
-    "rmse": 0.02507174597837878,
-    "auc": 0.4129094240135841,
+    "predicted_return": -0.0066452219753326365,
+    "next_day_return_pred": -0.0066452219753326365,
+    "prob_up": 0.25684959862661577,
+    "rmse": 0.025052081467096577,
+    "auc": 0.41502232142857143,
     "model": "histgb",
     "for_date": "2026-07-09"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-07-09T04:08:28Z",
+    "ts": "2026-07-09T08:37:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.00436612399696947,
-    "next_day_return_pred": 0.00436612399696947,
-    "prob_up": 0.49274703820670457,
-    "rmse": 0.0386910518410744,
-    "auc": 0.45632019967908716,
+    "predicted_return": 0.006450054866367304,
+    "next_day_return_pred": 0.006450054866367304,
+    "prob_up": 0.6001910613091287,
+    "rmse": 0.038675270338503626,
+    "auc": 0.4612712128635696,
     "model": "histgb",
     "for_date": "2026-07-09"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-07-09T04:08:29Z",
+    "ts": "2026-07-09T08:37:45Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.008911465015871617,
-    "next_day_return_pred": -0.008911465015871617,
-    "prob_up": 0.38505454793552424,
-    "rmse": 0.04416739237783667,
-    "auc": 0.4850174531937078,
+    "predicted_return": 0.011394732618064623,
+    "next_day_return_pred": 0.011394732618064623,
+    "prob_up": 0.46409000592574345,
+    "rmse": 0.044161615002310584,
+    "auc": 0.4850226244343891,
     "model": "histgb",
     "for_date": "2026-07-09"
   }
