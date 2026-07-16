@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-07-16T06:28:37Z",
+    "ts": "2026-07-16T08:33:27Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.00844017259537525,
-    "next_day_return_pred": 0.00844017259537525,
-    "prob_up": 0.7443184149778299,
-    "rmse": 0.025762626191292878,
-    "auc": 0.458918774253981,
+    "predicted_return": -0.004808554448906087,
+    "next_day_return_pred": -0.004808554448906087,
+    "prob_up": 0.10547117440276019,
+    "rmse": 0.025782490238914324,
+    "auc": 0.46421875,
     "model": "histgb",
     "for_date": "2026-07-16"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-07-16T06:28:38Z",
+    "ts": "2026-07-16T08:33:28Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.005249180257612969,
-    "next_day_return_pred": -0.005249180257612969,
-    "prob_up": 0.7044306480896219,
-    "rmse": 0.03925380509488666,
-    "auc": 0.5094734033090198,
+    "predicted_return": -0.009068595933541597,
+    "next_day_return_pred": -0.009068595933541597,
+    "prob_up": 0.3919867831111272,
+    "rmse": 0.03925395196138445,
+    "auc": 0.51559510567297,
     "model": "histgb",
     "for_date": "2026-07-16"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-07-16T06:28:38Z",
+    "ts": "2026-07-16T08:33:29Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.016245717856010044,
-    "next_day_return_pred": -0.016245717856010044,
-    "prob_up": 0.24037715362574205,
-    "rmse": 0.04067891552864915,
+    "predicted_return": 0.0026145334370594082,
+    "next_day_return_pred": 0.0026145334370594082,
+    "prob_up": 0.5313009138651686,
+    "rmse": 0.04067221832905372,
     "auc": 0.5018713924963926,
     "model": "histgb",
     "for_date": "2026-07-16"
