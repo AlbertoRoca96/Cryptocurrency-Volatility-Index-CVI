@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-07-21T00:06:23Z",
+    "ts": "2026-07-21T03:41:39Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.006005061338279771,
-    "next_day_return_pred": -0.006005061338279771,
-    "prob_up": 0.125069057924819,
-    "rmse": 0.025092734817500868,
-    "auc": 0.442950176189839,
+    "predicted_return": -0.0040013199237500735,
+    "next_day_return_pred": -0.0040013199237500735,
+    "prob_up": 0.242503931368716,
+    "rmse": 0.02509189636327933,
+    "auc": 0.4363745765733642,
     "model": "histgb",
     "for_date": "2026-07-21"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-07-21T00:06:23Z",
+    "ts": "2026-07-21T03:41:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.00842724653679559,
-    "next_day_return_pred": -0.00842724653679559,
-    "prob_up": 0.1394978221284276,
-    "rmse": 0.03664932931216495,
-    "auc": 0.522631274732115,
+    "predicted_return": -0.013219979181108928,
+    "next_day_return_pred": -0.013219979181108928,
+    "prob_up": 0.16600979792714315,
+    "rmse": 0.036678933450992796,
+    "auc": 0.5171363798008535,
     "model": "histgb",
     "for_date": "2026-07-21"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-07-21T00:06:24Z",
+    "ts": "2026-07-21T03:41:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0006917222571823509,
-    "next_day_return_pred": 0.0006917222571823509,
-    "prob_up": 0.40603229058253865,
-    "rmse": 0.04029541499440214,
+    "predicted_return": 0.0022547725238263303,
+    "next_day_return_pred": 0.0022547725238263303,
+    "prob_up": 0.4511451474923813,
+    "rmse": 0.04029657551418121,
     "auc": 0.5204264870931538,
     "model": "histgb",
     "for_date": "2026-07-21"
