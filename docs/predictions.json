@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-07-22T11:59:34Z",
+    "ts": "2026-07-22T14:18:59Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.005708629828640068,
-    "next_day_return_pred": 0.005708629828640068,
-    "prob_up": 0.18226792542847817,
-    "rmse": 0.025354785032571728,
+    "predicted_return": -0.0020997324725779325,
+    "next_day_return_pred": -0.0020997324725779325,
+    "prob_up": 0.09086245746875139,
+    "rmse": 0.025359568082645,
     "auc": 0.4472053842039579,
     "model": "histgb",
     "for_date": "2026-07-22"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-07-22T11:59:35Z",
+    "ts": "2026-07-22T14:19:00Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.01215930429770433,
-    "next_day_return_pred": -0.01215930429770433,
-    "prob_up": 0.1661380269493875,
-    "rmse": 0.036173226558616864,
-    "auc": 0.5191811877667141,
+    "predicted_return": -0.01234547598322201,
+    "next_day_return_pred": -0.01234547598322201,
+    "prob_up": 0.3856929263271516,
+    "rmse": 0.03617725722319204,
+    "auc": 0.5134672652117872,
     "model": "histgb",
     "for_date": "2026-07-22"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-07-22T11:59:36Z",
+    "ts": "2026-07-22T14:19:01Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.021074870268878564,
-    "next_day_return_pred": -0.021074870268878564,
-    "prob_up": 0.28067784960379466,
-    "rmse": 0.03967751571123795,
-    "auc": 0.5147474747474747,
+    "predicted_return": -0.014782386068777173,
+    "next_day_return_pred": -0.014782386068777173,
+    "prob_up": 0.5662649418731028,
+    "rmse": 0.0396822175355218,
+    "auc": 0.5141230272596844,
     "model": "histgb",
     "for_date": "2026-07-22"
   }
