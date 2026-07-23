@@ -1,6 +1,6 @@
 {
   "symbol": "BTC",
-  "ts": "2026-07-23T19:41:47Z",
+  "ts": "2026-07-23T21:18:56Z",
   "horizon_days": 1,
   "features": [
     "iv",
@@ -12,10 +12,10 @@
     "iv_minus_rv30"
   ],
   "sample_size": 364,
-  "predicted_return": -0.005353037193134573,
-  "next_day_return_pred": -0.005353037193134573,
-  "prob_up": 0.31108943561163144,
-  "rmse": 0.025427587447376485,
+  "predicted_return": -5.345093604223626e-06,
+  "next_day_return_pred": -5.345093604223626e-06,
+  "prob_up": 0.13752490788239932,
+  "rmse": 0.025421022352973336,
   "auc": 0.44540345242874346,
   "model": "histgb",
   "for_date": "2026-07-23"
