@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-08-04T09:46:32Z",
+    "ts": "2026-08-04T12:12:16Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0015574331012625344,
-    "next_day_return_pred": -0.0015574331012625344,
-    "prob_up": 0.7922675612206249,
-    "rmse": 0.02552590986653027,
+    "predicted_return": -0.0009476181218431726,
+    "next_day_return_pred": -0.0009476181218431726,
+    "prob_up": 0.573969647557593,
+    "rmse": 0.025530398620746308,
     "auc": 0.42341034005094064,
     "model": "histgb",
     "for_date": "2026-08-04"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-08-04T09:46:32Z",
+    "ts": "2026-08-04T12:12:17Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.009147907446782191,
-    "next_day_return_pred": 0.009147907446782191,
-    "prob_up": 0.5589935528282199,
-    "rmse": 0.03727328197433606,
-    "auc": 0.47334816462736373,
+    "predicted_return": 0.01318984479041543,
+    "next_day_return_pred": 0.01318984479041543,
+    "prob_up": 0.7530323947756759,
+    "rmse": 0.03727570066502142,
+    "auc": 0.4724470734744707,
     "model": "histgb",
     "for_date": "2026-08-04"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-08-04T09:46:33Z",
+    "ts": "2026-08-04T12:12:17Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.006216780469436268,
-    "next_day_return_pred": 0.006216780469436268,
-    "prob_up": 0.484503111940627,
-    "rmse": 0.04026163522626063,
-    "auc": 0.49509252172347035,
+    "predicted_return": 0.005871826389250991,
+    "next_day_return_pred": 0.005871826389250991,
+    "prob_up": 0.5280426653597777,
+    "rmse": 0.04028051608142751,
+    "auc": 0.4896826110411796,
     "model": "histgb",
     "for_date": "2026-08-04"
   }
