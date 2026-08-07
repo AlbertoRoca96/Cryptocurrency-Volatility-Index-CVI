@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-08-07T00:12:01Z",
+    "ts": "2026-08-07T03:59:18Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.003720374445613637,
-    "next_day_return_pred": 0.003720374445613637,
-    "prob_up": 0.5314560317330906,
-    "rmse": 0.02478630341037244,
-    "auc": 0.4759578928587359,
+    "predicted_return": 0.0038455564322024145,
+    "next_day_return_pred": 0.0038455564322024145,
+    "prob_up": 0.36437039653413444,
+    "rmse": 0.02489351477614766,
+    "auc": 0.4606473214285714,
     "model": "histgb",
     "for_date": "2026-08-07"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-08-07T00:12:01Z",
+    "ts": "2026-08-07T03:59:18Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01251358427691178,
-    "next_day_return_pred": 0.01251358427691178,
-    "prob_up": 0.6692443256924528,
-    "rmse": 0.0361754727878462,
-    "auc": 0.46534939544807963,
+    "predicted_return": 0.018212102499428104,
+    "next_day_return_pred": 0.018212102499428104,
+    "prob_up": 0.35600053762584827,
+    "rmse": 0.03620480847072065,
+    "auc": 0.47425636921435244,
     "model": "histgb",
     "for_date": "2026-08-07"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-08-07T00:12:02Z",
+    "ts": "2026-08-07T03:59:19Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.010722179376133458,
-    "next_day_return_pred": 0.010722179376133458,
-    "prob_up": 0.5742336907756144,
-    "rmse": 0.03710577028819242,
-    "auc": 0.4890602582496414,
+    "predicted_return": 0.01469176265304308,
+    "next_day_return_pred": 0.01469176265304308,
+    "prob_up": 0.2786596954074865,
+    "rmse": 0.037042262103794125,
+    "auc": 0.4927721661054994,
     "model": "histgb",
     "for_date": "2026-08-07"
   }
