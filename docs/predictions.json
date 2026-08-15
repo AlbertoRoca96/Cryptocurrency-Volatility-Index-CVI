@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-08-15T14:34:26Z",
+    "ts": "2026-08-15T15:31:25Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0018032221032744534,
-    "next_day_return_pred": -0.0018032221032744534,
-    "prob_up": 0.17137507275195688,
-    "rmse": 0.024864838855689568,
-    "auc": 0.45397470843201215,
+    "predicted_return": -0.0005604486770747833,
+    "next_day_return_pred": -0.0005604486770747833,
+    "prob_up": 0.33186261641337456,
+    "rmse": 0.024864841608841753,
+    "auc": 0.45703125,
     "model": "histgb",
     "for_date": "2026-08-15"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-08-15T14:34:27Z",
+    "ts": "2026-08-15T15:31:26Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0008108973950730694,
-    "next_day_return_pred": -0.0008108973950730694,
-    "prob_up": 0.24310201311322446,
-    "rmse": 0.0357365708577114,
-    "auc": 0.48566093103908226,
+    "predicted_return": 0.0008208469725910984,
+    "next_day_return_pred": 0.0008208469725910984,
+    "prob_up": 0.500731293201929,
+    "rmse": 0.03573652120725668,
+    "auc": 0.48217460881934565,
     "model": "histgb",
     "for_date": "2026-08-15"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-08-15T14:34:27Z",
+    "ts": "2026-08-15T15:31:26Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.004095476121386267,
-    "next_day_return_pred": -0.004095476121386267,
-    "prob_up": 0.19568817533161714,
-    "rmse": 0.0370224650196663,
+    "predicted_return": -0.005458428520077784,
+    "next_day_return_pred": -0.005458428520077784,
+    "prob_up": 0.1960794526307795,
+    "rmse": 0.036985004045717126,
     "auc": 0.4864913222401145,
     "model": "histgb",
     "for_date": "2026-08-15"
