@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-09-05T13:51:08Z",
+    "ts": "2026-09-05T16:46:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0006933929416550562,
-    "next_day_return_pred": 0.0006933929416550562,
-    "prob_up": 0.38307179864350305,
-    "rmse": 0.024747915347056375,
-    "auc": 0.49504884249966546,
+    "predicted_return": 0.00552573499183452,
+    "next_day_return_pred": 0.00552573499183452,
+    "prob_up": 0.8739411432913279,
+    "rmse": 0.024743121683096354,
+    "auc": 0.5016714209306472,
     "model": "histgb",
     "for_date": "2026-09-05"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-09-05T13:51:09Z",
+    "ts": "2026-09-05T16:46:50Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0018869362961305366,
-    "next_day_return_pred": -0.0018869362961305366,
-    "prob_up": 0.10815066400183149,
-    "rmse": 0.03570062562126987,
-    "auc": 0.4547777777777777,
+    "predicted_return": -0.004041408230903384,
+    "next_day_return_pred": -0.004041408230903384,
+    "prob_up": 0.45239226556621376,
+    "rmse": 0.03570792609132919,
+    "auc": 0.44897551002266767,
     "model": "histgb",
     "for_date": "2026-09-05"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-09-05T13:51:09Z",
+    "ts": "2026-09-05T16:46:51Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.007045794576232485,
-    "next_day_return_pred": -0.007045794576232485,
-    "prob_up": 0.2014397708882629,
-    "rmse": 0.03710373159132894,
+    "predicted_return": -0.005537144343846975,
+    "next_day_return_pred": -0.005537144343846975,
+    "prob_up": 0.1546975819199229,
+    "rmse": 0.03711326723848326,
     "auc": 0.4634478752401805,
     "model": "histgb",
     "for_date": "2026-09-05"
