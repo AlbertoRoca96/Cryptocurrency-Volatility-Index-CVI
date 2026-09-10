@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-09-10T01:01:40Z",
+    "ts": "2026-09-10T05:53:57Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.007910754439403811,
-    "next_day_return_pred": -0.007910754439403811,
-    "prob_up": 0.21917664703404516,
-    "rmse": 0.025327837338708414,
-    "auc": 0.507086824745944,
+    "predicted_return": 0.0012238004215140805,
+    "next_day_return_pred": 0.0012238004215140805,
+    "prob_up": 0.5171996894179014,
+    "rmse": 0.025332348734741068,
+    "auc": 0.5010021825308449,
     "model": "histgb",
     "for_date": "2026-09-10"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-09-10T01:01:41Z",
+    "ts": "2026-09-10T05:53:57Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.004108363698114861,
-    "next_day_return_pred": 0.004108363698114861,
-    "prob_up": 0.7430663566906724,
-    "rmse": 0.03485381497327024,
+    "predicted_return": 0.0021122145494957456,
+    "next_day_return_pred": 0.0021122145494957456,
+    "prob_up": 0.4234411860349467,
+    "rmse": 0.034856479095151494,
     "auc": 0.4818856685633002,
     "model": "histgb",
     "for_date": "2026-09-10"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-09-10T01:01:42Z",
+    "ts": "2026-09-10T05:53:58Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.035385153734510476,
-    "next_day_return_pred": -0.035385153734510476,
-    "prob_up": 0.28653009733120255,
-    "rmse": 0.03886316435166731,
-    "auc": 0.4632021091201573,
+    "predicted_return": -0.02509561093478148,
+    "next_day_return_pred": -0.02509561093478148,
+    "prob_up": 0.4014123849188981,
+    "rmse": 0.03886889854536008,
+    "auc": 0.4565625,
     "model": "histgb",
     "for_date": "2026-09-10"
   }
