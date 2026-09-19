@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-09-19T00:13:06Z",
+    "ts": "2026-09-19T05:45:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.005461833365099079,
-    "next_day_return_pred": 0.005461833365099079,
-    "prob_up": 0.732919591393082,
-    "rmse": 0.025007092759897123,
+    "predicted_return": -0.0027443335342297423,
+    "next_day_return_pred": -0.0027443335342297423,
+    "prob_up": 0.5833232018926995,
+    "rmse": 0.025009198392667648,
     "auc": 0.5129870129870129,
     "model": "histgb",
     "for_date": "2026-09-19"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-09-19T00:13:07Z",
+    "ts": "2026-09-19T05:45:40Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.009779382664650381,
-    "next_day_return_pred": -0.009779382664650381,
-    "prob_up": 0.18601500277593097,
-    "rmse": 0.03577756373982859,
-    "auc": 0.49215241652216446,
+    "predicted_return": -0.009424186112194621,
+    "next_day_return_pred": -0.009424186112194621,
+    "prob_up": 0.4610399460527713,
+    "rmse": 0.03578374784979639,
+    "auc": 0.488880982031667,
     "model": "histgb",
     "for_date": "2026-09-19"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-09-19T00:13:08Z",
+    "ts": "2026-09-19T05:45:41Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.016960461701462124,
-    "next_day_return_pred": -0.016960461701462124,
-    "prob_up": 0.31255536354243063,
-    "rmse": 0.03818203453772987,
-    "auc": 0.5141071428571429,
+    "predicted_return": -0.018691847665647694,
+    "next_day_return_pred": -0.018691847665647694,
+    "prob_up": 0.44427803763761103,
+    "rmse": 0.038229945622727454,
+    "auc": 0.5079619965208082,
     "model": "histgb",
     "for_date": "2026-09-19"
   }
