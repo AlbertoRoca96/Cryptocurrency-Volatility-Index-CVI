@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-09-20T12:15:45Z",
+    "ts": "2026-09-20T16:46:45Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.01311791701762652,
-    "next_day_return_pred": 0.01311791701762652,
-    "prob_up": 0.6701946080102015,
-    "rmse": 0.02497047036231065,
-    "auc": 0.48745272525027805,
+    "predicted_return": 0.01746864725292485,
+    "next_day_return_pred": 0.01746864725292485,
+    "prob_up": 0.5914482838328035,
+    "rmse": 0.024980711046683955,
+    "auc": 0.48232076143035046,
     "model": "histgb",
     "for_date": "2026-09-20"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-09-20T12:15:46Z",
+    "ts": "2026-09-20T16:46:46Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.006114739285519451,
-    "next_day_return_pred": 0.006114739285519451,
-    "prob_up": 0.6861629605521806,
-    "rmse": 0.03501625229032602,
-    "auc": 0.48970699390867456,
+    "predicted_return": 0.0027354383827043064,
+    "next_day_return_pred": 0.0027354383827043064,
+    "prob_up": 0.521958180298888,
+    "rmse": 0.03501724860758357,
+    "auc": 0.48567870485678705,
     "model": "histgb",
     "for_date": "2026-09-20"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-09-20T12:15:47Z",
+    "ts": "2026-09-20T16:46:46Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0021313960306593963,
-    "next_day_return_pred": -0.0021313960306593963,
-    "prob_up": 0.5931100863776126,
-    "rmse": 0.03805818317054788,
-    "auc": 0.52578125,
+    "predicted_return": -0.005491775898162824,
+    "next_day_return_pred": -0.005491775898162824,
+    "prob_up": 0.6364465765057727,
+    "rmse": 0.03812305136840474,
+    "auc": 0.5206967304518488,
     "model": "histgb",
     "for_date": "2026-09-20"
   }
