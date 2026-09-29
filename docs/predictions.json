@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-09-29T01:49:54Z",
+    "ts": "2026-09-29T08:22:04Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0009117287011620882,
-    "next_day_return_pred": -0.0009117287011620882,
-    "prob_up": 0.3288713951097976,
-    "rmse": 0.02464267132601963,
-    "auc": 0.501891915954416,
+    "predicted_return": 0.0035603734723685517,
+    "next_day_return_pred": 0.0035603734723685517,
+    "prob_up": 0.6192410275413182,
+    "rmse": 0.024641190840652753,
+    "auc": 0.5065850945494994,
     "model": "histgb",
     "for_date": "2026-09-29"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-09-29T01:49:55Z",
+    "ts": "2026-09-29T08:22:04Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0028076571757385802,
-    "next_day_return_pred": -0.0028076571757385802,
-    "prob_up": 0.4296655033244744,
-    "rmse": 0.03553137930272128,
-    "auc": 0.46554177226446136,
+    "predicted_return": 0.009266812920421636,
+    "next_day_return_pred": 0.009266812920421636,
+    "prob_up": 0.5620697324902921,
+    "rmse": 0.0355379867747407,
+    "auc": 0.4681773705746309,
     "model": "histgb",
     "for_date": "2026-09-29"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-09-29T01:49:55Z",
+    "ts": "2026-09-29T08:22:05Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.002534601219336932,
-    "next_day_return_pred": -0.002534601219336932,
-    "prob_up": 0.36532294034283974,
-    "rmse": 0.03769191352707852,
+    "predicted_return": 0.00181139801887174,
+    "next_day_return_pred": 0.00181139801887174,
+    "prob_up": 0.42250165968223086,
+    "rmse": 0.03769245526042019,
     "auc": 0.5147976466393296,
     "model": "histgb",
     "for_date": "2026-09-29"
