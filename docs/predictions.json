@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-10-06T15:03:27Z",
+    "ts": "2026-10-06T20:29:16Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.008370517764575515,
-    "next_day_return_pred": 0.008370517764575515,
-    "prob_up": 0.7844783892692209,
-    "rmse": 0.02456620301794927,
-    "auc": 0.5313681868743048,
+    "predicted_return": 0.005652010457425622,
+    "next_day_return_pred": 0.005652010457425622,
+    "prob_up": 0.5545816719202032,
+    "rmse": 0.02457502158256082,
+    "auc": 0.5261529558404558,
     "model": "histgb",
     "for_date": "2026-10-06"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-10-06T15:03:28Z",
+    "ts": "2026-10-06T20:29:16Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.00208768118597567,
-    "next_day_return_pred": 0.00208768118597567,
-    "prob_up": 0.6265863537473857,
-    "rmse": 0.035333751561013434,
-    "auc": 0.47665732959850604,
+    "predicted_return": 0.0029669215305986973,
+    "next_day_return_pred": 0.0029669215305986973,
+    "prob_up": 0.20552464796104206,
+    "rmse": 0.03532579758510576,
+    "auc": 0.4772626244665718,
     "model": "histgb",
     "for_date": "2026-10-06"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-10-06T15:03:29Z",
+    "ts": "2026-10-06T20:29:17Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.008858041586758401,
-    "next_day_return_pred": 0.008858041586758401,
-    "prob_up": 0.8826322133846719,
-    "rmse": 0.03763776413165453,
+    "predicted_return": 0.005950992020561329,
+    "next_day_return_pred": 0.005950992020561329,
+    "prob_up": 0.8727121233562227,
+    "rmse": 0.03761696266119008,
     "auc": 0.5081956260300209,
     "model": "histgb",
     "for_date": "2026-10-06"
