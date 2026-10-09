@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-10-09T13:15:18Z",
+    "ts": "2026-10-09T16:10:29Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.011145848033172036,
-    "next_day_return_pred": 0.011145848033172036,
-    "prob_up": 0.8847024879771369,
-    "rmse": 0.02428418950647938,
-    "auc": 0.5415794396686117,
+    "predicted_return": 0.010984369910290557,
+    "next_day_return_pred": 0.010984369910290557,
+    "prob_up": 0.9246720175737536,
+    "rmse": 0.0243009060269497,
+    "auc": 0.5423366442474723,
     "model": "histgb",
     "for_date": "2026-10-09"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-10-09T13:15:19Z",
+    "ts": "2026-10-09T16:10:29Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.001663942498817701,
-    "next_day_return_pred": 0.001663942498817701,
-    "prob_up": 0.7100338155081612,
-    "rmse": 0.034896987815229555,
-    "auc": 0.4773737553342817,
+    "predicted_return": -0.004119498038682047,
+    "next_day_return_pred": -0.004119498038682047,
+    "prob_up": 0.474327018160249,
+    "rmse": 0.034978704554836586,
+    "auc": 0.4757734708392603,
     "model": "histgb",
     "for_date": "2026-10-09"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-10-09T13:15:20Z",
+    "ts": "2026-10-09T16:10:30Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.007683052008852852,
-    "next_day_return_pred": 0.007683052008852852,
-    "prob_up": 0.8045382215566601,
-    "rmse": 0.03834477784022402,
-    "auc": 0.5452763796712842,
+    "predicted_return": 0.021136067873775734,
+    "next_day_return_pred": 0.021136067873775734,
+    "prob_up": 0.8084599324346007,
+    "rmse": 0.038125793644456125,
+    "auc": 0.5509331432898312,
     "model": "histgb",
     "for_date": "2026-10-09"
   }
