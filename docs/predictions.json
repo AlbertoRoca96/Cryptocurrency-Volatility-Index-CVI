@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-10-11T12:48:00Z",
+    "ts": "2026-10-11T18:01:30Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.004356741185106403,
-    "next_day_return_pred": -0.004356741185106403,
-    "prob_up": 0.6347244977711768,
-    "rmse": 0.024592903005333927,
+    "predicted_return": 0.00883378293500148,
+    "next_day_return_pred": 0.00883378293500148,
+    "prob_up": 0.8409572955897875,
+    "rmse": 0.024596861798149725,
     "auc": 0.5323025583982203,
     "model": "histgb",
     "for_date": "2026-10-11"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-10-11T12:48:01Z",
+    "ts": "2026-10-11T18:01:31Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.0038815208062657584,
-    "next_day_return_pred": 0.0038815208062657584,
-    "prob_up": 0.36646738079664665,
-    "rmse": 0.03468911898490791,
-    "auc": 0.4658530078698146,
+    "predicted_return": -0.0039260304323709624,
+    "next_day_return_pred": -0.0039260304323709624,
+    "prob_up": 0.4468952915279261,
+    "rmse": 0.03468719847869361,
+    "auc": 0.4688000355808575,
     "model": "histgb",
     "for_date": "2026-10-11"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-10-11T12:48:01Z",
+    "ts": "2026-10-11T18:01:32Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,11 +57,11 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.015599580351791775,
-    "next_day_return_pred": -0.015599580351791775,
-    "prob_up": 0.39154326601745426,
-    "rmse": 0.03697955839119352,
-    "auc": 0.4920984686609687,
+    "predicted_return": 0.024307106833090272,
+    "next_day_return_pred": 0.024307106833090272,
+    "prob_up": 0.8274468072023264,
+    "rmse": 0.03705320014958642,
+    "auc": 0.4915461624026697,
     "model": "histgb",
     "for_date": "2026-10-11"
   }
