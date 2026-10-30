@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-10-30T07:01:05Z",
+    "ts": "2026-10-30T12:53:22Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": 0.005605587086864171,
-    "next_day_return_pred": 0.005605587086864171,
-    "prob_up": 0.654084205476902,
-    "rmse": 0.024902822648916537,
-    "auc": 0.4693732193732193,
+    "predicted_return": -0.008506637544946747,
+    "next_day_return_pred": -0.008506637544946747,
+    "prob_up": 0.27455517040675553,
+    "rmse": 0.024883837054261795,
+    "auc": 0.4745445637165382,
     "model": "histgb",
     "for_date": "2026-10-30"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-10-30T07:01:06Z",
+    "ts": "2026-10-30T12:53:22Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.009092006476532896,
-    "next_day_return_pred": -0.009092006476532896,
-    "prob_up": 0.5594338397853621,
-    "rmse": 0.03430009351485269,
-    "auc": 0.5024226529160739,
+    "predicted_return": -0.008864000613089276,
+    "next_day_return_pred": -0.008864000613089276,
+    "prob_up": 0.2515490152408807,
+    "rmse": 0.03430202877591914,
+    "auc": 0.5080003555713588,
     "model": "histgb",
     "for_date": "2026-10-30"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-10-30T07:01:07Z",
+    "ts": "2026-10-30T12:53:23Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0004287919710791153,
-    "next_day_return_pred": -0.0004287919710791153,
-    "prob_up": 0.40909651420897175,
-    "rmse": 0.03755650702789367,
+    "predicted_return": -0.006365071357711166,
+    "next_day_return_pred": -0.006365071357711166,
+    "prob_up": 0.3062973641074099,
+    "rmse": 0.037530864093200146,
     "auc": 0.5053392658509455,
     "model": "histgb",
     "for_date": "2026-10-30"
