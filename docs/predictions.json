@@ -1,7 +1,7 @@
 [
   {
     "symbol": "BTC",
-    "ts": "2026-11-11T10:45:22Z",
+    "ts": "2026-11-11T14:19:44Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -13,17 +13,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.0005400293591755205,
-    "next_day_return_pred": -0.0005400293591755205,
-    "prob_up": 0.4653220702841887,
-    "rmse": 0.02535242320232553,
-    "auc": 0.4491113981559841,
+    "predicted_return": -0.0019023441736457924,
+    "next_day_return_pred": -0.0019023441736457924,
+    "prob_up": 0.41599166931721393,
+    "rmse": 0.025352902773443115,
+    "auc": 0.45016937065430557,
     "model": "histgb",
     "for_date": "2026-11-11"
   },
   {
     "symbol": "ETH",
-    "ts": "2026-11-11T10:45:23Z",
+    "ts": "2026-11-11T14:19:45Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -35,17 +35,17 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.00014211849227149733,
-    "next_day_return_pred": -0.00014211849227149733,
-    "prob_up": 0.5599604166133076,
-    "rmse": 0.03462846843486771,
-    "auc": 0.5052676031294453,
+    "predicted_return": -0.011166859450588252,
+    "next_day_return_pred": -0.011166859450588252,
+    "prob_up": 0.5795708360987103,
+    "rmse": 0.034615124218297856,
+    "auc": 0.5107560336014934,
     "model": "histgb",
     "for_date": "2026-11-11"
   },
   {
     "symbol": "LINK",
-    "ts": "2026-11-11T10:45:23Z",
+    "ts": "2026-11-11T14:19:46Z",
     "horizon_days": 1,
     "features": [
       "iv",
@@ -57,10 +57,10 @@
       "iv_minus_rv30"
     ],
     "sample_size": 364,
-    "predicted_return": -0.014063688323602738,
-    "next_day_return_pred": -0.014063688323602738,
-    "prob_up": 0.2935180478138312,
-    "rmse": 0.0391153812779853,
+    "predicted_return": -0.01099447084556361,
+    "next_day_return_pred": -0.01099447084556361,
+    "prob_up": 0.28339647708498883,
+    "rmse": 0.039115672347198475,
     "auc": 0.49109686609686615,
     "model": "histgb",
     "for_date": "2026-11-11"
